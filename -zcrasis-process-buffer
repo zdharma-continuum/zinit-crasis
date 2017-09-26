@@ -43,7 +43,7 @@ fi
 # place to break the word into 2 halves (for
 # complete_in_word option)
 
-local i word wordlen tword
+local i word wordlen
 integer char_count=0
 
 # (Z) handles spaces nicely, but we need them for the user
@@ -72,10 +72,7 @@ for (( i=1; i<=nwords; i++ )); do
     # Remember the spaces
     ZCR_PB_SPACES[i]="$MATCH"
 
-    tword="${buf[1,wordlen]}"
-
     # Remove the word
-    [[ "$tword" != "$word" && ${#word} != ${#tword} ]] && { echo "BUG in processing ${buf[1,wordlen]} vs. $word"; return 1; }
     buf="${buf[wordlen+1,-1]}"
 
     # Spaces point to previous shell word
