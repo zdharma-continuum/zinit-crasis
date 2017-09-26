@@ -16,6 +16,7 @@ local -a mbegin mend match
 local MATCH; integer MBEGIN MEND
 
 local buf="$1"
+local len="${#buf}"
 
 # All output variables are either overwritten or cleared
 ZCR_PB_WORDS=( "${(Z+cn+)buf}" )
@@ -63,7 +64,7 @@ for (( i=1; i<=nwords; i++ )); do
     ZCR_PB_SPACES[i]="$MATCH"
 
     # Remove the word
-    buf="${buf[wordlen+1,-1]}"
+    buf="${buf[wordlen+1,len]}"
 done 
 
 # What's left in $buf can be only white spaces
