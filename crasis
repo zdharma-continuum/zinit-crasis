@@ -1,0 +1,244 @@
+# -*- mode: shell-script -*-
+# Started from Zle or from command line
+#
+# Copyright (c) 2017 Sebastian Gniazdowski
+
+-zui_std_cleanup deserialize:"zplugin-crasis"
+-zui_std_init app:"zplugin-crasis" app_name:"Zplugin-Crasis"
+emulate -LR zsh -o extendedglob -o typesetsilent -o warncreateglobal
+-zui_std_init2
+
+-zui_std_store_default_app_config b:border 1
+
+#
+# CONSTANTS
+#
+
+local -A TOKEN_TYPES
+
+TOKEN_TYPES=(
+
+  # Precommand
+
+  'builtin'     1
+  'command'     1
+  'exec'        1
+  'nocorrect'   1
+  'noglob'      1
+  'pkexec'      1
+
+  # Control flow
+  # Tokens that at "command position" are followed by a command
+
+  $'\x7b'   2 # {
+  $'\x28'   2 # (
+  '()'      2
+  'while'   2
+  'until'   2
+  'if'      2
+  'then'    2
+  'elif'    2
+  'else'    2
+  'do'      2
+  'time'    2
+  'coproc'  2
+  '!'       2
+
+  # Command separators
+
+  '|'   3
+  '||'  3
+  ';'   3
+  '&'   3
+  '&&'  3
+  '|&'  3
+  '&!'  3
+  '&|'  3
+)
+#
+# PARAMETERS
+#
+
+# Document to process
+local zshrc_path="${ZDOTDIR:-$HOME}/.zshrc" zshrc
+
+# The bits returned by -zplg-process-buffer
+local token prev_token spaces prev_spaces next_token next_spaces
+
+# Command detection
+integer at_command=1 in_zplugin=0
+
+# Functions
+local fun_name
+integer next_fun=0 cur_fun=0 prev_fun=0
+
+# Depths in functions, i.e. -1 not in function, 0 in one function, etc.
+integer depth=0 prev_depth=0 fun_depth=-1 anon_depth=-1 descentff=0 descentfa=0
+
+# Nested functions tracking
+integer nested_fun=0 next_nested_fun=0 prev_nested_fun=0
+local -a fun_stack_depths
+
+# Common
+local -a mbegin mend match
+local MATCH; integer MBEGIN MEND
+
+#
+# Load zshrc
+#
+
+[[ ! -e "$zshrc_path" ]] && { print "No such file \`$zshrc_path'${ZDOTDIR:+ (using \$ZDOTDIR)}"; return 1; }
+[[ ! -f "$zshrc_path" ]] && { print "\`$zshrc_path' isn't a plain, regular file${ZDOTDIR:+ (using \$ZDOTDIR)}"; return 1; }
+[[ ! -r "$zshrc_path" ]] && { print "No read permissions to \`$zshrc_path'${ZDOTDIR:+ (using \$ZDOTDIR)}"; return 1; }
+[[ ! -w "$zshrc_path" ]] && { print "No write permissions to \`$zshrc_path'${ZDOTDIR:+ (using \$ZDOTDIR)}"; return 1; }
+[[ ! -s "$zshrc_path" ]] && { print "File \`$zshrc_path' is empty, aborting"; return 1; }
+
+local zshrc="$(<$zshrc_path)"
+
+-zcrasis-parse-zsh-rc() {
+    -zcrasis-process-buffer "$zshrc" 1
+    integer i size="${#ZCR_PB_WORDS}"
+
+    for (( i=1; i<=size; ++ i )); do
+        token="${ZCR_PB_WORDS[i]}"
+        spaces="${ZCR_PB_SPACES[i]}"
+        next_token="${ZCR_PB_WORDS[i+1]}"
+        next_spaces="${ZCR_PB_SPACES[i+1]}"
+
+        cur_fun=0 prev_fun=0 descentff=0 descentfa=0
+        nested_fun=0 prev_nested_fun=0
+
+        (( next_fun )) && { next_fun=0 cur_fun=1 prev_fun=0 anon_depth=-1; }
+        (( next_nested_fun )) && { next_nested_fun=0 nested_fun=1 prev_nested_fun=0; }
+
+        # Explicit future-function
+        if [[ "$token" = "function" && ( "$fun_depth" -lt 0 ) && ( $anon_depth -lt 0 ) ]]; then
+            next_fun=1 cur_fun=0 prev_fun=0 anon_depth=-1
+        # Detect top-level prev-function differentiating from anonymous function
+        elif [[ "$token" = "()" && ( "$fun_depth" -lt 0 ) && ( $anon_depth -lt 0 ) ]]; then
+            if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [123] ]]; then
+                next_fun=0 cur_fun=0 prev_fun=0 anon_depth=$depth
+            else
+                next_fun=0 cur_fun=0 prev_fun=1 anon_depth=-1
+            fi
+        # Must be a nested future-function
+        elif [[ "$token" = "function" ]]; then
+            next_nested_fun=1 nested_fun=0 prev_nested_fun=0
+        # Is it a nested prev-function?
+        elif [[ "$token" = "()" && "$nested_fun" -eq 0 && "$depth" -gt "$fun_stack_depths[-1]" ]]; then
+            if [[ "$spaces" != *$'\n'* && -n "$prev_token" && "${TOKEN_TYPES[$prev_token]}" != [123] ]]; then
+                next_nested_fun=0 nested_fun=0 prev_nested_fun=1
+            fi
+        elif [[ "$token" = "{" ]]; then
+            (( ++ depth ))
+        elif [[ "$token" = "}" ]]; then
+            (( -- depth ))
+        fi
+
+        # Check if any final function-flag is raised
+        if (( cur_fun )); then
+            fun_name="$token"
+            fun_depth="$depth"
+            fun_stack_depths+=( "$depth" )
+        elif (( prev_fun )); then
+            fun_name="$prev_token"
+            fun_depth="$depth"
+            fun_stack_depths+=( "$depth" )
+        fi
+
+        # Track nested functions
+        if (( nested_fun + prev_nested_fun )); then
+            fun_stack_depths+=( "$depth" )
+        fi
+
+        # Ascent to function - skip '{'
+        if (( fun_depth >= 0 && depth == (fun_depth + 1) )) && [[ "$token" = "{" ]]; then
+            :
+        # In function
+        elif (( fun_depth >= 0 && depth > fun_depth )); then
+            if [[ "$token" != [[:space:]]#\#* ]]; then
+                : # do something with a non-comment function line
+            fi
+            # Handle descent from nested function
+            if (( ${#fun_stack_depths} > 0 && depth == fun_stack_depths[-1] && prev_depth == fun_stack_depths[-1] + 1 )); then
+                fun_stack_depths[-1]=()
+            fi
+        # In anonymous-function
+        elif (( anon_depth >= 0 && depth > anon_depth )); then
+            if (( ${#fun_stack_depths} > 0 && depth == fun_stack_depths[-1] && prev_depth == fun_stack_depths[-1] + 1 )); then
+                fun_stack_depths[-1]=()
+            fi
+        # Descent from function - skip '}'
+        elif (( fun_depth >= 0 && depth == fun_depth && prev_depth == fun_depth + 1 )); then
+            descentff=1
+        # Descent from anon
+        elif (( anon_depth >= 0 && depth == anon_depth && prev_depth == anon_depth + 1 )); then
+            descentfa=1
+        fi
+
+        # Anon function in top-level
+        if (( anon_depth >= 0 && fun_depth < 0 )); then
+            [[ "$token" != [[:space:]]#\#* ]] && : # do something with non-comment anon-function line
+        fi
+
+        # Check for introduction of Zplugin call
+        if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [123] ]]; then
+            at_command=1
+            in_zplugin=0
+        fi
+
+        if (( at_command )); then
+            at_command=0
+            # Zplugin call not in function
+            if [[ "$cur_fun" -eq 0 && "$next_token" != "()" && "$fun_stack_depths[-1]" -le "0" ]]; then
+                if [[ "$token" = (zplugin|zplg) ]]; then
+                    in_zplugin=1
+                fi
+            fi
+        elif (( in_zplugin )); then
+            : # do something with Zplugin-related lines
+        fi
+
+        # Late disable of anonymous function
+        if (( descentfa )); then
+            anon_depth=-1
+        # Late disable of normal function
+        elif (( descentff )); then
+            fun_name=""
+            fun_depth=-1
+            fun_stack_depths[-1]=()
+        # No-function text gathering
+        elif (( next_fun == 0 && cur_fun == 0 && prev_fun == 0 && anon_depth < 0 && fun_depth < 0 )); then
+            if [[ "$next_token" != "()" || "$next_spaces" = *$'\n'* || "${TOKEN_TYPES[$token]}" = 3 ]]; then
+                [[ "$token" != [[:space:]]#\#* ]] && : # do something with script-body text
+            fi
+        fi
+
+        # History of state
+        prev_depth="$depth"
+        prev_token="$token"
+        prev_spaces="$spaces"
+    done
+}
+
+# Generator for module 1
+-zcrasis_generator_A() {
+    local mod="$1" ice="$2"
+
+    # Content
+    reply=( "Hello World from ${ZUI[YELLOW]}ZUI${ZUI[FMT_END]}! Module $mod, instance $ice." )
+
+    # Non-selectable lines   Hops to jump with [ and ]   Local anchors
+    reply2=( )               reply3=( 1 )                reply4=( )
+}
+
+-zcrasis-parse-zsh-rc
+
+## Start application ##
+zui-event-loop 1:-zcrasis_generator_A
+
+-zui_std_cleanup serialize
+
+return 0
+
+# vim:ft=zsh
