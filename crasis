@@ -160,7 +160,7 @@ local zshrc="$(<$zshrc_path)"
         # In function
         elif (( fun_depth >= 0 && depth > fun_depth )); then
             if [[ "$token" != [[:blank:]]#\#* ]]; then
-                : # do something with a non-comment function line
+                : # do something with a non-comment function token
             fi
             # Handle descent from nested function
             if (( ${#fun_stack_depths} > 0 && depth == fun_stack_depths[-1] && prev_depth == fun_stack_depths[-1] + 1 )); then
@@ -181,7 +181,7 @@ local zshrc="$(<$zshrc_path)"
 
         # Anon function in top-level
         if (( anon_depth >= 0 && fun_depth < 0 )); then
-            [[ "$token" != [[:blank:]]#\#* ]] && : # do something with non-comment anon-function line
+            [[ "$token" != [[:blank:]]#\#* ]] && : # do something with non-comment anon-function token
         fi
 
         # Check for introduction of Zplugin call
@@ -219,7 +219,7 @@ local zshrc="$(<$zshrc_path)"
         # No-function text gathering
         elif (( next_fun == 0 && cur_fun == 0 && prev_fun == 0 && anon_depth < 0 && fun_depth < 0 )); then
             if [[ "$next_token" != "()" || "$next_spaces" = *$'\n'* || "${TOKEN_TYPES[$token]}" = 3 ]]; then
-                [[ "$token" != [[:blank:]]#\#* ]] && : # do something with script-body text
+                [[ "$token" != [[:blank:]]#\#* ]] && : # do something with script-body token
             fi
         fi
 
