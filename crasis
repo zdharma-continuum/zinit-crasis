@@ -234,7 +234,14 @@ local zshrc="$(<$zshrc_path)"
     done
 
     (( pre_block_end == 0 )) && pre_block_end=2*(i-1)
-    (( post_block_begin == 0 )) && post_block_begin=2*i-1
+    (( post_block_begin == 0 )) && post_block_begin=2*i-1 || {
+        # Detect not related trailing comments
+        for (( j=(post_block_begin+1)/2-1; j >= 1; j -- )); do
+            [[ "${ZCR_PB_WORDS[j]}" = [[:blank:]]#\#* && "${ZCR_PB_WORDS[j]}" != [[:blank:]]#\#[[:blank:]]#zplugin* ]] && {
+                post_block_begin=2*j-1
+            } || break
+        done
+    }
 }
 
 # Generator for module 1
