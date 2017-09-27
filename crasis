@@ -100,7 +100,7 @@ local zshrc="$(<$zshrc_path)"
 
 -zcrasis-parse-zsh-rc() {
     -zcrasis-process-buffer "$zshrc" 1
-    integer i size="${#ZCR_PB_WORDS}"
+    integer i j size="${#ZCR_PB_WORDS}"
 
     for (( i=1; i<=size; ++ i )); do
         token="${ZCR_PB_WORDS[i]}"
@@ -188,7 +188,7 @@ local zshrc="$(<$zshrc_path)"
         if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [123] ]]; then
             at_command=1
             (( in_zplugin )) && post_block_begin=2*i-1
-            in_zplugin=0
+            [[ "$token" != [[:blank:]]#\#* ]] && in_zplugin=0 || { (( in_zplugin )) && in_zplugin=1; }
         fi
 
         # Command token
@@ -198,7 +198,11 @@ local zshrc="$(<$zshrc_path)"
             if [[ "$cur_fun" -eq 0 && "$next_token" != "()" && "$fun_stack_depths[-1]" -le "0" ]]; then
                 if [[ "$token" = (zplugin|zplg) ]]; then
                     in_zplugin=1
-                    (( was_zplugin == 0 )) && pre_block_end=2*(i-1)
+                    (( was_zplugin == 0 )) && {
+                        for (( j=i-1; j >= 1; j -- )); do
+                            [[ "${ZCR_PB_WORDS[j]}" != [[:blank:]]#\#* || "${ZCR_PB_SPACES[j+1]}" = *$'\n'*$'\n'* ]] && { pre_block_end=2*j; break; }
+                        done
+                    }
                     was_zplugin=1
                 fi
             fi
