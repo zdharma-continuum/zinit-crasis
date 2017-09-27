@@ -7,6 +7,7 @@
 # ZCR_PB_WORDS - split of "$1" into shell words; array
 # ZCR_PB_WORDS_BEGINNINGS - indexes of first letters of corresponding words in ZCR_PB_WORDS
 # ZCR_PB_SPACES - white spaces before corresponding words in ZCR_PB_WORDS
+# ZCR_PB_ALL - spaces and words, together
 #
 
 emulate -LR zsh
@@ -20,12 +21,13 @@ local len="${#buf}"
 
 # All output variables are either overwritten or cleared
 ZCR_PB_WORDS=( "${(Z+cn+)buf}" )
-ZCR_PB_SPACES=( )
-ZCR_PB_WORDS_BEGINNINGS=( )
+ZCR_PB_SPACES=()
+ZCR_PB_WORDS_BEGINNINGS=()
+ZCR_PB_ALL=()
 
 # (Z+n+) will return 1 element for buf that is empty or only whitespace
 if [[ "$buf" = ( |$'\t')# ]]; then
-    ZCR_PB_WORDS=( )
+    ZCR_PB_WORDS=()
     integer nwords=0
 else
     integer nwords="${#ZCR_PB_WORDS}"
@@ -63,12 +65,16 @@ for (( i=1; i<=nwords; i++ )); do
     # Remember the spaces
     ZCR_PB_SPACES[i]="$MATCH"
 
+    # Store full data
+    ZCR_PB_ALL+=( "$MATCH" "$word" )
+
     # Remove the word
     buf="${buf[wordlen+1,len]}"
 done 
 
 # What's left in $buf can be only white spaces
 ZCR_PB_SPACES[i]="$buf"
+ZCR_PB_ALL+=( "$buf" )
 
 return 0
 
