@@ -79,6 +79,9 @@ integer depth=0 prev_depth=0 fun_depth=-1 anon_depth=-1 descentff=0 descentfa=0
 integer nested_fun=0 next_nested_fun=0 prev_nested_fun=0
 local -a fun_stack_depths
 
+# Text data
+integer was_zplugin=0 pre_block_end=0 post_block_begin=0
+
 # Common
 local -a mbegin mend match
 local MATCH; integer MBEGIN MEND
@@ -184,18 +187,24 @@ local zshrc="$(<$zshrc_path)"
         # Check for introduction of Zplugin call
         if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [123] ]]; then
             at_command=1
+            (( in_zplugin )) && post_block_begin=2*i-1
             in_zplugin=0
         fi
 
+        # Command token
         if (( at_command )); then
             at_command=0
             # Zplugin call not in function
             if [[ "$cur_fun" -eq 0 && "$next_token" != "()" && "$fun_stack_depths[-1]" -le "0" ]]; then
                 if [[ "$token" = (zplugin|zplg) ]]; then
                     in_zplugin=1
+                    (( was_zplugin == 0 )) && pre_block_end=2*(i-1)
+                    was_zplugin=1
                 fi
             fi
-        elif (( in_zplugin )); then
+        fi
+
+        if (( in_zplugin )); then
             : # do something with Zplugin-related lines
         fi
 
@@ -219,6 +228,9 @@ local zshrc="$(<$zshrc_path)"
         prev_token="$token"
         prev_spaces="$spaces"
     done
+
+    (( pre_block_end == 0 )) && pre_block_end=2*(i-1)
+    (( post_block_begin == 0 )) && post_block_begin=2*i-1
 }
 
 # Generator for module 1
