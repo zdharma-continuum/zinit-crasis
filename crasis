@@ -257,6 +257,87 @@ local zshrc="$(<$zshrc_path)"
     }
 }
 
+# Processes block with zplugin commands established in
+# -zcrasis-process-zsh-rc() and generates $commands
+# array which holds serialized hashes of every zplugin
+# invocation, mixed-in additional commands, comments.
+-zcrasis-process-zplugin-commands() {
+    # From start to end of zplugin block
+    for (( i=(pre_block_end/2)+1; i<=(post_block_begin+1)/2-1; ++ i )); do
+        token="${ZCR_PB_WORDS[i]}"
+        spaces="${ZCR_PB_SPACES[i]}"
+        next_token="${ZCR_PB_WORDS[i+1]}"
+        next_spaces="${ZCR_PB_SPACES[i+1]}"
+
+        # New command?
+        if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [123] ]]; then
+            in_zplugin=1
+
+            if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
+                commands[coidx+1]="${(j: :)${(qkv)cmd3[@]}}"
+            elif [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" != "ice" ]]; then
+                commands[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
+                coidx+=3
+            fi
+
+            cmd3=()
+        fi
+
+        # Command token
+        if [[ "$token" = [[:blank:]]#\#* ]]; then
+            if (( in_zplugin == 1 )); then
+                commands[coidx]+="$token"$'\n'
+            else
+                cmd3[comment]="$token"
+            fi
+        elif (( in_zplugin == 1 )); then
+            [[ "$token" = (zplugin|zplg) ]] && cmd3[c]="zplugin" || cmd3[c]="$token"
+            # Postpone current state to next token
+            [[ "$token" = ":" ]] && { cmd3[disabled]=1; (( in_zplugin -- )); }
+        elif (( in_zplugin == 2 )); then
+            if [[ "${cmd3[c]}" = "zplugin" ]]; then
+                [[ "$token" = (ice|load|light|snippet|cdclear|cdreplay) ]] && cmd3[sub]="$token" || { cmd3[sub]="unkn"; cmd3[unkn]="$token"; }
+            else
+                cmd3[arg_1]="$token"
+            fi
+        else
+            if [[ "${cmd3[sub]}" = "ice" ]]; then
+                [[ "$token" = (#b)(from|proto|report|depth|blockf|atload|atpull|atclone|if)(*) ]] && cmd3[${match[1]}]="${match[2]}"
+            elif [[ "${cmd3[sub]}" = (load|light) ]]; then
+                cmd3[url]="$token"
+            elif [[ "${cmd3[sub]}" = "snippet" ]]; then
+                [[ "$token" = "-f" ]] && cmd3[-f]="1" || {
+                    [[ "$token" = "--command" ]] && cmd3[--command]="1" || {
+                        cmd3[url]="$token"
+                    }
+                }
+            elif [[ "${cmd3[sub]}" = "cdclear" ]]; then
+                [[ "$token" = "-q" ]] && cmd3[-q]="1"
+            elif [[ "${cmd3[sub]}" = "cdreplay" ]]; then
+                :
+            elif [[ "${cmd3[sub]}" = "unkn" ]]; then
+                # Argument following "zplugin <unknown> ..."
+                cmd3[arg_$(( in_zplugin - 2 ))]="$token"
+            else
+                # Argument following "<unknown> <arg_1> ..."
+                cmd3[arg_$(( in_zplugin - 1 ))]="$token"
+            fi
+        fi
+
+        # Advance deeper into "zplugin ..." if it wasn't comment
+        #[[ "$token" != [[:blank:]]#\#* ]] && in_zplugin+=1
+        in_zplugin+=1
+    done
+
+    if [[ -n "${cmd3[c]}" ]];then
+        if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
+            commands[coidx+1]="${(j: :)${(qkv)cmd3[@]}}"
+        elif [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" != "ice" ]]; then
+            commands[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
+        fi
+    fi
+}
+
 # Generator for module 1
 -zcrasis_generator_A() {
     local mod="$1" ice="$2"
@@ -270,6 +351,7 @@ local zshrc="$(<$zshrc_path)"
 
 -zcrasis-tokenize-zsh-rc
 -zcrasis-process-zsh-rc
+-zcrasis-process-zplugin-commands
 
 ## Start application ##
 zui-event-loop 1:-zcrasis_generator_A
