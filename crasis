@@ -98,8 +98,18 @@ local MATCH; integer MBEGIN MEND
 
 local zshrc="$(<$zshrc_path)"
 
--zcrasis-parse-zsh-rc() {
+# Runs -zcrasis-process-buffer() on $zshrc (containing
+# the loaded zshrc)
+-zcrasis-tokenize-zsh-rc() {
     -zcrasis-process-buffer "$zshrc" 1
+}
+
+# Parses tokens of the loaded zshrc and detects:
+# - functions
+# - block preceding zplugin commands
+# - block with those commands
+# - block following them
+-zcrasis-process-zsh-rc() {
     integer i j size="${#ZCR_PB_WORDS}"
 
     for (( i=1; i<=size; ++ i )); do
@@ -255,7 +265,8 @@ local zshrc="$(<$zshrc_path)"
     reply2=( )               reply3=( 1 )                reply4=( )
 }
 
--zcrasis-parse-zsh-rc
+-zcrasis-tokenize-zsh-rc
+-zcrasis-process-zsh-rc
 
 ## Start application ##
 zui-event-loop 1:-zcrasis_generator_A
