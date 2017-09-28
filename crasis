@@ -206,7 +206,7 @@ local zshrc="$(<$zshrc_path)"
             at_command=0
             # Zplugin call not in function
             if [[ "$cur_fun" -eq 0 && "$next_token" != "()" && "$fun_stack_depths[-1]" -le "0" ]]; then
-                if [[ "$token" = (zplugin|zplg) ]]; then
+                if [[ "$token" = (zplugin|zplg) || ( "$token" = ":" && "$next_token" = (zplugin|zplg) ) ]]; then
                     in_zplugin=1
                     (( was_zplugin == 0 )) && {
                         for (( j=i-1; j >= 1; j -- )); do
@@ -214,6 +214,9 @@ local zshrc="$(<$zshrc_path)"
                         done
                     }
                     was_zplugin=1
+
+                    # Revive at_command mode if disabled zplugin command
+                    [[ "$token" = ":" ]] && at_command=1
                 fi
             fi
         fi
