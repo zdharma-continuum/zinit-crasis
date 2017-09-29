@@ -484,6 +484,14 @@ local zshrc="$(<$zshrc_path)"
 
         reply+=( "${ZUI[MAGENTA]}${(l:2::0:)ice}.${ZUI[FMT_END]} ${output[1]} ${output[2]} P ${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
         reply+=( "${output[3]} ${output[4]}" )
+    elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
+        reply+=( "${ZUI[MAGENTA]}${(l:2::0:)ice}.${ZUI[FMT_END]} ${output[1]} ${output[2]} cdreplay" )
+        reply+=( "${output[3]}" )
+    elif [[ "${main_cmd[sub]}" = "cdclear" ]]; then
+        reply+=( "${ZUI[MAGENTA]}${(l:2::0:)ice}.${ZUI[FMT_END]} ${output[1]} ${output[2]} cdclear" )
+        reply+=( "${output[3]}" )
+    else
+        reply+=( "Unknown command" )
     fi
 
     # Instead of debugging ZUI, I've added '-1' here
@@ -494,6 +502,7 @@ local zshrc="$(<$zshrc_path)"
     reply2=( )               reply3=( 1 )                reply4=( move_up_${mod}_${ice} move_down_${mod}_${ice} )
 }
 
+print "Parsing zshrc..."
 -zcrasis-tokenize-zsh-rc
 -zcrasis-process-zsh-rc
 -zcrasis-process-zplugin-commands
