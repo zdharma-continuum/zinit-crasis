@@ -346,13 +346,48 @@ local zshrc="$(<$zshrc_path)"
 
 # Generator for module 1
 -zcrasis_generator_A() {
-    local mod="$1" ice="$2"
+    local mod="$1" ice="$2" comment
+    local -a cmd output
+    local -A ice_cmd main_cmd
+    local dis_col mode_col disabled_text
 
-    # Content
-    reply=( "Hello World from ${ZUI[YELLOW]}ZUI${ZUI[FMT_END]}! Module $mod, instance $ice." )
+    comment="${cmd[1]}"
+    cmd=( "${(@)commands[(ice-1)*3+1,ice*3+1]}" )
+    [[ -n "${cmd[2]}" ]] && ice_cmd=( "${(z@)cmd[2]}" )
+    [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" )
+
+    # "DISABLED" or "Enabled"
+    [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || main_cmd[disabled]=${ZUI[toggle_dis_${mod}_${ice}]}
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "dis_col" "${ZUI[RED]}" "${ZUI[GREEN]}"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "DISABLED" "Enabled"
+
+    output=()
+    -zui_std_rc_button "toggle_dis_${mod}_${ice}" "${dis_col}${disabled_text}${ZUI[FMT_END]}" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
+
+    reply=()
+    if [[ "${main_cmd[sub]}" = "snippet" ]]; then
+        reply+=( "[snippet] ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]}" )
+        reply+=( "${output[1]}" )
+    elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
+        #
+        # Mode: light or normal ("load")
+        #
+
+        [[ -z "${ZUI[toggle_mode_${mod}_${ice}]}" ]] && ZUI[toggle_mode_${mod}_${ice}]="${main_cmd[sub]}" || main_cmd[sub]=${ZUI[toggle_mode_${mod}_${ice}]}
+        -zui_util_map_bools "[[ \"${ZUI[toggle_mode_${mod}_${ice}]}\" = light ]]" "mode_col" "${ZUI[YELLOW]}" "${ZUI[GREEN]}"
+        local mode_text="Mode: ${mode_col}${main_cmd[sub]}${ZUI[FMT_END]}"
+        -zui_std_rc_button "toggle_mode_${mod}_${ice}" "$mode_text" '[[ ${ZUI[toggle_mode_'"${mod}_${ice}"']} = light ]] && ZUI[toggle_mode_'"${mod}_${ice}"']=load || ZUI[toggle_mode_'"${mod}_${ice}"']=light; -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
+
+        #
+        # Document
+        #
+
+        reply+=( "[plugin] ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]}" )
+        reply+=( "${output[1]} ${output[2]}" )
+    fi
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
-    reply2=( )               reply3=( 1 )                reply4=( )
+    reply2=( 1 )               reply3=( 1 )                reply4=( )
 }
 
 -zcrasis-tokenize-zsh-rc
@@ -360,7 +395,7 @@ local zshrc="$(<$zshrc_path)"
 -zcrasis-process-zplugin-commands
 
 ## Start application ##
-zui-event-loop 1:-zcrasis_generator_A
+zui-event-loop $(( ${#commands} / 3 )):-zcrasis_generator_A
 
 -zui_std_cleanup serialize
 
