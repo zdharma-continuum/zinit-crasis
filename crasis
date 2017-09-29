@@ -347,7 +347,7 @@ local zshrc="$(<$zshrc_path)"
 # Moves given instance ($ice) up, i.e. swaps
 # current and previous instance
 -zcrasis_move_up() {
-    local mod="$1" ice="$2"
+    local mod="$1" ice="$2" tmp
 
     local -a cmd1 cmd2
 
@@ -356,12 +356,28 @@ local zshrc="$(<$zshrc_path)"
 
     commands[(ice-1-1)*3+1,(ice-1)*3+1]=( "${cmd2[@]}" )
     commands[(ice-1)*3+1,ice*3+1]=( "${cmd1[@]}" )
+
+    tmp="${ZUI[toggle_dis_${mod}_${ice}]}"
+    ZUI[toggle_dis_${mod}_${ice}]="${ZUI[toggle_dis_${mod}_$(( ice-1 ))]}"
+    ZUI[toggle_dis_${mod}_$(( ice-1 ))]="$tmp"
+
+    tmp="${ZUI[toggle_command_${mod}_${ice}]}"
+    ZUI[toggle_command_${mod}_${ice}]="${ZUI[toggle_command_${mod}_$(( ice-1 ))]}"
+    ZUI[toggle_command_${mod}_$(( ice-1 ))]="$tmp"
+
+    tmp="${ZUI[toggle_force_${mod}_${ice}]}"
+    ZUI[toggle_force_${mod}_${ice}]="${ZUI[toggle_force_${mod}_$(( ice-1 ))]}"
+    ZUI[toggle_force_${mod}_$(( ice-1 ))]="$tmp"
+
+    tmp="${ZUI[toggle_mode_${mod}_${ice}]}"
+    ZUI[toggle_mode_${mod}_${ice}]="${ZUI[toggle_mode_${mod}_$(( ice-1 ))]}"
+    ZUI[toggle_mode_${mod}_$(( ice-1 ))]="$tmp"
 }
 
 # Moves given instance ($ice) down, i.e. swaps
 # current and next instance
 -zcrasis_move_down() {
-    local mod="$1" ice="$2"
+    local mod="$1" ice="$2" tmp
 
     local -a cmd1 cmd2
 
@@ -370,6 +386,22 @@ local zshrc="$(<$zshrc_path)"
 
     commands[(ice-1)*3+1,ice*3+1]=( "${cmd2[@]}" )
     commands[(ice-1+1)*3+1,(ice+1)*3+1]=( "${cmd1[@]}" )
+
+    tmp="${ZUI[toggle_dis_${mod}_${ice}]}"
+    ZUI[toggle_dis_${mod}_${ice}]="${ZUI[toggle_dis_${mod}_$(( ice+1 ))]}"
+    ZUI[toggle_dis_${mod}_$(( ice+1 ))]="$tmp"
+
+    tmp="${ZUI[toggle_command_${mod}_${ice}]}"
+    ZUI[toggle_command_${mod}_${ice}]="${ZUI[toggle_command_${mod}_$(( ice+1 ))]}"
+    ZUI[toggle_command_${mod}_$(( ice+1 ))]="$tmp"
+
+    tmp="${ZUI[toggle_force_${mod}_${ice}]}"
+    ZUI[toggle_force_${mod}_${ice}]="${ZUI[toggle_force_${mod}_$(( ice+1 ))]}"
+    ZUI[toggle_force_${mod}_$(( ice+1 ))]="$tmp"
+
+    tmp="${ZUI[toggle_mode_${mod}_${ice}]}"
+    ZUI[toggle_mode_${mod}_${ice}]="${ZUI[toggle_mode_${mod}_$(( ice+1 ))]}"
+    ZUI[toggle_mode_${mod}_$(( ice+1 ))]="$tmp"
 }
 
 # Generator for module 1
