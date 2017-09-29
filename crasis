@@ -388,7 +388,7 @@ local zshrc="$(<$zshrc_path)"
         # Document
         #
 
-        reply+=( "${ZUI[MAGENTA]}${(l:2::0:)ice}.${ZUI[FMT_END]} (S) ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]}" )
+        reply+=( "${ZUI[MAGENTA]}${(l:2::0:)ice}.${ZUI[FMT_END]} S ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]}" )
         reply+=( "${output[1]} ${output[2]} ${output[3]}" )
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
         #
@@ -404,7 +404,7 @@ local zshrc="$(<$zshrc_path)"
         # Document
         #
 
-        reply+=( "${ZUI[MAGENTA]}${(l:2::0:)ice}.${ZUI[FMT_END]} (P) ${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
+        reply+=( "${ZUI[MAGENTA]}${(l:2::0:)ice}.${ZUI[FMT_END]} P ${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
         reply+=( "${output[1]} ${output[2]}" )
     fi
 
