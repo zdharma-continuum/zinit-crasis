@@ -80,8 +80,11 @@ integer depth=0 prev_depth=0 fun_depth=-1 anon_depth=-1 descentff=0 descentfa=0
 integer nested_fun=0 next_nested_fun=0 prev_nested_fun=0
 local -a fun_stack_depths
 
-# Text data
+# Text and commands data
 integer was_zplugin=0 pre_block_end=0 post_block_begin=0
+local -A cmd3
+local -a commands
+integer coidx=1
 
 # Common
 local -a mbegin mend match
