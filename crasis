@@ -225,10 +225,6 @@ local zshrc="$(<$zshrc_path)"
             fi
         fi
 
-        if (( in_zplugin )); then
-            : # do something with Zplugin-related lines
-        fi
-
         # Late disable of anonymous function
         if (( descentfa )); then
             anon_depth=-1
