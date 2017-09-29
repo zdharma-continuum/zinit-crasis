@@ -306,7 +306,11 @@ local zshrc="$(<$zshrc_path)"
             if [[ "${cmd3[sub]}" = "ice" ]]; then
                 [[ "$token" = (#b)(from|proto|report|depth|blockf|atload|atpull|atclone|if)(*) ]] && cmd3[${match[1]}]="${match[2]}"
             elif [[ "${cmd3[sub]}" = (load|light) ]]; then
-                cmd3[url]="$token"
+                if (( in_zplugin == 4 )); then
+                    cmd3[url]+="/$token"
+                else
+                    cmd3[url]="$token"
+                fi
             elif [[ "${cmd3[sub]}" = "snippet" ]]; then
                 [[ "$token" = "-f" ]] && cmd3[-f]="1" || {
                     [[ "$token" = "--command" ]] && cmd3[--command]="1" || {
