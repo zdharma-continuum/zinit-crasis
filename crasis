@@ -391,8 +391,17 @@ local zshrc="$(<$zshrc_path)"
     var_name1="my_mod${mod}_ice${ice}_size"
     var_name2="my_mod${mod}_ice$(( ice+1 ))_size"
 
-    -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "${ZUI[YELLOW]}[Up]${ZUI[FMT_END]}" "-zcrasis_move_up $mod $ice" output
-    -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "${ZUI[YELLOW]}[Down]${ZUI[FMT_END]}" "-zcrasis_move_down $mod $ice" output
+    if [[ "$ice" -gt 1 ]]; then
+        -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "${ZUI[YELLOW]}[Up]${ZUI[FMT_END]}" "-zcrasis_move_up $mod $ice" output
+    else
+        output+=( "[Up]" )
+    fi
+
+    if [[ "$ice" -lt $(( ${#commands} / 3 )) ]]; then
+        -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "${ZUI[YELLOW]}[Down]${ZUI[FMT_END]}" "-zcrasis_move_down $mod $ice" output
+    else
+        output+=( "[Down]" )
+    fi
 
     # "DISABLED" or "Enabled"
     [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || main_cmd[disabled]=${ZUI[toggle_dis_${mod}_${ice}]}
