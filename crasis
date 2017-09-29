@@ -344,24 +344,61 @@ local zshrc="$(<$zshrc_path)"
     fi
 }
 
+# Moves given instance ($ice) up, i.e. swaps
+# current and previous instance
+-zcrasis_move_up() {
+    local mod="$1" ice="$2"
+
+    local -a cmd1 cmd2
+
+    cmd1=( "${(@)commands[(ice-1-1)*3+1,(ice-1)*3+1]}" )
+    cmd2=( "${(@)commands[(ice-1)*3+1,ice*3+1]}" )
+
+    commands[(ice-1-1)*3+1,(ice-1)*3+1]=( "${cmd2[@]}" )
+    commands[(ice-1)*3+1,ice*3+1]=( "${cmd1[@]}" )
+}
+
+# Moves given instance ($ice) down, i.e. swaps
+# current and next instance
+-zcrasis_move_down() {
+    local mod="$1" ice="$2"
+
+    local -a cmd1 cmd2
+
+    cmd1=( "${(@)commands[(ice-1)*3+1,ice*3+1]}" )
+    cmd2=( "${(@)commands[(ice-1+1)*3+1,(ice+1)*3+1]}" )
+
+    commands[(ice-1)*3+1,ice*3+1]=( "${cmd2[@]}" )
+    commands[(ice-1+1)*3+1,(ice+1)*3+1]=( "${cmd1[@]}" )
+}
+
 # Generator for module 1
 -zcrasis_generator_A() {
     local mod="$1" ice="$2" comment
     local -a cmd output
     local -A ice_cmd main_cmd
-    local dis_col mode_col command_col disabled_text
+    local var_name1 var_name2
+    local dis_col mode_col command_col force_col disabled_text
 
     comment="${cmd[1]}"
     cmd=( "${(@)commands[(ice-1)*3+1,ice*3+1]}" )
     [[ -n "${cmd[2]}" ]] && ice_cmd=( "${(z@)cmd[2]}" )
     [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" )
 
+    output=()
+
+    # "Up", "Down"
+    var_name1="my_mod${mod}_ice${ice}_size"
+    var_name2="my_mod${mod}_ice$(( ice+1 ))_size"
+
+    -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "${ZUI[YELLOW]}[Up]${ZUI[FMT_END]}" "-zcrasis_move_up $mod $ice" output
+    -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "${ZUI[YELLOW]}[Down]${ZUI[FMT_END]}" "-zcrasis_move_down $mod $ice" output
+
     # "DISABLED" or "Enabled"
     [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || main_cmd[disabled]=${ZUI[toggle_dis_${mod}_${ice}]}
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "dis_col" "${ZUI[RED]}" "${ZUI[GREEN]}"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "DISABLED" "Enabled"
 
-    output=()
     -zui_std_rc_button "toggle_dis_${mod}_${ice}" "${dis_col}${disabled_text}${ZUI[FMT_END]}" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
     reply=()
@@ -388,8 +425,8 @@ local zshrc="$(<$zshrc_path)"
         # Document
         #
 
-        reply+=( "${ZUI[MAGENTA]}${(l:2::0:)ice}.${ZUI[FMT_END]} S ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]}" )
-        reply+=( "${output[1]} ${output[2]} ${output[3]}" )
+        reply+=( "${ZUI[MAGENTA]}${(l:2::0:)ice}.${ZUI[FMT_END]} ${output[1]} ${output[2]} S ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]}" )
+        reply+=( "${output[3]} ${output[4]} ${output[5]}" )
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
         #
         # Mode: light or normal ("load")
@@ -404,17 +441,25 @@ local zshrc="$(<$zshrc_path)"
         # Document
         #
 
-        reply+=( "${ZUI[MAGENTA]}${(l:2::0:)ice}.${ZUI[FMT_END]} P ${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
-        reply+=( "${output[1]} ${output[2]}" )
+        reply+=( "${ZUI[MAGENTA]}${(l:2::0:)ice}.${ZUI[FMT_END]} ${output[1]} ${output[2]} P ${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
+        reply+=( "${output[3]} ${output[4]}" )
     fi
 
+    # Instead of debugging ZUI, I've added '-1' here
+    : "${(P)var_name1::=${#reply}-1}"
+
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
-    reply2=( 1 )               reply3=( 1 )                reply4=( )
+    reply2=( )               reply3=( 1 )                reply4=( move_up_${mod}_${ice} move_down_${mod}_${ice} )
 }
 
 -zcrasis-tokenize-zsh-rc
 -zcrasis-process-zsh-rc
 -zcrasis-process-zplugin-commands
+# Create needed local parameters
+integer i
+for (( i=1; i<=${#commands}/3; i++ )); do
+    local my_mod1_ice${i}_size="0"
+done
 
 ## Start application ##
 zui-event-loop $(( ${#commands} / 3 )):-zcrasis_generator_A
