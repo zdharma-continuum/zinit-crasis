@@ -503,6 +503,9 @@ for (( i=1; i<=${#commands}/3; i++ )); do
     local my_mod1_ice${i}_size="0"
 done
 
+# Don't reset current segment on jump
+ZUI[reset_current_segment]="no"
+
 ## Start application ##
 zui-event-loop $(( ${#commands} / 3 )):-zcrasis_generator_A
 
