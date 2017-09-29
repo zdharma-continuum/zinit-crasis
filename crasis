@@ -9,6 +9,7 @@ emulate -LR zsh -o extendedglob -o typesetsilent -o warncreateglobal
 -zui_std_init2
 
 -zui_std_store_default_app_config b:border 1
+-zui_std_store_default_app_config b:top_anchors 0  # no top-anchors
 
 #
 # CONSTANTS
