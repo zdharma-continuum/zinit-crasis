@@ -537,6 +537,11 @@ local zshrc="$(<$zshrc_path)"
 
     # Delete
     -zui_std_rc_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "${ZUI[RED]}Delete${ZUI[FMT_END]}" -zcrasis_delete output
+    if (( ZUI[zc_delete_mode] )); then
+        output[4]+=" "
+    else
+        output[4]=""
+    fi
 
     reply=()
     if [[ "${main_cmd[sub]}" = "snippet" ]]; then
@@ -563,7 +568,7 @@ local zshrc="$(<$zshrc_path)"
         #
 
         reply+=( "$num ${output[1]} ${output[2]} S ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]}" )
-        reply+=( "${output[3]} ${output[4]} ${output[5]} ${output[6]}" )
+        reply+=( "${output[3]} ${output[4]}${output[5]} ${output[6]}" )
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
         #
         # Mode: light or normal ("load")
@@ -579,13 +584,13 @@ local zshrc="$(<$zshrc_path)"
         #
 
         reply+=( "$num ${output[1]} ${output[2]} P ${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
-        reply+=( "${output[3]} ${output[4]} ${output[5]}" )
+        reply+=( "${output[3]} ${output[4]}${output[5]}" )
     elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdreplay" )
-        reply+=( "${output[3]} ${output[4]}" )
+        reply+=( "${output[3]} ${output[4]% }" )
     elif [[ "${main_cmd[sub]}" = "cdclear" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdclear" )
-        reply+=( "${output[3]} ${output[4]}" )
+        reply+=( "${output[3]} ${output[4]% }" )
     else
         # Custom command
         local -a keys
@@ -596,7 +601,7 @@ local zshrc="$(<$zshrc_path)"
             text+=" ${main_cmd[$key]}"
         done
         reply+=( "$num ${output[1]} ${output[2]} $text" )
-        reply+=( "${output[3]} ${output[4]}" )
+        reply+=( "${output[3]} ${output[4]% }" )
     fi
 
     # Instead of debugging ZUI, I've added '-1' here
