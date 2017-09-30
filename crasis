@@ -468,12 +468,13 @@ local zshrc="$(<$zshrc_path)"
 }
 
 -zcrasis_compose() {
+    local with_comments="$1" whole="$2"
     local buf="" tmp comment
     integer i size=$(( ${#commands} / 3 ))
     local -a cmd
     local -A ice_cmd main_cmd
 
-    [[ "$1" = "1" ]] && buf="${(j::)ZCR_PB_ALL[1,pre_block_end]}"
+    [[ "$whole" = "1" ]] && buf="${(j::)ZCR_PB_ALL[1,pre_block_end]}"
 
     for (( i=1; i<=size; ++ i )); do
         cmd=( "${(@)cmdlist[(i-1)*3+1,i*3]}" )
@@ -484,6 +485,9 @@ local zshrc="$(<$zshrc_path)"
 
         ice_cmd=( "${(Qkv)ice_cmd[@]}" )
         main_cmd=( "${(Qkv)main_cmd[@]}" )
+
+        # Comment
+        [[ "$with_comments" = "1" ]] && buf+="$comment"
 
         # ICE
         if [[ "${#ice_cmd}" -ge 1 ]]; then
@@ -528,7 +532,7 @@ local zshrc="$(<$zshrc_path)"
         fi
     done
 
-    [[ "$1" = "1" ]] && buf+="${(j::)ZCR_PB_ALL[post_block_begin,-1]}"
+    [[ "$whole" = "1" ]] && buf+="${(j::)ZCR_PB_ALL[post_block_begin,-1]}"
 
     reply=( "${(@f)buf}" )
 }
