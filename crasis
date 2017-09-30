@@ -548,7 +548,7 @@ local zshrc="$(<$zshrc_path)"
             [[ "$key" != arg_* ]] && continue
             text+=" ${main_cmd[$key]}"
         done
-        reply+=( "$num ${output[1]} ${output[2]} $text" )
+        reply+=( "$num ${output[1]} ${output[2]} ${output[3]} $text" )
     fi
 
     # Instead of debugging ZUI, I've added '-1' here
