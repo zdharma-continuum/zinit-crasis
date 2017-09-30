@@ -460,6 +460,9 @@ local zshrc="$(<$zshrc_path)"
     [[ -n "${cmd[2]}" ]] && ice_cmd=( "${(z@)cmd[2]}" )
     [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" )
 
+    ice_cmd=( "${(Qkv)ice_cmd[@]}" )
+    main_cmd=( "${(Qkv)main_cmd[@]}" )
+
     output=()
 
     # Command number
