@@ -551,6 +551,12 @@ local zshrc="$(<$zshrc_path)"
     reply=( "${(@f)buf}" )
 }
 
+-zcrasis_save() {
+    -zcrasis_compose 1 1
+    print -rl -- "${reply[@]}" >| ~/.myzshrc
+    reply=()
+}
+
 -zcrasis_generator_0() {
     local mod="$1" ice="$2"
     local pv_col dl_col
