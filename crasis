@@ -467,6 +467,71 @@ local zshrc="$(<$zshrc_path)"
     reply=( "$rtext" "" )
 }
 
+-zcrasis_compose() {
+    local buf="" tmp comment
+    integer i size=$(( ${#commands} / 3 ))
+    local -a cmd
+    local -A ice_cmd main_cmd
+
+    [[ "$1" = "1" ]] && buf="${(j::)ZCR_PB_ALL[1,pre_block_end]}"
+
+    for (( i=1; i<=size; ++ i )); do
+        cmd=( "${(@)cmdlist[(i-1)*3+1,i*3]}" )
+        comment="${cmd[1]}"
+        ice_cmd=() main_cmd=()
+        [[ -n "${cmd[2]}" ]] && ice_cmd=( "${(z@)cmd[2]}" )
+        [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" )
+
+        ice_cmd=( "${(Qkv)ice_cmd[@]}" )
+        main_cmd=( "${(Qkv)main_cmd[@]}" )
+
+        # ICE
+        if [[ "${#ice_cmd}" -ge 1 ]]; then
+            buf+="zplugin ice"
+            for tmp in "${(ok@)ice_cmd}"; do
+                case "$tmp" in
+                    (from|proto|report|depth|atload|atpull|atclone|if)
+                        buf+=" $tmp${ice_cmd[$tmp]}"
+                        ;;
+                    (blockf)
+                        buf+=" $tmp"
+                        ;;
+                esac
+            done
+            buf+=$'\n'
+        fi
+
+        # COMMAND
+        if [[ "${#main_cmd}" -ge 1 ]]; then
+            if [[ "${main_cmd[c]}" = (zplugin|zplg) ]]; then
+                if [[ "${main_cmd[sub]}" = (light|load|snippet|cdreplay|cdclear) ]]; then
+                    buf+="zplugin ${main_cmd[sub]}"
+                    [[ -n "${main_cmd[--command]}" ]] && buf+=" --command"
+                    [[ -n "${main_cmd[-f]}" ]] && buf+=" -f"
+                    [[ -n "${main_cmd[-q]}" ]] && buf+=" -q"
+                    [[ -n "${main_cmd[url]}" ]] && buf+=" ${main_cmd[url]}"
+                else
+                    # TODO unknown's arguments
+                    buf+="zplugin ${main_cmd[unkn]}"
+                fi
+            else
+                local -a keys
+                local key text="${main_cmd[c]}"
+                keys=( "${(kon)main_cmd[@]}" )
+                for key in "${keys[@]}"; do
+                    [[ "$key" != arg_* ]] && continue
+                    text+=" ${main_cmd[$key]}"
+                done
+                buf+="$text"
+            fi
+            buf+=$'\n'
+        fi
+    done
+
+    [[ "$1" = "1" ]] && buf+="${(j::)ZCR_PB_ALL[post_block_begin,-1]}"
+
+    reply=( "${(@f)buf}" )
+}
 
 -zcrasis_generator_0() {
     local mod="$1" ice="$2"
@@ -621,31 +686,7 @@ local zshrc="$(<$zshrc_path)"
     size=${#cmdlist}
 
     reply=()
-
-    for (( i=1; i <= size/3; ++ i )); do
-        cmd=( "${(@)cmdlist[(i-1)*3+1,i*3+1]}" )
-        comment="${cmd[1]}"
-        [[ -n "${cmd[2]}" ]] && ice_cmd=( "${(z@)cmd[2]}" )
-        [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" )
-
-        ice_cmd=( "${(Qkv)ice_cmd[@]}" )
-        main_cmd=( "${(Qkv)main_cmd[@]}" )
-
-        if [[ "${main_cmd[sub]}" = (snippet|light|load) ]]; then
-            reply+=( "${main_cmd[url]}" )
-        elif [[ "${main_cmd[sub]}" = (cdreplay|cdclear) ]]; then
-            reply+=( "${main_cmd[sub]}" )
-        else
-            local -a keys
-            local key text="${main_cmd[c]}"
-            keys=( "${(kon)main_cmd[@]}" )
-            for key in "${keys[@]}"; do
-                [[ "$key" != arg_* ]] && continue
-                text+=" ${main_cmd[$key]}"
-            done
-            reply+=( "$text" )
-        fi
-    done
+    -zcrasis_compose
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
