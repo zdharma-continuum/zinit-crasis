@@ -666,11 +666,13 @@ local zshrc="$(<$zshrc_path)"
         # Custom command
         local -a keys
         local key text="${main_cmd[c]}"
+        [[ -n "${main_cmd[unkn]}" ]] && text+=" ${main_cmd[unkn]}"
         keys=( "${(kon)main_cmd[@]}" )
         for key in "${keys[@]}"; do
             [[ "$key" != arg_* ]] && continue
             text+=" ${main_cmd[$key]}"
         done
+        [[ -n "${main_cmd[unkn]}" ]] && text+=" (${ZUI[RED]}Unknown Zplugin subcommand${ZUI[FMT_END]})"
         reply+=( "$num ${output[1]} ${output[2]} $text" )
         reply+=( "${output[3]}${output[4]:+ }${output[4]% }" )
     fi
