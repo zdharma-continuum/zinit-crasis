@@ -360,10 +360,10 @@ local zshrc="$(<$zshrc_path)"
     local -a cmd1 cmd2
 
     cmd1=( "${(@)commands[(ice-1-1)*3+1,(ice-1)*3+1]}" )
-    cmd2=( "${(@)commands[(ice-1)*3+1,ice*3+1]}" )
+    cmd2=( "${(@)commands[(ice-1)*3+1,ice*3]}" )
 
     commands[(ice-1-1)*3+1,(ice-1)*3+1]=( "${cmd2[@]}" )
-    commands[(ice-1)*3+1,ice*3+1]=( "${cmd1[@]}" )
+    commands[(ice-1)*3+1,ice*3]=( "${cmd1[@]}" )
 
     tmp="${ZUI[toggle_dis_${mod}_${ice}]}"
     ZUI[toggle_dis_${mod}_${ice}]="${ZUI[toggle_dis_${mod}_$(( ice-1 ))]}"
@@ -389,10 +389,10 @@ local zshrc="$(<$zshrc_path)"
 
     local -a cmd1 cmd2
 
-    cmd1=( "${(@)commands[(ice-1)*3+1,ice*3+1]}" )
+    cmd1=( "${(@)commands[(ice-1)*3+1,ice*3]}" )
     cmd2=( "${(@)commands[(ice-1+1)*3+1,(ice+1)*3+1]}" )
 
-    commands[(ice-1)*3+1,ice*3+1]=( "${cmd2[@]}" )
+    commands[(ice-1)*3+1,ice*3]=( "${cmd2[@]}" )
     commands[(ice-1+1)*3+1,(ice+1)*3+1]=( "${cmd1[@]}" )
 
     tmp="${ZUI[toggle_dis_${mod}_${ice}]}"
@@ -455,7 +455,7 @@ local zshrc="$(<$zshrc_path)"
     local var_name1 var_name2
     local num dis_col mode_col command_col force_col disabled_text
 
-    cmd=( "${(@)commands[(ice-1)*3+1,ice*3+1]}" )
+    cmd=( "${(@)commands[(ice-1)*3+1,ice*3]}" )
     comment="${cmd[1]}"
     [[ -n "${cmd[2]}" ]] && ice_cmd=( "${(z@)cmd[2]}" )
     [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" )
