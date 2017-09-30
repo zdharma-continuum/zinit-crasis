@@ -678,14 +678,6 @@ local zshrc="$(<$zshrc_path)"
 }
 
 -zcrasis_generator_B() {
-    local -a cmd
-    local -A ice_cmd main_cmd
-    local comment
-    integer i size
-
-    size=${#cmdlist}
-
-    reply=()
     -zcrasis_compose
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
