@@ -449,19 +449,43 @@ local zshrc="$(<$zshrc_path)"
     reply=( "$rtext" "" )
 }
 
+# Enables ability to delete entries
+-zcrasis_delete_mode() {
+    if [[ -n "${ZUI[zc_delete_mode]}" ]]; then
+        (( ZUI[zc_delete_mode] = 1 - ZUI[zc_delete_mode] ))
+    else
+        ZUI[zc_delete_mode]=1
+    fi
+
+    local rtext=",mod1_ice1,"
+    integer i size=$(( ${#cmdlist} / 3 ))
+
+    for (( i=1; i<=size; ++ i )); do
+        rtext+="mod2_ice${i},"
+    done
+
+    reply=( "$rtext" "" )
+}
+
+
 -zcrasis_generator_0() {
     local mod="$1" ice="$2"
-    local pv_col
+    local pv_col dl_col
 
     reply=()
 
     -zui_util_map_bools '[[ ${ZUI[in_preview]} = 1 ]]' pv_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
+    -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col "${ZUI[BG_BLUE]}" "${ZUI[RED]}"
 
     -zui_std_rc_button "reload" "${ZUI[GREEN]}Reload${ZUI[FMT_END]}" -zcrasis_reload
     -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" -zcrasis_save
     -zui_std_rc_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_preview
+    -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_delete_mode
 
-    reply=( "${reply[1]} ${reply[2]} ${reply[3]}" )
+    reply=(
+        "${reply[1]} ${reply[2]} ${reply[3]}"
+        "${reply[4]}"
+    )
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
