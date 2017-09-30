@@ -412,8 +412,8 @@ local zshrc="$(<$zshrc_path)"
     local var_name1 var_name2
     local num dis_col mode_col command_col force_col disabled_text
 
-    comment="${cmd[1]}"
     cmd=( "${(@)commands[(ice-1)*3+1,ice*3+1]}" )
+    comment="${cmd[1]}"
     [[ -n "${cmd[2]}" ]] && ice_cmd=( "${(z@)cmd[2]}" )
     [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" )
 
