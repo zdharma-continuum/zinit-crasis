@@ -85,7 +85,7 @@ local -a fun_stack_depths
 # Text and commands data
 integer was_zplugin=0 pre_block_end=0 post_block_begin=0
 local -A cmd3
-local -a commands
+local -a cmdlist
 integer coidx=1
 
 # Common
@@ -276,16 +276,16 @@ local zshrc="$(<$zshrc_path)"
             in_zplugin=1
 
             if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
-                commands[coidx+1]="${(j: :)${(qkv)cmd3[@]}}"
+                cmdlist[coidx+1]="${(j: :)${(qkv)cmd3[@]}}"
             elif [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" != "ice" ]]; then
-                commands[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
+                cmdlist[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
                 coidx+=3
             else
                 # Don't increase coidx untill we get some command.
                 # This causes preceding comments to accumulate.
                 if [[ -n "${cmd3[c]}" ]]; then
                     # Custom command
-                    commands[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
+                    cmdlist[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
                     coidx+=3
                 fi
             fi
@@ -296,7 +296,7 @@ local zshrc="$(<$zshrc_path)"
         # Command token
         if [[ "$token" = [[:blank:]]#\#* ]]; then
             if (( in_zplugin == 1 )); then
-                commands[coidx]+="$token"$'\n'
+                cmdlist[coidx]+="$token"$'\n'
             else
                 cmd3[comment]="$token"
             fi
@@ -345,9 +345,9 @@ local zshrc="$(<$zshrc_path)"
 
     if [[ -n "${cmd3[c]}" ]];then
         if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
-            commands[coidx+1]="${(j: :)${(qkv)cmd3[@]}}"
+            cmdlist[coidx+1]="${(j: :)${(qkv)cmd3[@]}}"
         elif [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" != "ice" ]]; then
-            commands[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
+            cmdlist[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
         fi
     fi
 }
@@ -359,11 +359,11 @@ local zshrc="$(<$zshrc_path)"
 
     local -a cmd1 cmd2
 
-    cmd1=( "${(@)commands[(ice-1-1)*3+1,(ice-1)*3+1]}" )
-    cmd2=( "${(@)commands[(ice-1)*3+1,ice*3]}" )
+    cmd1=( "${(@)cmdlist[(ice-1-1)*3+1,(ice-1)*3+1]}" )
+    cmd2=( "${(@)cmdlist[(ice-1)*3+1,ice*3]}" )
 
-    commands[(ice-1-1)*3+1,(ice-1)*3+1]=( "${cmd2[@]}" )
-    commands[(ice-1)*3+1,ice*3]=( "${cmd1[@]}" )
+    cmdlist[(ice-1-1)*3+1,(ice-1)*3+1]=( "${cmd2[@]}" )
+    cmdlist[(ice-1)*3+1,ice*3]=( "${cmd1[@]}" )
 
     tmp="${ZUI[toggle_dis_${mod}_${ice}]}"
     ZUI[toggle_dis_${mod}_${ice}]="${ZUI[toggle_dis_${mod}_$(( ice-1 ))]}"
@@ -389,11 +389,11 @@ local zshrc="$(<$zshrc_path)"
 
     local -a cmd1 cmd2
 
-    cmd1=( "${(@)commands[(ice-1)*3+1,ice*3]}" )
-    cmd2=( "${(@)commands[(ice-1+1)*3+1,(ice+1)*3+1]}" )
+    cmd1=( "${(@)cmdlist[(ice-1)*3+1,ice*3]}" )
+    cmd2=( "${(@)cmdlist[(ice-1+1)*3+1,(ice+1)*3+1]}" )
 
-    commands[(ice-1)*3+1,ice*3]=( "${cmd2[@]}" )
-    commands[(ice-1+1)*3+1,(ice+1)*3+1]=( "${cmd1[@]}" )
+    cmdlist[(ice-1)*3+1,ice*3]=( "${cmd2[@]}" )
+    cmdlist[(ice-1+1)*3+1,(ice+1)*3+1]=( "${cmd1[@]}" )
 
     tmp="${ZUI[toggle_dis_${mod}_${ice}]}"
     ZUI[toggle_dis_${mod}_${ice}]="${ZUI[toggle_dis_${mod}_$(( ice+1 ))]}"
@@ -418,7 +418,7 @@ local zshrc="$(<$zshrc_path)"
         -zui_std_set_mod_factor 3 1
         ZUI[in_preview]=1
     else
-        -zui_std_set_mod_factor 2 $(( ${#commands} / 3 ))
+        -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
         -zui_std_set_mod_factor 3 0
         ZUI[in_preview]=0
     fi
@@ -430,14 +430,14 @@ local zshrc="$(<$zshrc_path)"
     reply=( ",mod3_ice1," "" )
 }
 
-# Removes given entry from $commands and orders
+# Removes given entry from $cmdlist and orders
 # full regeneration of commands-section
 -zcrasis_delete() {
     local id="$1" mod="$2" ice="$3"
-    commands[(ice-1)*3+1,ice*3]=()
+    cmdlist[(ice-1)*3+1,ice*3]=()
 
     local rtext=","
-    integer i size=$(( ${#commands} / 3 ))
+    integer i size=$(( ${#cmdlist} / 3 ))
 
     -zui_std_set_mod_factor 2 "$size"
 
@@ -456,10 +456,11 @@ local zshrc="$(<$zshrc_path)"
 
     -zui_util_map_bools '[[ ${ZUI[in_preview]} = 1 ]]' pv_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
 
+    -zui_std_rc_button "reload" "${ZUI[GREEN]}Reload${ZUI[FMT_END]}" -zcrasis_reload
     -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" -zcrasis_save
     -zui_std_rc_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_preview
 
-    reply=( "${reply[1]} ${reply[2]}" )
+    reply=( "${reply[1]} ${reply[2]} ${reply[3]}" )
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
@@ -473,7 +474,7 @@ local zshrc="$(<$zshrc_path)"
     local var_name1 var_name2
     local num dis_col mode_col command_col force_col disabled_text
 
-    cmd=( "${(@)commands[(ice-1)*3+1,ice*3]}" )
+    cmd=( "${(@)cmdlist[(ice-1)*3+1,ice*3]}" )
     comment="${cmd[1]}"
     [[ -n "${cmd[2]}" ]] && ice_cmd=( "${(z@)cmd[2]}" )
     [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" )
@@ -496,7 +497,7 @@ local zshrc="$(<$zshrc_path)"
         output+=( "[Up]" )
     fi
 
-    if [[ "$ice" -lt $(( ${#commands} / 3 )) ]]; then
+    if [[ "$ice" -lt $(( ${#cmdlist} / 3 )) ]]; then
         -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "${ZUI[YELLOW]}[Down]${ZUI[FMT_END]}" "-zcrasis_move_down $mod $ice" output
     else
         output+=( "[Down]" )
@@ -587,12 +588,12 @@ local zshrc="$(<$zshrc_path)"
     local comment
     integer i size
 
-    size=${#commands}
+    size=${#cmdlist}
 
     reply=()
 
     for (( i=1; i <= size/3; ++ i )); do
-        cmd=( "${(@)commands[(i-1)*3+1,i*3+1]}" )
+        cmd=( "${(@)cmdlist[(i-1)*3+1,i*3+1]}" )
         comment="${cmd[1]}"
         [[ -n "${cmd[2]}" ]] && ice_cmd=( "${(z@)cmd[2]}" )
         [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" )
@@ -620,13 +621,34 @@ local zshrc="$(<$zshrc_path)"
     reply2=( )               reply3=( 1 )                reply4=( )
 }
 
-print "Parsing zshrc..."
--zcrasis-tokenize-zsh-rc
--zcrasis-process-zsh-rc
--zcrasis-process-zplugin-commands
+-zcrasis_reload() {
+    local id="$1"
+    print "Parsing zshrc..."
+    cmdlist=()
+    coidx=1
+    -zcrasis-tokenize-zsh-rc
+    -zcrasis-process-zsh-rc
+    -zcrasis-process-zplugin-commands
+
+    # Called from button?
+    [[ -n "$id" ]] && {
+        integer i size=$(( ${#cmdlist} / 3 ))
+
+        -zui_std_set_mod_factor 2 "$size"
+
+        local rtext=","
+        for (( i=1; i<=size; ++ i )); do
+            rtext+="mod2_ice${i},"
+        done
+
+        reply=( "$rtext" "" )
+    } || reply=()
+}
+-zcrasis_reload
+
 # Create needed local parameters
 integer i
-for (( i=1; i<=${#commands}/3; i++ )); do
+for (( i=1; i<=${#cmdlist}/3; i++ )); do
     local my_mod2_ice${i}_size="0"
 done
 
@@ -634,7 +656,7 @@ done
 ZUI[reset_current_segment]="no"
 
 ## Start application ##
-zui-event-loop 1:-zcrasis_generator_0 $(( ${#commands} / 3 )):-zcrasis_generator_A 0:-zcrasis_generator_B
+zui-event-loop 1:-zcrasis_generator_0 $(( ${#cmdlist} / 3 )):-zcrasis_generator_A 0:-zcrasis_generator_B
 
 -zui_std_cleanup serialize
 
