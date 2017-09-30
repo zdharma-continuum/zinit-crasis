@@ -491,6 +491,7 @@ local zshrc="$(<$zshrc_path)"
 
         # ICE
         if [[ "${#ice_cmd}" -ge 1 ]]; then
+            (( ice_cmd[disabled] || main_cmd[disabled] )) && buf+=": "
             buf+="zplugin ice"
             for tmp in "${(ok@)ice_cmd}"; do
                 case "$tmp" in
@@ -508,6 +509,7 @@ local zshrc="$(<$zshrc_path)"
         # COMMAND
         if [[ "${#main_cmd}" -ge 1 ]]; then
             if [[ "${main_cmd[c]}" = (zplugin|zplg) ]]; then
+                (( ice_cmd[disabled] || main_cmd[disabled] )) && buf+=": "
                 if [[ "${main_cmd[sub]}" = (light|load|snippet|cdreplay|cdclear) ]]; then
                     buf+="zplugin ${main_cmd[sub]}"
                     [[ -n "${main_cmd[--command]}" ]] && buf+=" --command"
