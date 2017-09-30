@@ -264,6 +264,7 @@ local zshrc="$(<$zshrc_path)"
 # array which holds serialized hashes of every zplugin
 # invocation, mixed-in additional commands, comments.
 -zcrasis-process-zplugin-commands() {
+    cmd3=()
     # From start to end of zplugin block
     for (( i=(pre_block_end/2)+1; i<=(post_block_begin+1)/2-1; ++ i )); do
         token="${ZCR_PB_WORDS[i]}"
