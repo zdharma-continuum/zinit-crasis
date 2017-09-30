@@ -658,10 +658,10 @@ local zshrc="$(<$zshrc_path)"
         reply+=( "${output[3]} ${output[4]}${output[5]}" )
     elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdreplay" )
-        reply+=( "${output[3]} ${output[4]% }" )
+        reply+=( "${output[3]}${output[4]:+ }${output[4]% }" )
     elif [[ "${main_cmd[sub]}" = "cdclear" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdclear" )
-        reply+=( "${output[3]} ${output[4]% }" )
+        reply+=( "${output[3]}${output[4]:+ }${output[4]% }" )
     else
         # Custom command
         local -a keys
@@ -672,7 +672,7 @@ local zshrc="$(<$zshrc_path)"
             text+=" ${main_cmd[$key]}"
         done
         reply+=( "$num ${output[1]} ${output[2]} $text" )
-        reply+=( "${output[3]} ${output[4]% }" )
+        reply+=( "${output[3]}${output[4]:+ }${output[4]% }" )
     fi
 
     # Instead of debugging ZUI, I've added '-1' here
