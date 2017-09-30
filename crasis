@@ -575,6 +575,9 @@ local zshrc="$(<$zshrc_path)"
         [[ -n "${cmd[2]}" ]] && ice_cmd=( "${(z@)cmd[2]}" )
         [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" )
 
+        ice_cmd=( "${(Qkv)ice_cmd[@]}" )
+        main_cmd=( "${(Qkv)main_cmd[@]}" )
+
         if [[ "${main_cmd[sub]}" = (snippet|light|load) ]]; then
             reply+=( "${main_cmd[url]}" )
         elif [[ "${main_cmd[sub]}" = (cdreplay|cdclear) ]]; then
