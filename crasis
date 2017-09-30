@@ -277,8 +277,10 @@ local zshrc="$(<$zshrc_path)"
             in_zplugin=1
 
             if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
+                [[ -n "${cmdlist[coidx]}" ]] && cmdlist[coidx]+=$'\n'
                 cmdlist[coidx+1]="${(j: :)${(qkv)cmd3[@]}}"
             elif [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" != "ice" ]]; then
+                [[ -n "${cmdlist[coidx]}" ]] && cmdlist[coidx]+=$'\n'
                 cmdlist[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
                 coidx+=3
             else
@@ -286,6 +288,7 @@ local zshrc="$(<$zshrc_path)"
                 # This causes preceding comments to accumulate.
                 if [[ -n "${cmd3[c]}" ]]; then
                     # Custom command
+                    [[ -n "${cmdlist[coidx]}" ]] && cmdlist[coidx]+=$'\n'
                     cmdlist[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
                     coidx+=3
                 fi
@@ -297,9 +300,9 @@ local zshrc="$(<$zshrc_path)"
         # Command token
         if [[ "$token" = [[:blank:]]#\#* ]]; then
             if (( in_zplugin == 1 )); then
-                cmdlist[coidx]+="$token"$'\n'
+                cmdlist[coidx]+="$spaces$token"
             else
-                cmd3[comment]="$token"
+                cmd3[comment]="$spaces$token"
             fi
         elif (( in_zplugin == 1 )); then
             [[ "$token" = (zplugin|zplg) ]] && cmd3[c]="zplugin" || cmd3[c]="$token"
@@ -474,7 +477,7 @@ local zshrc="$(<$zshrc_path)"
     local -a cmd
     local -A ice_cmd main_cmd
 
-    [[ "$whole" = "1" ]] && buf="${(j::)ZCR_PB_ALL[1,pre_block_end]}"
+    [[ "$whole" = "1" ]] && buf="${(j::)ZCR_PB_ALL[1,pre_block_end]}"$'\n'
 
     for (( i=1; i<=size; ++ i )); do
         cmd=( "${(@)cmdlist[(i-1)*3+1,i*3]}" )
