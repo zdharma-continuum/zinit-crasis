@@ -517,8 +517,17 @@ local zshrc="$(<$zshrc_path)"
                     [[ -n "${main_cmd[-q]}" ]] && buf+=" -q"
                     [[ -n "${main_cmd[url]}" ]] && buf+=" ${main_cmd[url]}"
                 else
-                    # TODO unknown's arguments
-                    buf+="zplugin ${main_cmd[unkn]}"
+                    # Unknown subcommand
+                    local -a keys
+                    local key text="${main_cmd[c]}"
+                    [[ -n "${main_cmd[unkn]}" ]] && text+=" ${main_cmd[unkn]}"
+                    keys=( "${(kon)main_cmd[@]}" )
+                    for key in "${keys[@]}"; do
+                        [[ "$key" != arg_* ]] && continue
+                        text+=" ${main_cmd[$key]}"
+                    done
+
+                    buf+="$text"
                 fi
             else
                 local -a keys
