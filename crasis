@@ -430,6 +430,24 @@ local zshrc="$(<$zshrc_path)"
     reply=( ",mod3_ice1," "" )
 }
 
+# Removes given entry from $commands and orders
+# full regeneration of commands-section
+-zcrasis_delete() {
+    local id="$1" mod="$2" ice="$3"
+    commands[(ice-1)*3+1,ice*3]=()
+
+    local rtext=","
+    integer i size=$(( ${#commands} / 3 ))
+
+    -zui_std_set_mod_factor 2 "$size"
+
+    for (( i=1; i<=size; ++ i )); do
+        rtext+="mod${mod}_ice${i},"
+    done
+
+    reply=( "$rtext" "" )
+}
+
 -zcrasis_generator_0() {
     local mod="$1" ice="$2"
     local pv_col
@@ -491,6 +509,9 @@ local zshrc="$(<$zshrc_path)"
 
     -zui_std_rc_button "toggle_dis_${mod}_${ice}" "${dis_col}${disabled_text}${ZUI[FMT_END]}" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
+    # Delete
+    -zui_std_rc_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "${ZUI[RED]}Delete${ZUI[FMT_END]}" -zcrasis_delete output
+
     reply=()
     if [[ "${main_cmd[sub]}" = "snippet" ]]; then
         #
@@ -516,7 +537,7 @@ local zshrc="$(<$zshrc_path)"
         #
 
         reply+=( "$num ${output[1]} ${output[2]} S ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]}" )
-        reply+=( "${output[3]} ${output[4]} ${output[5]}" )
+        reply+=( "${output[3]} ${output[4]} ${output[5]} ${output[6]}" )
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
         #
         # Mode: light or normal ("load")
@@ -532,13 +553,13 @@ local zshrc="$(<$zshrc_path)"
         #
 
         reply+=( "$num ${output[1]} ${output[2]} P ${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
-        reply+=( "${output[3]} ${output[4]}" )
+        reply+=( "${output[3]} ${output[4]} ${output[5]}" )
     elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdreplay" )
-        reply+=( "${output[3]}" )
+        reply+=( "${output[3]} ${output[4]}" )
     elif [[ "${main_cmd[sub]}" = "cdclear" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdclear" )
-        reply+=( "${output[3]}" )
+        reply+=( "${output[3]} ${output[4]}" )
     else
         # Custom command
         local -a keys
@@ -548,7 +569,8 @@ local zshrc="$(<$zshrc_path)"
             [[ "$key" != arg_* ]] && continue
             text+=" ${main_cmd[$key]}"
         done
-        reply+=( "$num ${output[1]} ${output[2]} ${output[3]} $text" )
+        reply+=( "$num ${output[1]} ${output[2]} $text" )
+        reply+=( "${output[3]} ${output[4]}" )
     fi
 
     # Instead of debugging ZUI, I've added '-1' here
