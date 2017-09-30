@@ -540,7 +540,15 @@ local zshrc="$(<$zshrc_path)"
         reply+=( "$num ${output[1]} ${output[2]} cdclear" )
         reply+=( "${output[3]}" )
     else
-        reply+=( "Unknown command" )
+        # Custom command
+        local -a keys
+        local key text="${main_cmd[c]}"
+        keys=( "${(kon)main_cmd[@]}" )
+        for key in "${keys[@]}"; do
+            [[ "$key" != arg_* ]] && continue
+            text+=" ${main_cmd[$key]}"
+        done
+        reply+=( "$num $text" )
     fi
 
     # Instead of debugging ZUI, I've added '-1' here
