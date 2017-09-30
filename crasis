@@ -404,6 +404,41 @@ local zshrc="$(<$zshrc_path)"
     ZUI[toggle_mode_${mod}_$(( ice+1 ))]="$tmp"
 }
 
+-zcrasis_preview() {
+    if [[ "${ZUI[in_preview]}" != 1 ]]; then
+        -zui_std_set_mod_factor 2 0
+        -zui_std_set_mod_factor 3 1
+        ZUI[in_preview]=1
+    else
+        -zui_std_set_mod_factor 2 $(( ${#commands} / 3 ))
+        -zui_std_set_mod_factor 3 0
+        ZUI[in_preview]=0
+    fi
+
+    # To update "[Preview]" button
+    -zui_std_fly_mod_regen 1 1 ""
+
+    # Regenerate preview module
+    reply=( ",mod3_ice1," "" )
+}
+
+-zcrasis_generator_0() {
+    local mod="$1" ice="$2"
+    local pv_col
+
+    reply=()
+
+    -zui_util_map_bools '[[ ${ZUI[in_preview]} = 1 ]]' pv_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
+
+    -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" -zcrasis_save
+    -zui_std_rc_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_preview
+
+    reply=( "${reply[1]} ${reply[2]}" )
+
+    # Non-selectable lines   Hops to jump with [ and ]   Local anchors
+    reply2=( )               reply3=( 1 )                reply4=( )
+}
+
 # Generator for module 1
 -zcrasis_generator_A() {
     local mod="$1" ice="$2" comment
@@ -505,6 +540,33 @@ local zshrc="$(<$zshrc_path)"
     reply2=( )               reply3=( 1 )                reply4=( move_up_${mod}_${ice} move_down_${mod}_${ice} )
 }
 
+-zcrasis_generator_B() {
+    local -a cmd
+    local -A ice_cmd main_cmd
+    local comment
+    integer i size
+
+    size=${#commands}
+
+    reply=()
+
+    for (( i=1; i <= size/3; ++ i )); do
+        cmd=( "${(@)commands[(i-1)*3+1,i*3+1]}" )
+        comment="${cmd[1]}"
+        [[ -n "${cmd[2]}" ]] && ice_cmd=( "${(z@)cmd[2]}" )
+        [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" )
+
+        if [[ "${main_cmd[sub]}" = (snippet|light|load) ]]; then
+            reply+=( "${main_cmd[url]}" )
+        elif [[ "${main_cmd[sub]}" = (cdreplay|cdclear) ]]; then
+            reply+=( "${main_cmd[sub]}" )
+        fi
+    done
+
+    # Non-selectable lines   Hops to jump with [ and ]   Local anchors
+    reply2=( )               reply3=( 1 )                reply4=( )
+}
+
 print "Parsing zshrc..."
 -zcrasis-tokenize-zsh-rc
 -zcrasis-process-zsh-rc
@@ -512,14 +574,14 @@ print "Parsing zshrc..."
 # Create needed local parameters
 integer i
 for (( i=1; i<=${#commands}/3; i++ )); do
-    local my_mod1_ice${i}_size="0"
+    local my_mod2_ice${i}_size="0"
 done
 
 # Don't reset current segment on jump
 ZUI[reset_current_segment]="no"
 
 ## Start application ##
-zui-event-loop $(( ${#commands} / 3 )):-zcrasis_generator_A
+zui-event-loop 1:-zcrasis_generator_0 $(( ${#commands} / 3 )):-zcrasis_generator_A 0:-zcrasis_generator_B
 
 -zui_std_cleanup serialize
 
