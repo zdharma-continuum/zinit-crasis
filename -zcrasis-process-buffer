@@ -38,7 +38,7 @@ fi
 # place to break the word into 2 halves (for
 # complete_in_word option)
 
-local i word wordlen text text2 tmp_buf search="\\\\"$'\n'
+local i word wordlen text text_len text2 text2_len tmp_buf search="\\\\"$'\n'
 integer bslen start found found2
 integer char_count=0
 
@@ -64,14 +64,16 @@ for (( i=1; i<=nwords; i++ )); do
         # start+1+bslen-1 - position 1 shifted by `start',
         # follows text long for `bslen' characters
         text="${buf[start+1,start+1+bslen-1]}"
+        text_len="${#text}"
         text2="${tmp_buf[start+1,start+1+bslen-1]}"
+        text2_len="${#text2}"
         found="${text[(i)$search]}"
         # Found \$'n' ?
-        (( found && found <= ${#text} )) && {
+        (( found && found <= text_len )) && {
             found2="${text2[(i)$search]}"
             # The \$'\n' not missing?
-            if (( found2 == 0 || found2 > ${#text2} || found2 != found )); then
-                -zcrasis_dbg_msg "Found complex zshrc construct: $text"
+            if (( found2 == 0 || found2 > text2_len || found2 != found )); then
+                -zcrasis_dbg_msg "Complex zshrc construct [len:$text_len]: ${text//\\/\\\\}"
 
                 # Last +1 to fully compensate 2-characters long \$'\n'
                 # First +1 added before this loop
@@ -87,11 +89,16 @@ for (( i=1; i<=nwords; i++ )); do
                 # wordlen constantly holds.
                 bslen=bslen-(found+1)+2
             else
+                -zcrasis_dbg_msg "False alarm for [len:$text2_len]: ${text2//\\/\\\\}"
                 start+=found+2-1
                 bslen=bslen-(found+1)+2
             fi
         } || {
             wordlen="${#word}"
+            if [[ "$start" -gt 0 ]]; then
+                -zcrasis_dbg_msg "Fixed expression [len:$wordlen]: ${word//\\/\\\\}"
+                -zcrasis_dbg_msg ""
+            fi
             break
         }
     done

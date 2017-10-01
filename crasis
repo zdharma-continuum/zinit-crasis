@@ -763,9 +763,7 @@ local zshrc="$(<$zshrc_path)"
     print "Parsing zshrc..."
     cmdlist=()
     coidx=1
-    stats=( "" )
-
-    -zcrasis_dbg_msg ""
+    stats=()
 
     typeset -F 2 SECONDS=0
     -zcrasis-tokenize-zsh-rc
@@ -804,6 +802,7 @@ local zshrc="$(<$zshrc_path)"
 }
 
 -zcrasis_dbg_msg "ZSH version: $ZSH_VERSION ($ZSH_PATCHLEVEL), machine: $CPUTYPE $VENDOR $OSTYPE, LANG: $LANG"
+-zcrasis_dbg_msg ""
 -zcrasis_reload
 
 # Create needed local parameters
