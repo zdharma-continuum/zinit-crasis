@@ -754,13 +754,37 @@ local zshrc="$(<$zshrc_path)"
 }
 
 -zcrasis_reload() {
-    local id="$1"
+    local id="$1" msg
+    float -F 2 sum=0.0
+    local -a stats
+
     print "Parsing zshrc..."
     cmdlist=()
     coidx=1
+    stats=( "" )
+
+    -zcrasis_dbg_msg ""
+
+    typeset -F 2 SECONDS=0
     -zcrasis-tokenize-zsh-rc
+    stats+=( "Tokenization time: $SECONDS seconds" )
+    sum+=SECONDS
+
+    SECONDS=0
     -zcrasis-process-zsh-rc
+    stats+=( "Main processing time: $SECONDS seconds" )
+    sum+=SECONDS
+
+    SECONDS=0
     -zcrasis-process-zplugin-commands
+    stats+=( "Zplugin-commands processing time: $SECONDS seconds" )
+    sum+=SECONDS
+
+    for msg in "${stats[@]}"; do
+        -zcrasis_dbg_msg "$msg"
+    done
+
+    -zcrasis_dbg_msg "Total time: $sum"
 
     # Called from button?
     [[ -n "$id" ]] && {
@@ -776,6 +800,8 @@ local zshrc="$(<$zshrc_path)"
         reply=( "$rtext" "" )
     } || reply=()
 }
+
+-zcrasis_dbg_msg "ZSH version: $ZSH_VERSION ($ZSH_PATCHLEVEL), machine: $CPUTYPE $VENDOR $OSTYPE, LANG: $LANG"
 -zcrasis_reload
 
 # Create needed local parameters
