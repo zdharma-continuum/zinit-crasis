@@ -690,7 +690,7 @@ local zshrc="$(<$zshrc_path)"
             [[ "$key" != arg_* ]] && continue
             text+=" ${main_cmd[$key]}"
         done
-        [[ -n "${main_cmd[unkn]}" ]] && text+=" (${ZUI[RED]}Unknown Zplugin subcommand${ZUI[FMT_END]})"
+        [[ -n "${main_cmd[unkn]}" ]] && text+=" (${ZUI[RED]}unknown Zplugin subcommand${ZUI[FMT_END]})"
         reply+=( "$num ${output[1]} ${output[2]} $text" )
         reply+=( "${output[3]}${output[4]:+ }${output[4]% }" )
     fi
