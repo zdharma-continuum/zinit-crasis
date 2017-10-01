@@ -797,7 +797,7 @@ local zshrc="$(<$zshrc_path)"
         # 5. - 6.
         -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_delete_mode optional
         -zui_std_rc_button "edit_mode" "${ed_col}Edit Mode${ZUI[FMT_END]}" -zcrasis_edit_mode optional
-        -zui_std_rc_button "edit_mode" "${co_col}Compact Mode${ZUI[FMT_END]}" -zcrasis_compact_mode optional
+        -zui_std_rc_button "compact_mode" "${co_col}Compact Mode${ZUI[FMT_END]}" -zcrasis_compact_mode optional
 
         local line1="${optional[5]} ${optional[6]} ${optional[7]}"
         local line2="${optional[1]} ${optional[3]} ${optional[4]}  Choose: ${optional[2]}"
