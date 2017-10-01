@@ -13,6 +13,9 @@ emulate -LR zsh -o extendedglob -o typesetsilent -o warncreateglobal
 -zui_std_store_default_app_config b:border 1
 -zui_std_store_default_app_config b:top_anchors 0  # no top-anchors
 
+# Already autoloaded in *.plugin.zsh, here it's for Zshelldoc
+autoload -- -zcrasis-process-buffer
+
 # Debug array, for debug view
 local -a ZCR_DEBUG_MSGS
 
@@ -293,7 +296,7 @@ local zshrc="$(<$zshrc_path)"
 }
 
 # Processes block with zplugin commands established in
-# -zcrasis-process-zsh-rc() and generates $commands
+# -zcrasis-process-zsh-rc() and generates $cmdlist
 # array which holds serialized hashes of every zplugin
 # invocation, mixed-in additional commands, comments.
 -zcrasis-process-zplugin-commands() {
@@ -1019,6 +1022,9 @@ local zshrc="$(<$zshrc_path)"
     reply2=( )               reply3=( 1 )                reply4=( )
 }
 
+# Ran at startup and after [Reload] button press.
+# Performs full zshrc processing, recognizes normal
+# and zplugin-related zshrc parts.
 -zcrasis_reload() {
     local id="$1" msg
     float -F 2 sum=0.0
