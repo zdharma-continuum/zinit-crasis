@@ -787,6 +787,8 @@ local zshrc="$(<$zshrc_path)"
     coidx=1
     stats=()
 
+    [[ -n "$id" ]] && { -zcrasis_dbg_msg "[Reload] pressed"; -zcrasis_dbg_msg ""; }
+
     typeset -F 2 SECONDS=0
     -zcrasis-tokenize-zsh-rc
     stats+=( "Tokenization time: $SECONDS seconds" )
@@ -807,6 +809,7 @@ local zshrc="$(<$zshrc_path)"
     done
 
     -zcrasis_dbg_msg "Total time: $sum"
+    -zcrasis_dbg_msg ""
 
     # Called from button?
     [[ -n "$id" ]] && {
