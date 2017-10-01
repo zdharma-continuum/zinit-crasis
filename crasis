@@ -782,6 +782,21 @@ local zshrc="$(<$zshrc_path)"
         reply+=( "${output[3]} ${output[4]}${output[5]} ${output[6]}" )
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
         #
+        # Url, edited in edit-mode
+        #
+
+
+        if [[ "${ZUI[zc_edit_mode]}" = 1 ]]; then
+            # Variables of the text field
+            (( ${+ZUI[my_tfield2_${ice}_width]} == 0 )) && ZUI[my_tfield2_${ice}_width]=30
+            (( ${+ZUI[my_tfield2_${ice}_start]} == 0 )) && ZUI[my_tfield2_${ice}_start]=1
+            (( ${+ZUI[my_tfield2_${ice}_data]} == 0 )) && ZUI[my_tfield2_${ice}_data]="${main_cmd[url]}" || main_cmd[url]="${ZUI[my_tfield2_${ice}_data]}"
+
+            noglob -zui_std_text_field "tfield2_${mod}_${ice}" ZUI[my_tfield2_${ice}_width] ZUI[my_tfield2_${ice}_start] ZUI[my_tfield2_${ice}_data] "" "" "" '-zcrasis_update_main url "${ZUI[my_tfield2_'${ice}'_data]}" '$ice output
+        else
+            output+=( "${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
+        fi
+        #
         # Mode: light or normal ("load")
         #
 
@@ -800,8 +815,8 @@ local zshrc="$(<$zshrc_path)"
         # Document
         #
 
-        reply+=( "$num ${output[1]} ${output[2]} P ${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
-        reply+=( "${output[3]} ${output[4]}${output[5]} ${output[6]}" )
+        reply+=( "$num ${output[1]} ${output[2]} P ${output[5]}" )
+        reply+=( "${output[3]} ${output[4]}${output[6]} ${output[7]}" )
     elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdreplay" )
         reply+=( "${output[3]}${output[4]:+ }${output[4]% }" )
@@ -864,6 +879,13 @@ local zshrc="$(<$zshrc_path)"
     local id="$1" msg
     float -F 2 sum=0.0
     local -a stats
+
+    integer i
+    for (( i=1; i<=${#cmdlist}/3*2; i++ )); do
+        unset "ZUI[my_tfield2_${i}_width]"
+        unset "ZUI[my_tfield2_${i}_start]"
+        unset "ZUI[my_tfield2_${i}_data]"
+    done
 
     print "Parsing zshrc..."
     cmdlist=()
