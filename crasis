@@ -766,7 +766,7 @@ local zshrc="$(<$zshrc_path)"
     fi
 
     # "DISABLED" or "Enabled"
-    [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || main_cmd[disabled]=${ZUI[toggle_dis_${mod}_${ice}]}
+    [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || -zcrasis_update_main disabled "${ZUI[toggle_dis_${mod}_${ice}]}" "$ice"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "dis_col" "${ZUI[RED]}" "${ZUI[GREEN]}"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "DISABLED" "Enabled"
 
@@ -837,6 +837,7 @@ local zshrc="$(<$zshrc_path)"
         else
             output+=( "${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
         fi
+
         #
         # Mode: light or normal ("load")
         #
