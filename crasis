@@ -703,6 +703,10 @@ local zshrc="$(<$zshrc_path)"
         unset "ZUI[toggle_command_2_${i}]"
         unset "ZUI[toggle_force_2_${i}]"
         unset "ZUI[toggle_mode_2_${i}]"
+
+        unset "ZUI[my_tfield2_${i}_width]"
+        unset "ZUI[my_tfield2_${i}_start]"
+        unset "ZUI[my_tfield2_${i}_data]"
     done
 }
 
@@ -1020,12 +1024,7 @@ local zshrc="$(<$zshrc_path)"
     float -F 2 sum=0.0
     local -a stats
 
-    integer i
-    for (( i=1; i<=${#cmdlist}/3*2; i++ )); do
-        unset "ZUI[my_tfield2_${i}_width]"
-        unset "ZUI[my_tfield2_${i}_start]"
-        unset "ZUI[my_tfield2_${i}_data]"
-    done
+    -zcrasis_clear_visual_state
 
     print "Parsing zshrc..."
     cmdlist=()
