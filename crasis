@@ -694,6 +694,27 @@ local zshrc="$(<$zshrc_path)"
 
 }
 
+-zcrasis_add_snippet() {
+    local url="${ZUI[my_tfield3_data]}"
+    local -A main_cmd
+
+    [[ -z "$url" || "$url" = \<*\> ]] && { -zui_std_stalog "" "" "" "WARNING: " "" "Aborted, please enter a proper snippet URL"; return; }
+    [[ "$url" != /* && "$url" != (http|ftp|https):* ]] && -zui_std_stalog "" "" "" "WARNING: " "" "Snippet isn't absolute path or URL"
+
+    main_cmd[c]="zplugin"
+    main_cmd[sub]="snippet"
+    main_cmd[url]="$url"
+
+    -zcrasis_dbg_msg "Prepending snippet (data: ${(kv)main_cmd})"
+
+    cmdlist[1,0]=( "" "" "${(j: :)${(qkv)main_cmd[@]}}" )
+    -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
+    -zcrasis_clear_visual_state
+
+    -zcrasis_refresh2_all_string
+    reply=( "$REPLY" "" )
+}
+
 -zcrasis_generator_0() {
     local mod="$1" ice="$2"
     local pv_col dg_col dl_col ed_col
@@ -710,6 +731,23 @@ local zshrc="$(<$zshrc_path)"
     -zui_std_rc_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_preview
     -zui_std_rc_button "debug" "${dg_col}Debug${ZUI[FMT_END]}" -zcrasis_debug
 
+    # Variables of the text field
+    (( ${+ZUI[my_tfield3_width]} == 0 )) && ZUI[my_tfield3_width]=34
+    (( ${+ZUI[my_tfield3_start]} == 0 )) && ZUI[my_tfield3_start]=1
+    (( ${+ZUI[my_tfield3_data]} == 0 )) && ZUI[my_tfield3_data]="<Enter or select plugin to add>"
+
+    noglob -zui_std_text_field "tfield3_$mod" ZUI[my_tfield3_width] ZUI[my_tfield3_start] ZUI[my_tfield3_data] "" "" "" ''
+
+    # Variables of the list box
+    (( ${+ZUI[my_lbox1_width]} == 0 )) && ZUI[my_lbox1_width]=25
+    (( ${+ZUI[my_lbox1_idx]} == 0 )) && ZUI[my_lbox1_idx]=1
+    (( ${+ZUI[my_lbox1_opts]} == 0 )) && ZUI[my_lbox1_opts]="${(j:;:)chosen_plugins}"
+
+    noglob -zui_std_list_box "lbox1_$mod" ZUI[my_lbox1_width] ZUI[my_lbox1_idx] ZUI[my_lbox1_opts] "" "" "" 'ZUI[my_tfield3_data]="${${(s:;:)ZUI[my_lbox1_opts]}[${ZUI[my_lbox1_idx]}]}"; [[ "${ZUI[my_lbox1_idx]}" = 1 ]] && ZUI[my_tfield3_data]="";'
+
+    -zui_std_rc_button "snippet" "${dg_col}Add snippet${ZUI[FMT_END]}" -zcrasis_add_snippet
+    -zui_std_rc_button "plugin" "${dg_col}Add plugin${ZUI[FMT_END]}" -zcrasis_add_plugin
+
     (( ${ZUI[in_preview]} + ZUI[in_debug] == 0 )) && {
         -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_delete_mode
         -zui_std_rc_button "edit_mode" "${ed_col}Edit Mode${ZUI[FMT_END]}" -zcrasis_edit_mode
@@ -719,7 +757,8 @@ local zshrc="$(<$zshrc_path)"
 
     reply=(
         "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]}"
-        "${reply[5]} ${reply[6]}"
+        "${reply[9]} ${reply[10]}"
+        "${reply[5]} ${reply[7]} ${reply[8]}  Choose: ${reply[6]}"
     )
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
