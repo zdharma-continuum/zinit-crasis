@@ -7,7 +7,10 @@
 
 0="${(%):-%N}" # this gives immunity to functionargzero being unset
 ZCRASIS_REPO_DIR="${0%/*}"
-ZCRASIS_CONFIG_DIR="$HOME/.config/zui"
+
+if [[ "${+functions[-zui_std_cleanup]}" = "0" ]]; then
+    echo "Crasis uses ZUI plugin, please load https://github.com/zdharma/zui/ with your plugin manager, or source it."
+fi
 
 #
 # Update FPATH if:
