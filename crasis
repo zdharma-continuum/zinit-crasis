@@ -91,6 +91,7 @@ integer coidx=1
 # Common
 local -a mbegin mend match
 local MATCH; integer MBEGIN MEND
+local internal # to mark inline action as no-ZUI-restart
 
 # Debug array, for debug view
 local -a ZCR_DEBUG_MSGS
@@ -601,7 +602,7 @@ local zshrc="$(<$zshrc_path)"
     -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col "${ZUI[BG_BLUE]}" "${ZUI[RED]}"
 
     -zui_std_rc_button "reload" "${ZUI[GREEN]}Reload${ZUI[FMT_END]}" -zcrasis_reload
-    -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" -zcrasis_save
+    -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" '-zcrasis_save; internal=1'
     -zui_std_rc_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_preview
     -zui_std_rc_button "debug" "${dg_col}Debug${ZUI[FMT_END]}" -zcrasis_debug
     -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_delete_mode
