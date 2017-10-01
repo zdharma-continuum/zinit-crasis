@@ -13,6 +13,15 @@ emulate -LR zsh -o extendedglob -o typesetsilent -o warncreateglobal
 -zui_std_store_default_app_config b:border 1
 -zui_std_store_default_app_config b:top_anchors 0  # no top-anchors
 
+# Debug array, for debug view
+local -a ZCR_DEBUG_MSGS
+
+# Appends message to the debug view
+-zcrasis_dbg_msg() { ZCR_DEBUG_MSGS+=( "$*" ); }
+
+# Initial debug message
+-zcrasis_dbg_msg "ZSH version: $ZSH_VERSION ($ZSH_PATCHLEVEL), machine: $CPUTYPE $VENDOR $OSTYPE, LANG: $LANG"
+
 #
 # CONSTANTS
 #
@@ -93,9 +102,6 @@ local -a mbegin mend match
 local MATCH; integer MBEGIN MEND
 local internal # to mark inline action as no-ZUI-restart
 
-# Debug array, for debug view
-local -a ZCR_DEBUG_MSGS
-
 #
 # Load zshrc
 #
@@ -105,6 +111,9 @@ local -a ZCR_DEBUG_MSGS
 [[ ! -r "$zshrc_path" ]] && { print "No read permissions to \`$zshrc_path'${ZDOTDIR:+ (using \$ZDOTDIR)}"; return 1; }
 [[ ! -w "$zshrc_path" ]] && { print "No write permissions to \`$zshrc_path'${ZDOTDIR:+ (using \$ZDOTDIR)}"; return 1; }
 [[ ! -s "$zshrc_path" ]] && { print "File \`$zshrc_path' is empty, aborting"; return 1; }
+
+-zcrasis_dbg_msg "Loading \`$zshrc_path'..."
+-zcrasis_dbg_msg ""
 
 local zshrc="$(<$zshrc_path)"
 
@@ -463,11 +472,6 @@ local zshrc="$(<$zshrc_path)"
     reply=( ",mod4_ice1," "" )
 }
 
-# Appends debug message to log of the debug view
--zcrasis_dbg_msg() {
-    ZCR_DEBUG_MSGS+=( "$*" )
-}
-
 # Removes given entry from $cmdlist and orders
 # full regeneration of commands-section
 -zcrasis_delete() {
@@ -801,8 +805,6 @@ local zshrc="$(<$zshrc_path)"
     } || reply=()
 }
 
--zcrasis_dbg_msg "ZSH version: $ZSH_VERSION ($ZSH_PATCHLEVEL), machine: $CPUTYPE $VENDOR $OSTYPE, LANG: $LANG"
--zcrasis_dbg_msg ""
 -zcrasis_reload
 
 # Create needed local parameters

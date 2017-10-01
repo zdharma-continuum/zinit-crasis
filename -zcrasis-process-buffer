@@ -33,6 +33,8 @@ else
     integer nwords="${#ZCR_PB_WORDS}"
 fi
 
+-zcrasis_dbg_msg "Processing #$nwords tokens"
+
 # Remove ZCR_PB_WORDS one by one, counting characters,
 # computing beginning of each word, to find
 # place to break the word into 2 halves (for
