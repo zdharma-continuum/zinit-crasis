@@ -681,6 +681,19 @@ local zshrc="$(<$zshrc_path)"
     return 0
 }
 
+# Clears generators' working variables to
+# trigger refresh from model-structures
+-zcrasis_clear_visual_state() {
+    integer i size=$(( ${#cmdlist} / 3 ))
+    for (( i=1; i<=size+15; i++ )); do
+        unset "ZUI[toggle_dis_2_${i}]"
+        unset "ZUI[toggle_command_2_${i}]"
+        unset "ZUI[toggle_force_2_${i}]"
+        unset "ZUI[toggle_mode_2_${i}]"
+    done
+
+}
+
 -zcrasis_generator_0() {
     local mod="$1" ice="$2"
     local pv_col dg_col dl_col ed_col
