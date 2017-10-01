@@ -1,0 +1,430 @@
+crasis(1)
+=========
+:compat-mode!:
+
+NAME
+----
+crasis - a shell script
+
+SYNOPSIS
+--------
+Documentation automatically generated with `zshelldoc'
+
+FUNCTIONS
+---------
+
+ -zcrasis-process-zplugin-commands
+ -zcrasis-process-zsh-rc
+ -zcrasis-tokenize-zsh-rc
+ -zcrasis_add_plugin
+ -zcrasis_add_snippet
+ -zcrasis_clear_visual_state
+ -zcrasis_compact_mode
+ -zcrasis_compose
+ -zcrasis_dbg_msg
+ -zcrasis_debug
+ -zcrasis_delete
+ -zcrasis_delete_mode
+ -zcrasis_edit_mode
+ -zcrasis_generator_0
+ -zcrasis_generator_A
+ -zcrasis_generator_B
+ -zcrasis_generator_DBG
+ -zcrasis_move_down
+ -zcrasis_move_up
+ -zcrasis_preview
+ -zcrasis_refresh2_all_string
+ -zcrasis_reload
+ -zcrasis_save
+ -zcrasis_update_main
+AUTOLOAD -zcrasis-process-buffer
+
+DETAILS
+-------
+
+Script Body
+~~~~~~~~~~~
+
+Has 110 line(s). Calls functions:
+
+ Script-Body
+ |-- -zcrasis_dbg_msg
+ `-- -zcrasis_reload
+     |-- -zcrasis-process-zplugin-commands
+     |   `-- -zcrasis_dbg_msg
+     |-- -zcrasis-process-zsh-rc
+     |-- -zcrasis-tokenize-zsh-rc
+     |   `-- -zcrasis-process-buffer
+     |       `-- -zcrasis_dbg_msg
+     |-- -zcrasis_clear_visual_state
+     `-- -zcrasis_dbg_msg
+
+-zcrasis-process-zplugin-commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Processes block with zplugin commands established in
+ # -zcrasis-process-zsh-rc() and generates $cmdlist
+ # array which holds serialized hashes of every zplugin
+ # invocation, mixed-in additional commands, comments.
+____
+
+Has 82 line(s). Calls functions:
+
+ -zcrasis-process-zplugin-commands
+ `-- -zcrasis_dbg_msg
+
+Called by:
+
+ -zcrasis_reload
+
+-zcrasis-process-zsh-rc
+~~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Parses tokens of the loaded zshrc and detects:
+ # - functions
+ # - block preceding zplugin commands
+ # - block with those commands
+ # - block following them
+____
+
+Has 109 line(s). Doesn't call other functions.
+
+Called by:
+
+ -zcrasis_reload
+
+-zcrasis-tokenize-zsh-rc
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Runs -zcrasis-process-buffer() on $zshrc (containing
+ # the loaded zshrc)
+____
+
+Has 1 line(s). Calls functions:
+
+ -zcrasis-tokenize-zsh-rc
+ `-- -zcrasis-process-buffer
+     `-- -zcrasis_dbg_msg
+
+Called by:
+
+ -zcrasis_reload
+
+-zcrasis_add_plugin
+~~~~~~~~~~~~~~~~~~~
+
+____
+ # Adds plugin to $cmdlist and refreshes the view
+____
+
+Has 18 line(s). Calls functions:
+
+ -zcrasis_add_plugin
+ |-- -zcrasis_clear_visual_state
+ |-- -zcrasis_dbg_msg
+ `-- -zcrasis_refresh2_all_string
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_add_snippet
+~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Adds snippet to $cmdlist and refreshes the view
+____
+
+Has 18 line(s). Calls functions:
+
+ -zcrasis_add_snippet
+ |-- -zcrasis_clear_visual_state
+ |-- -zcrasis_dbg_msg
+ `-- -zcrasis_refresh2_all_string
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_clear_visual_state
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Clears generators' working variables to
+ # trigger refresh from model-structures
+____
+
+Has 11 line(s). Doesn't call other functions.
+
+Called by:
+
+ -zcrasis_add_plugin
+ -zcrasis_add_snippet
+ -zcrasis_delete
+ -zcrasis_move_down
+ -zcrasis_move_up
+ -zcrasis_reload
+
+-zcrasis_compact_mode
+~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Switches the entry list to compact-mode
+____
+
+Has 8 line(s). Calls functions:
+
+ -zcrasis_compact_mode
+ `-- -zcrasis_refresh2_all_string
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_compose
+~~~~~~~~~~~~~~~~
+
+____
+ # Constructs text with zplugin commands, optionally
+ # including original Zshrc blocks (in order to create
+ # full zshrc).
+____
+
+Has 71 line(s). Doesn't call other functions.
+
+Called by:
+
+ -zcrasis_generator_B
+ -zcrasis_save
+
+-zcrasis_dbg_msg
+~~~~~~~~~~~~~~~~
+
+____
+ # Appends message to the debug view
+____
+
+Has 1 line(s). Doesn't call other functions.
+
+Called by:
+
+ -zcrasis-process-buffer
+ -zcrasis-process-zplugin-commands
+ -zcrasis_add_plugin
+ -zcrasis_add_snippet
+ -zcrasis_reload
+ Script-Body
+
+-zcrasis_debug
+~~~~~~~~~~~~~~
+
+____
+ # Enters debug view
+____
+
+Has 24 line(s). Doesn't call other functions.
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_delete
+~~~~~~~~~~~~~~~
+
+____
+ # Removes given entry from $cmdlist and orders
+ # full regeneration of commands-section
+____
+
+Has 15 line(s). Calls functions:
+
+ -zcrasis_delete
+ `-- -zcrasis_clear_visual_state
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_delete_mode
+~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Enables ability to delete entries
+____
+
+Has 14 line(s). Doesn't call other functions.
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_edit_mode
+~~~~~~~~~~~~~~~~~~
+
+____
+ # Enables ability to edit entries
+____
+
+Has 8 line(s). Calls functions:
+
+ -zcrasis_edit_mode
+ `-- -zcrasis_refresh2_all_string
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_generator_0
+~~~~~~~~~~~~~~~~~~~~
+
+Has 45 line(s). Doesn't call other functions.
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_generator_A
+~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Generator for module 1
+____
+
+Has 118 line(s). Calls functions:
+
+ -zcrasis_generator_A
+ `-- -zcrasis_update_main
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_generator_B
+~~~~~~~~~~~~~~~~~~~~
+
+Has 2 line(s). Calls functions:
+
+ -zcrasis_generator_B
+ `-- -zcrasis_compose
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_generator_DBG
+~~~~~~~~~~~~~~~~~~~~~~
+
+Has 15 line(s). Doesn't call other functions.
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_move_down
+~~~~~~~~~~~~~~~~~~
+
+____
+ # Moves given instance ($ice) down, i.e. swaps
+ # current and next instance
+____
+
+Has 27 line(s). Calls functions:
+
+ -zcrasis_move_down
+ `-- -zcrasis_clear_visual_state
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_move_up
+~~~~~~~~~~~~~~~~
+
+____
+ # Moves given instance ($ice) up, i.e. swaps
+ # current and previous instance
+____
+
+Has 27 line(s). Calls functions:
+
+ -zcrasis_move_up
+ `-- -zcrasis_clear_visual_state
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_preview
+~~~~~~~~~~~~~~~~
+
+____
+ # Enters preview view
+____
+
+Has 12 line(s). Doesn't call other functions.
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_refresh2_all_string
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Returns string that when passed to ZUI
+ # causes to regenerate all instances of
+ # module 2 and module 1 (menu "bar")
+____
+
+Has 8 line(s). Doesn't call other functions.
+
+Called by:
+
+ -zcrasis_add_plugin
+ -zcrasis_add_snippet
+ -zcrasis_compact_mode
+ -zcrasis_edit_mode
+
+-zcrasis_reload
+~~~~~~~~~~~~~~~
+
+____
+ # Ran at startup and after [Reload] button press.
+ # Performs full zshrc processing, recognizes normal
+ # and zplugin-related zshrc parts.
+____
+
+Has 53 line(s). Calls functions:
+
+ -zcrasis_reload
+ |-- -zcrasis-process-zplugin-commands
+ |   `-- -zcrasis_dbg_msg
+ |-- -zcrasis-process-zsh-rc
+ |-- -zcrasis-tokenize-zsh-rc
+ |   `-- -zcrasis-process-buffer
+ |       `-- -zcrasis_dbg_msg
+ |-- -zcrasis_clear_visual_state
+ `-- -zcrasis_dbg_msg
+
+Called by:
+
+ Script-Body
+
+-zcrasis_save
+~~~~~~~~~~~~~
+
+Has 5 line(s). Calls functions:
+
+ -zcrasis_save
+ `-- -zcrasis_compose
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_update_main
+~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Updates main entry in given ($3) command packet.
+ #
+ # $1 - key to update in the main command
+ # $2 - data to store under the key
+ # $3 - index of command pack to alter
+____
+
+Has 11 line(s). Doesn't call other functions.
+
+Called by:
+
+ -zcrasis_generator_A
+
+-zcrasis-process-buffer
+~~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # vim:ft=zsh
+____
+
+Has 134 line(s). Calls functions:
+
+ -zcrasis-process-buffer
+ `-- -zcrasis_dbg_msg
+
+Called by:
+
+ -zcrasis-tokenize-zsh-rc
+
