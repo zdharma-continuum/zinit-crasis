@@ -22,7 +22,7 @@ local -a ZCR_DEBUG_MSGS
 # Initial debug message
 -zcrasis_dbg_msg "ZSH version: $ZSH_VERSION ($ZSH_PATCHLEVEL), machine: $CPUTYPE $VENDOR $OSTYPE, LANG: $LANG"
 if [[ ${+ZPLGM} = 1 ]]; then
-    -zcrasis_dbg_msg "Zplugin version: <ZPLGVERSION>"
+    -zcrasis_dbg_msg "Zplugin version: <ZPLGVERSION>, Zplugin-Crasis version: <ZCRVERSION>"
     -zcrasis_dbg_msg "Zplugin BIN_DIR: ${ZPLGM[BIN_DIR]/$HOME/~}, HOME_DIR: ${ZPLGM[HOME_DIR]/$HOME/~}, PLUGINS_DIR: ${ZPLGM[PLUGINS_DIR]/$HOME/~}"
 else
     -zcrasis_dbg_msg "${ZUI[RED]}Zplugin not loaded${ZUI[FMT_END]}"
@@ -471,12 +471,18 @@ local zshrc="$(<$zshrc_path)"
     if [[ "${ZUI[in_debug]}" != 1 ]]; then
         -zui_std_set_mod_factor 2 0
         -zui_std_set_mod_factor 4 1
+        ZUI[in_debug]=1
+
         ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCSIZE>/${#zshrc}}" )
         ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCLINES>/${#${(f@)zshrc}}}" )
+
         { local ver="$(<${ZPLGM[BIN_DIR]}/.git/refs/heads/master)" } 2>/dev/null
         [[ -z "$ver" ]] && ver="unknown (no .git/refs/heads/master)" || ver="${ver[1,7]}"
         ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZPLGVERSION>/$ver}" )
-        ZUI[in_debug]=1
+
+        { local ver="$(<${ZPLGM[PLUGINS_DIR]}/zdharma---zplugin-crasis/.git/refs/heads/master)" } 2>/dev/null
+        [[ -z "$ver" ]] && ver="unknown (no .git/refs/heads/master)" || ver="${ver[1,7]}"
+        ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZCRVERSION>/$ver}" )
     else
         -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
         -zui_std_set_mod_factor 4 0
