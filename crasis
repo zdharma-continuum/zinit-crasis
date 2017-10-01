@@ -669,7 +669,7 @@ local zshrc="$(<$zshrc_path)"
 
 -zcrasis_save() {
     -zcrasis_compose 1 1
-    print -rl -- "${reply[@]}" >| ~/.myzshrc
+    print -rl -- "${reply[@]}" >| "$zshrc_path"
     reply=()
 
     -zui_std_stalog "Saved to:" "\`$zshrc_path'"
