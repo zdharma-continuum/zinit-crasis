@@ -366,7 +366,12 @@ local zshrc="$(<$zshrc_path)"
         elif [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" != "ice" ]]; then
             cmdlist[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
         fi
+        -zcrasis_dbg_msg "Zplugin block in zshrc has $(( (coidx + 2) / 3 )) commands (not counting \`zplugin ice ...')"
+    else
+        -zcrasis_dbg_msg "Zplugin block in zshrc has $(( (coidx-1) / 3 )) commands (not counting \`zplugin ice ...')"
     fi
+
+    -zcrasis_dbg_msg ""
 }
 
 # Moves given instance ($ice) up, i.e. swaps
