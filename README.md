@@ -6,4 +6,4 @@ but this moment is close, `Crasis` is nearly complete:
 
 [![asciicast](https://asciinema.org/a/140446.png)](https://asciinema.org/a/140446)
 
-`Crasies` uses [ZUI](http://github.com/zdharma/zui/) library to create `ncurses` interface.
+`Crasis` uses [ZUI](http://github.com/zdharma/zui/) library to create `ncurses` interface.
