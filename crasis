@@ -789,7 +789,22 @@ local zshrc="$(<$zshrc_path)"
 }
 
 -zcrasis_generator_DBG() {
-    reply=( "${ZCR_DEBUG_MSGS[@]}" )
+    reply=()
+
+    # Variables of the text field
+    (( ${+ZUI[my_tfield1_width]} == 0 )) && ZUI[my_tfield1_width]=50
+    (( ${+ZUI[my_tfield1_start]} == 0 )) && ZUI[my_tfield1_start]=1
+    (( ${+ZUI[my_tfield1_data]} == 0 )) && ZUI[my_tfield1_data]="$HOME/crasis-report.txt"
+
+    noglob -zui_std_text_field "report_path" ZUI[my_tfield1_width] ZUI[my_tfield1_start] ZUI[my_tfield1_data] "" "" "" ''
+    -zui_std_rc_button "save_report" "${ZUI[YELLOW]}Save${ZUI[FMT_END]}" 'print -rl -- "${ZCR_DEBUG_MSGS[@]}" >| "${ZUI[my_tfield1_data]}"; -zui_std_stalog "Report written to: " "\`${ZUI[my_tfield1_data]}'"'"'";'
+
+    reply=( "Send reports to: ${ZUI[YELLOW]}psprint${ZUI[FMT_END]}${ZUI[BOLD]}${ZUI[YELLOW]}@${ZUI[FMT_END]}${ZUI[YELLOW]}zdharma.org${ZUI[FMT_END]}. Please include Zshrc if possible."
+        ""
+        "${reply[1]} ${reply[2]}"
+        ""
+        "${ZCR_DEBUG_MSGS[@]}"
+    )
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
