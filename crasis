@@ -533,6 +533,18 @@ local zshrc="$(<$zshrc_path)"
     reply=( "$rtext" "" )
 }
 
+# Enables ability to delete entries
+-zcrasis_edit_mode() {
+    if [[ -n "${ZUI[zc_edit_mode]}" ]]; then
+        (( ZUI[zc_edit_mode] = 1 - ZUI[zc_edit_mode] ))
+    else
+        ZUI[zc_edit_mode]=1
+    fi
+
+    -zcrasis_refresh2_all_string
+    reply=( "$REPLY" "" )
+}
+
 # Returns string that when passed to ZUI
 # causes to regenerate all instances of
 # module 2 and module 1 (menu "bar")
@@ -547,6 +559,9 @@ local zshrc="$(<$zshrc_path)"
     REPLY="$rtext"
 }
 
+# Constructs text with zplugin commands, optionally
+# including original Zshrc blocks (in order to create
+# full zshrc).
 -zcrasis_compose() {
     local with_comments="$1" whole="$2"
     local buf="" tmp comment
@@ -638,13 +653,14 @@ local zshrc="$(<$zshrc_path)"
 
 -zcrasis_generator_0() {
     local mod="$1" ice="$2"
-    local pv_col dg_col dl_col
+    local pv_col dg_col dl_col ed_col
 
     reply=()
 
     -zui_util_map_bools '[[ ${ZUI[in_preview]} = 1 ]]' pv_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
     -zui_util_map_bools '[[ ${ZUI[in_debug]} = 1 ]]' dg_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
     -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col "${ZUI[BG_BLUE]}" "${ZUI[RED]}"
+    -zui_util_map_bools '[[ "${ZUI[zc_edit_mode]}" = "1" ]]' ed_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
 
     -zui_std_rc_button "reload" "${ZUI[GREEN]}Reload${ZUI[FMT_END]}" -zcrasis_reload
     -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" '-zcrasis_save; internal=1'
@@ -653,13 +669,14 @@ local zshrc="$(<$zshrc_path)"
 
     (( ${ZUI[in_preview]} + ZUI[in_debug] == 0 )) && {
         -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_delete_mode
+        -zui_std_rc_button "edit_mode" "${ed_col}Edit Mode${ZUI[FMT_END]}" -zcrasis_edit_mode
     } || {
-        reply+=()
+        reply+=( "" "" )
     }
 
     reply=(
         "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]}"
-        "${reply[5]}"
+        "${reply[5]} ${reply[6]}"
     )
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
