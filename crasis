@@ -533,6 +533,20 @@ local zshrc="$(<$zshrc_path)"
     reply=( "$rtext" "" )
 }
 
+# Returns string that when passed to ZUI
+# causes to regenerate all instances of
+# module 2 and module 1 (menu "bar")
+-zcrasis_refresh2_all_string() {
+    local rtext=",mod1_ice1,"
+    integer i size=$(( ${#cmdlist} / 3 ))
+
+    for (( i=1; i<=size; ++ i )); do
+        rtext+="mod2_ice${i},"
+    done
+
+    REPLY="$rtext"
+}
+
 -zcrasis_compose() {
     local with_comments="$1" whole="$2"
     local buf="" tmp comment
