@@ -727,12 +727,14 @@ local zshrc="$(<$zshrc_path)"
     var_name1="my_mod${mod}_ice$(( ice-1 ))_size"
     var_name2="my_mod${mod}_ice$(( ice+1 ))_size"
 
+    # 1.
     if [[ "$ice" -gt 1 ]]; then
         -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "${ZUI[YELLOW]}[Up]${ZUI[FMT_END]}" "-zcrasis_move_up $mod $ice" output
     else
         output+=( "[Up]" )
     fi
 
+    # 2.
     if [[ "$ice" -lt $(( ${#cmdlist} / 3 )) ]]; then
         -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "${ZUI[YELLOW]}[Down]${ZUI[FMT_END]}" "-zcrasis_move_down $mod $ice" output
     else
@@ -744,9 +746,10 @@ local zshrc="$(<$zshrc_path)"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "dis_col" "${ZUI[RED]}" "${ZUI[GREEN]}"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "DISABLED" "Enabled"
 
+    # 3.
     -zui_std_rc_button "toggle_dis_${mod}_${ice}" "${dis_col}${disabled_text}${ZUI[FMT_END]}" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
-    # Delete
+    # 4. Delete
     -zui_std_rc_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "${ZUI[RED]}Delete${ZUI[FMT_END]}" -zcrasis_delete output
     if (( ZUI[zc_delete_mode] )); then
         output[4]+=" "
@@ -756,6 +759,21 @@ local zshrc="$(<$zshrc_path)"
 
     reply=()
     if [[ "${main_cmd[sub]}" = "snippet" ]]; then
+        #
+        # Url, edited in edit-mode
+        #
+
+        if [[ "${ZUI[zc_edit_mode]}" = 1 ]]; then
+            # Variables of the text field
+            (( ${+ZUI[my_tfield2_${ice}_width]} == 0 )) && ZUI[my_tfield2_${ice}_width]=$(( ${#main_cmd[url]} + 10 < 30 ? 30 : ${#main_cmd[url]} + 10 ))
+            (( ${+ZUI[my_tfield2_${ice}_start]} == 0 )) && ZUI[my_tfield2_${ice}_start]=1
+            (( ${+ZUI[my_tfield2_${ice}_data]} == 0 )) && ZUI[my_tfield2_${ice}_data]="${main_cmd[url]}" || main_cmd[url]="${ZUI[my_tfield2_${ice}_data]}"
+
+            noglob -zui_std_text_field "tfield2_${mod}_${ice}" ZUI[my_tfield2_${ice}_width] ZUI[my_tfield2_${ice}_start] ZUI[my_tfield2_${ice}_data] "" "" "" '-zcrasis_update_main url "${ZUI[my_tfield2_'${ice}'_data]}" '$ice output
+        else
+            output+=( ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]} )
+        fi
+
         #
         # command on/off
         #
@@ -778,13 +796,12 @@ local zshrc="$(<$zshrc_path)"
         # Document
         #
 
-        reply+=( "$num ${output[1]} ${output[2]} S ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]}" )
-        reply+=( "${output[3]} ${output[4]}${output[5]} ${output[6]}" )
+        reply+=( "$num ${output[1]} ${output[2]} S ${output[5]}" )
+        reply+=( "${output[3]} ${output[4]}${output[6]} ${output[7]}" )
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
         #
         # Url, edited in edit-mode
         #
-
 
         if [[ "${ZUI[zc_edit_mode]}" = 1 ]]; then
             # Variables of the text field
