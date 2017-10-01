@@ -691,9 +691,9 @@ local zshrc="$(<$zshrc_path)"
         unset "ZUI[toggle_force_2_${i}]"
         unset "ZUI[toggle_mode_2_${i}]"
     done
-
 }
 
+# Adds snippet to $cmdlist and refreshes the view
 -zcrasis_add_snippet() {
     local url="${ZUI[my_tfield3_data]}"
     local -A main_cmd
@@ -715,9 +715,32 @@ local zshrc="$(<$zshrc_path)"
     reply=( "$REPLY" "" )
 }
 
+# Adds plugin to $cmdlist and refreshes the view
+-zcrasis_add_plugin() {
+    local url="${ZUI[my_tfield3_data]}"
+    local -A main_cmd
+
+    [[ -z "$url" || "$url" = \<*\> ]] && { -zui_std_stalog "" "" "" "WARNING: " "" "Aborted, please enter or select a proper plugin ID"; return; }
+    [[ "$url" != [a-zA-Z0-9-]##/[a-zA-Z0-9-]## ]] && -zui_std_stalog "" "" "" "WARNING: " "" "Plugin ID isn't of the form \`user/plugin'"
+
+    main_cmd[c]="zplugin"
+    main_cmd[sub]="load"
+    main_cmd[url]="$url"
+
+    -zcrasis_dbg_msg "Prepending plugin (data: ${(kv)main_cmd})"
+
+    cmdlist[1,0]=( "" "" "${(j: :)${(qkv)main_cmd[@]}}" )
+    -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
+    -zcrasis_clear_visual_state
+
+    -zcrasis_refresh2_all_string
+    reply=( "$REPLY" "" )
+}
+
 -zcrasis_generator_0() {
     local mod="$1" ice="$2"
     local pv_col dg_col dl_col ed_col
+    local -a optional
 
     reply=()
 
@@ -726,40 +749,50 @@ local zshrc="$(<$zshrc_path)"
     -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col "${ZUI[BG_BLUE]}" "${ZUI[RED]}"
     -zui_util_map_bools '[[ "${ZUI[zc_edit_mode]}" = "1" ]]' ed_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
 
+    # 1. - 4.
     -zui_std_rc_button "reload" "${ZUI[GREEN]}Reload${ZUI[FMT_END]}" -zcrasis_reload
     -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" '-zcrasis_save; internal=1'
     -zui_std_rc_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_preview
     -zui_std_rc_button "debug" "${dg_col}Debug${ZUI[FMT_END]}" -zcrasis_debug
 
-    # Variables of the text field
-    (( ${+ZUI[my_tfield3_width]} == 0 )) && ZUI[my_tfield3_width]=34
-    (( ${+ZUI[my_tfield3_start]} == 0 )) && ZUI[my_tfield3_start]=1
-    (( ${+ZUI[my_tfield3_data]} == 0 )) && ZUI[my_tfield3_data]="<Enter or select plugin to add>"
-
-    noglob -zui_std_text_field "tfield3_$mod" ZUI[my_tfield3_width] ZUI[my_tfield3_start] ZUI[my_tfield3_data] "" "" "" ''
-
-    # Variables of the list box
-    (( ${+ZUI[my_lbox1_width]} == 0 )) && ZUI[my_lbox1_width]=25
-    (( ${+ZUI[my_lbox1_idx]} == 0 )) && ZUI[my_lbox1_idx]=1
-    (( ${+ZUI[my_lbox1_opts]} == 0 )) && ZUI[my_lbox1_opts]="${(j:;:)chosen_plugins}"
-
-    noglob -zui_std_list_box "lbox1_$mod" ZUI[my_lbox1_width] ZUI[my_lbox1_idx] ZUI[my_lbox1_opts] "" "" "" 'ZUI[my_tfield3_data]="${${(s:;:)ZUI[my_lbox1_opts]}[${ZUI[my_lbox1_idx]}]}"; [[ "${ZUI[my_lbox1_idx]}" = 1 ]] && ZUI[my_tfield3_data]="";'
-
-    -zui_std_rc_button "snippet" "${dg_col}Add snippet${ZUI[FMT_END]}" -zcrasis_add_snippet
-    -zui_std_rc_button "plugin" "${dg_col}Add plugin${ZUI[FMT_END]}" -zcrasis_add_plugin
-
     (( ${ZUI[in_preview]} + ZUI[in_debug] == 0 )) && {
-        -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_delete_mode
-        -zui_std_rc_button "edit_mode" "${ed_col}Edit Mode${ZUI[FMT_END]}" -zcrasis_edit_mode
+        # Variables of the text field
+        (( ${+ZUI[my_tfield3_width]} == 0 )) && ZUI[my_tfield3_width]=34
+        (( ${+ZUI[my_tfield3_start]} == 0 )) && ZUI[my_tfield3_start]=1
+        (( ${+ZUI[my_tfield3_data]} == 0 )) && ZUI[my_tfield3_data]="<Enter or select plugin to add>"
+
+        # 1.
+        noglob -zui_std_text_field "tfield3_$mod" ZUI[my_tfield3_width] ZUI[my_tfield3_start] ZUI[my_tfield3_data] "" "" "" '' optional
+
+        # Variables of the list box
+        (( ${+ZUI[my_lbox1_width]} == 0 )) && ZUI[my_lbox1_width]=25
+        (( ${+ZUI[my_lbox1_idx]} == 0 )) && ZUI[my_lbox1_idx]=1
+        (( ${+ZUI[my_lbox1_opts]} == 0 )) && ZUI[my_lbox1_opts]="${(j:;:)chosen_plugins}"
+
+        # 2.
+        noglob -zui_std_list_box "lbox1_$mod" ZUI[my_lbox1_width] ZUI[my_lbox1_idx] ZUI[my_lbox1_opts] "" "" "" 'ZUI[my_tfield3_data]="${${(s:;:)ZUI[my_lbox1_opts]}[${ZUI[my_lbox1_idx]}]}"; [[ "${ZUI[my_lbox1_idx]}" = 1 ]] && ZUI[my_tfield3_data]="";' optional
+
+        # 3. - 4.
+        -zui_std_rc_button "snippet" "${ZUI[GREEN]}Add snippet${ZUI[FMT_END]}" -zcrasis_add_snippet optional
+        -zui_std_rc_button "plugin" "${ZUI[GREEN]}Add plugin${ZUI[FMT_END]}" -zcrasis_add_plugin optional
+
+        # 5. - 6.
+        -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_delete_mode optional
+        -zui_std_rc_button "edit_mode" "${ed_col}Edit Mode${ZUI[FMT_END]}" -zcrasis_edit_mode optional
+
+        local line1="${optional[5]} ${optional[6]}"
+        local line2="${optional[1]} ${optional[3]} ${optional[4]}  Choose: ${optional[2]}"
     } || {
-        reply+=( "" "" )
+        local line1="" line2=""
     }
 
     reply=(
         "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]}"
-        "${reply[9]} ${reply[10]}"
-        "${reply[5]} ${reply[7]} ${reply[8]}  Choose: ${reply[6]}"
+        "$line1"
+        "$line2"
     )
+
+    [[ -z "$line1" && -z "$line2" ]] && reply[2,3]=()
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
