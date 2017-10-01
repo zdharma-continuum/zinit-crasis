@@ -71,6 +71,8 @@ for (( i=1; i<=nwords; i++ )); do
             found2="${text2[(i)$search]}"
             # The \$'\n' not missing?
             if (( found2 == 0 || found2 > ${#text2} || found2 != found )); then
+                -zcrasis_dbg_msg "Found complex zshrc construct: $text"
+
                 # Last +1 to fully compensate 2-characters long \$'\n'
                 # First +1 added before this loop
                 word="${buf[1,start+1+bslen-1+1]}"

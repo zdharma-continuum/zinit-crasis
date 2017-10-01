@@ -92,6 +92,9 @@ integer coidx=1
 local -a mbegin mend match
 local MATCH; integer MBEGIN MEND
 
+# Debug array, for debug view
+local -a ZCR_DEBUG_MSGS
+
 #
 # Load zshrc
 #
@@ -416,7 +419,10 @@ local zshrc="$(<$zshrc_path)"
     ZUI[toggle_mode_${mod}_$(( ice+1 ))]="$tmp"
 }
 
+# Enters preview view
 -zcrasis_preview() {
+    -zui_std_set_mod_factor 4 0
+    ZUI[in_debug]=0
     if [[ "${ZUI[in_preview]}" != 1 ]]; then
         -zui_std_set_mod_factor 2 0
         -zui_std_set_mod_factor 3 1
@@ -432,6 +438,33 @@ local zshrc="$(<$zshrc_path)"
 
     # Regenerate preview module
     reply=( ",mod3_ice1," "" )
+}
+
+# Enters debug view
+-zcrasis_debug() {
+    -zui_std_set_mod_factor 3 0
+    ZUI[in_preview]=0
+
+    if [[ "${ZUI[in_debug]}" != 1 ]]; then
+        -zui_std_set_mod_factor 2 0
+        -zui_std_set_mod_factor 4 1
+        ZUI[in_debug]=1
+    else
+        -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
+        -zui_std_set_mod_factor 4 0
+        ZUI[in_debug]=0
+    fi
+
+    # To update "[Debug]" button
+    -zui_std_fly_mod_regen 1 1 ""
+
+    # Regenerate debug module
+    reply=( ",mod4_ice1," "" )
+}
+
+# Appends debug message to log of the debug view
+-zcrasis_dbg_msg() {
+    ZCR_DEBUG_MSGS+=( "$*" )
 }
 
 # Removes given entry from $cmdlist and orders
@@ -559,21 +592,23 @@ local zshrc="$(<$zshrc_path)"
 
 -zcrasis_generator_0() {
     local mod="$1" ice="$2"
-    local pv_col dl_col
+    local pv_col dg_col dl_col
 
     reply=()
 
     -zui_util_map_bools '[[ ${ZUI[in_preview]} = 1 ]]' pv_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
+    -zui_util_map_bools '[[ ${ZUI[in_debug]} = 1 ]]' dg_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
     -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col "${ZUI[BG_BLUE]}" "${ZUI[RED]}"
 
     -zui_std_rc_button "reload" "${ZUI[GREEN]}Reload${ZUI[FMT_END]}" -zcrasis_reload
     -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" -zcrasis_save
     -zui_std_rc_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_preview
+    -zui_std_rc_button "debug" "${dg_col}Debug${ZUI[FMT_END]}" -zcrasis_debug
     -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_delete_mode
 
     reply=(
-        "${reply[1]} ${reply[2]} ${reply[3]}"
-        "${reply[4]}"
+        "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]}"
+        "${reply[5]}"
     )
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
@@ -710,6 +745,13 @@ local zshrc="$(<$zshrc_path)"
     reply2=( )               reply3=( 1 )                reply4=( )
 }
 
+-zcrasis_generator_DBG() {
+    reply=( "${ZCR_DEBUG_MSGS[@]}" )
+
+    # Non-selectable lines   Hops to jump with [ and ]   Local anchors
+    reply2=( )               reply3=( 1 )                reply4=( )
+}
+
 -zcrasis_reload() {
     local id="$1"
     print "Parsing zshrc..."
@@ -745,7 +787,8 @@ done
 ZUI[reset_current_segment]="no"
 
 ## Start application ##
-zui-event-loop 1:-zcrasis_generator_0 $(( ${#cmdlist} / 3 )):-zcrasis_generator_A 0:-zcrasis_generator_B
+zui-event-loop 1:-zcrasis_generator_0 $(( ${#cmdlist} / 3 )):-zcrasis_generator_A \
+               0:-zcrasis_generator_B 0:-zcrasis_generator_DBG
 
 -zui_std_cleanup serialize
 
