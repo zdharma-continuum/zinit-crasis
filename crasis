@@ -636,7 +636,12 @@ local zshrc="$(<$zshrc_path)"
     -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" '-zcrasis_save; internal=1'
     -zui_std_rc_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_preview
     -zui_std_rc_button "debug" "${dg_col}Debug${ZUI[FMT_END]}" -zcrasis_debug
-    -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_delete_mode
+
+    (( ${ZUI[in_preview]} + ZUI[in_debug] == 0 )) && {
+        -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_delete_mode
+    } || {
+        reply+=()
+    }
 
     reply=(
         "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]}"
