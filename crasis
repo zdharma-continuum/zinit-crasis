@@ -811,6 +811,8 @@ local zshrc="$(<$zshrc_path)"
     -zcrasis_dbg_msg "Total time: $sum"
     -zcrasis_dbg_msg ""
 
+    -zui_std_stalog "Read " "\`$zshrc_path' " "(time: $sum)"
+
     # Called from button?
     [[ -n "$id" ]] && {
         integer i size=$(( ${#cmdlist} / 3 ))
