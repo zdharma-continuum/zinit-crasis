@@ -589,6 +589,8 @@ local zshrc="$(<$zshrc_path)"
     -zcrasis_compose 1 1
     print -rl -- "${reply[@]}" >| ~/.myzshrc
     reply=()
+
+    -zui_std_stalog "Saved to:" "\`$zshrc_path'"
 }
 
 -zcrasis_generator_0() {
