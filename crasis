@@ -473,11 +473,8 @@ local zshrc="$(<$zshrc_path)"
         ZUI[in_preview]=0
     fi
 
-    # To update "[Preview]" button
-    -zui_std_fly_mod_regen 1 1 ""
-
-    # Regenerate preview module
-    reply=( ",mod3_ice1," "" )
+    # Regenerate menu and preview module
+    reply=( ",mod1_ice1,mod3_ice1," "" )
 }
 
 # Enters debug view
@@ -506,11 +503,8 @@ local zshrc="$(<$zshrc_path)"
         ZUI[in_debug]=0
     fi
 
-    # To update "[Debug]" button
-    -zui_std_fly_mod_regen 1 1 ""
-
-    # Regenerate debug module
-    reply=( ",mod4_ice1," "" )
+    # Regenerate menu and debug module
+    reply=( ",mod1_ice1,mod4_ice1," "" )
 }
 
 # Removes given entry from $cmdlist and orders
