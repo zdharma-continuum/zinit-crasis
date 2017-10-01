@@ -113,9 +113,11 @@ local internal # to mark inline action as no-ZUI-restart
 [[ ! -s "$zshrc_path" ]] && { print "File \`$zshrc_path' is empty, aborting"; return 1; }
 
 -zcrasis_dbg_msg "Loading \`$zshrc_path'..."
--zcrasis_dbg_msg ""
 
 local zshrc="$(<$zshrc_path)"
+
+-zcrasis_dbg_msg "Read <ZSHRCSIZE> bytes (<ZSHRCLINES> lines)"
+-zcrasis_dbg_msg ""
 
 # Runs -zcrasis-process-buffer() on $zshrc (containing
 # the loaded zshrc)
@@ -463,6 +465,8 @@ local zshrc="$(<$zshrc_path)"
     if [[ "${ZUI[in_debug]}" != 1 ]]; then
         -zui_std_set_mod_factor 2 0
         -zui_std_set_mod_factor 4 1
+        ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCSIZE>/${#zshrc}}" )
+        ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCLINES>/${#${(f@)zshrc}}}" )
         ZUI[in_debug]=1
     else
         -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
