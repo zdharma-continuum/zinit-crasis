@@ -757,6 +757,9 @@ local zshrc="$(<$zshrc_path)"
     reply=( "$REPLY" "" )
 }
 
+# ZUI generator that creates top menu (its hypertext).
+# The menu can differ depending on current view mode
+# (normal, preview, debug).
 -zcrasis_generator_0() {
     local mod="$1" ice="$2"
     local pv_col dg_col dl_col ed_col co_col
@@ -820,7 +823,9 @@ local zshrc="$(<$zshrc_path)"
     reply2=( )               reply3=( 1 )                reply4=( )
 }
 
-# Generator for module 1
+# ZUI generator that creates document block for each plugin,
+# snippet or other command. This is module #2, each document
+# block is an instance of this module.
 -zcrasis_generator_A() {
     local mod="$1" ice="$2" comment
     local -a cmd output
@@ -993,6 +998,9 @@ local zshrc="$(<$zshrc_path)"
     reply2=( )               reply3=( 1 )                reply4=( move_up_${mod}_${ice} move_down_${mod}_${ice} )
 }
 
+# ZUI generator that creates preview text. This is module 3.
+# There is 0 or 1 instance of this module, depending on chosen
+# view.
 -zcrasis_generator_B() {
     -zcrasis_compose
 
@@ -1000,6 +1008,9 @@ local zshrc="$(<$zshrc_path)"
     reply2=( )               reply3=( 1 )                reply4=( )
 }
 
+# ZUI generator that creates debug-report text. This is module 4.
+# There is 0 or 1 instance of this module, depending on chosen
+# view.
 -zcrasis_generator_DBG() {
     reply=()
 

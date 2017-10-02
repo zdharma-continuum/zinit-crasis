@@ -270,6 +270,12 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 -zcrasis_generator_0
 ~~~~~~~~~~~~~~~~~~~~
 
+____
+ # ZUI generator that creates top menu (its hypertext).
+ # The menu can differ depending on current view mode
+ # (normal, preview, debug).
+____
+
 Has 45 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
@@ -278,7 +284,9 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 ~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Generator for module 1
+ # ZUI generator that creates document block for each plugin,
+ # snippet or other command. This is module #2, each document
+ # block is an instance of this module.
 ____
 
 Has 118 line(s). Calls functions:
@@ -291,6 +299,12 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 -zcrasis_generator_B
 ~~~~~~~~~~~~~~~~~~~~
 
+____
+ # ZUI generator that creates preview text. This is module 3.
+ # There is 0 or 1 instance of this module, depending on chosen
+ # view.
+____
+
 Has 2 line(s). Calls functions:
 
  -zcrasis_generator_B
@@ -300,6 +314,12 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 
 -zcrasis_generator_DBG
 ~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # ZUI generator that creates debug-report text. This is module 4.
+ # There is 0 or 1 instance of this module, depending on chosen
+ # view.
+____
 
 Has 15 line(s). Doesn't call other functions.
 
