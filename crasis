@@ -119,6 +119,7 @@ integer was_zplugin=0 pre_block_end=0 post_block_begin=0
 local -A cmd3
 local -a cmdlist
 integer coidx=1
+local leading_spaces
 
 # Common
 local -a mbegin mend match
@@ -395,6 +396,14 @@ local zshrc="$(<$zshrc_path)"
         in_zplugin+=1
     done
 
+    # Spaces before first comment or command - not moved with command
+    if [[ -n "${cmdlist[1]}" ]]; then
+        cmdlist[1]="${cmdlist[1]##(#m)[[:space:]]##}"
+        leading_spaces="$MATCH"
+    else
+        leading_spaces="${ZCR_PB_SPACES[(pre_block_end/2)+1]}"
+    fi
+
     if [[ -n "${cmd3[c]}" ]];then
         if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
             cmdlist[coidx+1]="${(j: :)${(qkv)cmd3[@]}}"
@@ -610,7 +619,7 @@ local zshrc="$(<$zshrc_path)"
     local -a cmd
     local -A ice_cmd main_cmd
 
-    [[ "$whole" = "1" ]] && buf="${(j::)ZCR_PB_ALL[1,pre_block_end]}"$'\n'
+    [[ "$whole" = "1" ]] && buf="${(j::)ZCR_PB_ALL[1,pre_block_end]}$leading_spaces"
 
     for (( i=1; i<=size; ++ i )); do
         cmd=( "${(@)cmdlist[(i-1)*3+1,i*3]}" )
