@@ -129,6 +129,10 @@ local tmp
 typeset -g REPLY
 typeset -ga reply
 
+# -zcrasis-process-buffer output parameters, declare
+# them to prevent globals from being created
+local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
+
 #
 # Load zshrc
 #
