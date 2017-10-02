@@ -16,26 +16,26 @@ FUNCTIONS
  -zcrasis-process-zplugin-commands
  -zcrasis-process-zsh-rc
  -zcrasis-tokenize-zsh-rc
- -zcrasis_add_plugin
- -zcrasis_add_snippet
+ -zcrasis_add_plugin_action
+ -zcrasis_add_snippet_action
  -zcrasis_clear_visual_state
- -zcrasis_compact_mode
+ -zcrasis_compact_mode_action
  -zcrasis_compose
  -zcrasis_dbg_msg
- -zcrasis_debug
- -zcrasis_delete
- -zcrasis_delete_mode
- -zcrasis_edit_mode
+ -zcrasis_debug_action
+ -zcrasis_delete_action
+ -zcrasis_delete_mode_action
+ -zcrasis_edit_mode_action
  -zcrasis_generator_0
  -zcrasis_generator_A
  -zcrasis_generator_B
  -zcrasis_generator_DBG
  -zcrasis_move_down
  -zcrasis_move_up
- -zcrasis_preview
+ -zcrasis_preview_action
  -zcrasis_refresh2_all_string
- -zcrasis_reload
- -zcrasis_save
+ -zcrasis_reload_action
+ -zcrasis_save_action
  -zcrasis_update_main
 AUTOLOAD -zcrasis-process-buffer
 
@@ -49,7 +49,7 @@ Has 110 line(s). Calls functions:
 
  Script-Body
  |-- -zcrasis_dbg_msg
- `-- -zcrasis_reload
+ `-- -zcrasis_reload_action
      |-- -zcrasis-process-zplugin-commands
      |   `-- -zcrasis_dbg_msg
      |-- -zcrasis-process-zsh-rc
@@ -76,7 +76,7 @@ Has 82 line(s). Calls functions:
 
 Called by:
 
- -zcrasis_reload
+ -zcrasis_reload_action
 
 -zcrasis-process-zsh-rc
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,7 +93,7 @@ Has 109 line(s). Doesn't call other functions.
 
 Called by:
 
- -zcrasis_reload
+ -zcrasis_reload_action
 
 -zcrasis-tokenize-zsh-rc
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,10 +111,10 @@ Has 1 line(s). Calls functions:
 
 Called by:
 
- -zcrasis_reload
+ -zcrasis_reload_action
 
--zcrasis_add_plugin
-~~~~~~~~~~~~~~~~~~~
+-zcrasis_add_plugin_action
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
  # Adds plugin to $cmdlist and refreshes the view
@@ -122,15 +122,15 @@ ____
 
 Has 18 line(s). Calls functions:
 
- -zcrasis_add_plugin
+ -zcrasis_add_plugin_action
  |-- -zcrasis_clear_visual_state
  |-- -zcrasis_dbg_msg
  `-- -zcrasis_refresh2_all_string
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
--zcrasis_add_snippet
-~~~~~~~~~~~~~~~~~~~~
+-zcrasis_add_snippet_action
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
  # Adds snippet to $cmdlist and refreshes the view
@@ -138,7 +138,7 @@ ____
 
 Has 18 line(s). Calls functions:
 
- -zcrasis_add_snippet
+ -zcrasis_add_snippet_action
  |-- -zcrasis_clear_visual_state
  |-- -zcrasis_dbg_msg
  `-- -zcrasis_refresh2_all_string
@@ -157,15 +157,15 @@ Has 11 line(s). Doesn't call other functions.
 
 Called by:
 
- -zcrasis_add_plugin
- -zcrasis_add_snippet
- -zcrasis_delete
+ -zcrasis_add_plugin_action
+ -zcrasis_add_snippet_action
+ -zcrasis_delete_action
  -zcrasis_move_down
  -zcrasis_move_up
- -zcrasis_reload
+ -zcrasis_reload_action
 
--zcrasis_compact_mode
-~~~~~~~~~~~~~~~~~~~~~
+-zcrasis_compact_mode_action
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
  # Switches the entry list to compact-mode
@@ -173,7 +173,7 @@ ____
 
 Has 8 line(s). Calls functions:
 
- -zcrasis_compact_mode
+ -zcrasis_compact_mode_action
  `-- -zcrasis_refresh2_all_string
 
 Not called by script or any function, may be a hook or Zle widget, etc.
@@ -192,7 +192,7 @@ Has 71 line(s). Doesn't call other functions.
 Called by:
 
  -zcrasis_generator_B
- -zcrasis_save
+ -zcrasis_save_action
 
 -zcrasis_dbg_msg
 ~~~~~~~~~~~~~~~~
@@ -207,13 +207,13 @@ Called by:
 
  -zcrasis-process-buffer
  -zcrasis-process-zplugin-commands
- -zcrasis_add_plugin
- -zcrasis_add_snippet
- -zcrasis_reload
+ -zcrasis_add_plugin_action
+ -zcrasis_add_snippet_action
+ -zcrasis_reload_action
  Script-Body
 
--zcrasis_debug
-~~~~~~~~~~~~~~
+-zcrasis_debug_action
+~~~~~~~~~~~~~~~~~~~~~
 
 ____
  # Enters debug view
@@ -223,8 +223,8 @@ Has 24 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
--zcrasis_delete
-~~~~~~~~~~~~~~~
+-zcrasis_delete_action
+~~~~~~~~~~~~~~~~~~~~~~
 
 ____
  # Removes given entry from $cmdlist and orders
@@ -233,13 +233,13 @@ ____
 
 Has 15 line(s). Calls functions:
 
- -zcrasis_delete
+ -zcrasis_delete_action
  `-- -zcrasis_clear_visual_state
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
--zcrasis_delete_mode
-~~~~~~~~~~~~~~~~~~~~
+-zcrasis_delete_mode_action
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
  # Enables ability to delete entries
@@ -249,8 +249,8 @@ Has 14 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
--zcrasis_edit_mode
-~~~~~~~~~~~~~~~~~~
+-zcrasis_edit_mode_action
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
  # Enables ability to edit entries
@@ -258,7 +258,7 @@ ____
 
 Has 8 line(s). Calls functions:
 
- -zcrasis_edit_mode
+ -zcrasis_edit_mode_action
  `-- -zcrasis_refresh2_all_string
 
 Not called by script or any function, may be a hook or Zle widget, etc.
@@ -331,8 +331,8 @@ Has 27 line(s). Calls functions:
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
--zcrasis_preview
-~~~~~~~~~~~~~~~~
+-zcrasis_preview_action
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
  # Enters preview view
@@ -355,13 +355,13 @@ Has 8 line(s). Doesn't call other functions.
 
 Called by:
 
- -zcrasis_add_plugin
- -zcrasis_add_snippet
- -zcrasis_compact_mode
- -zcrasis_edit_mode
+ -zcrasis_add_plugin_action
+ -zcrasis_add_snippet_action
+ -zcrasis_compact_mode_action
+ -zcrasis_edit_mode_action
 
--zcrasis_reload
-~~~~~~~~~~~~~~~
+-zcrasis_reload_action
+~~~~~~~~~~~~~~~~~~~~~~
 
 ____
  # Ran at startup and after [Reload] button press.
@@ -371,7 +371,7 @@ ____
 
 Has 53 line(s). Calls functions:
 
- -zcrasis_reload
+ -zcrasis_reload_action
  |-- -zcrasis-process-zplugin-commands
  |   `-- -zcrasis_dbg_msg
  |-- -zcrasis-process-zsh-rc
@@ -385,12 +385,12 @@ Called by:
 
  Script-Body
 
--zcrasis_save
-~~~~~~~~~~~~~
+-zcrasis_save_action
+~~~~~~~~~~~~~~~~~~~~
 
 Has 5 line(s). Calls functions:
 
- -zcrasis_save
+ -zcrasis_save_action
  `-- -zcrasis_compose
 
 Not called by script or any function, may be a hook or Zle widget, etc.
