@@ -446,7 +446,6 @@ local zshrc="$(<$zshrc_path)"
     ZUI[toggle_mode_${mod}_${ice}]="${ZUI[toggle_mode_${mod}_$(( ice-1 ))]}"
     ZUI[toggle_mode_${mod}_$(( ice-1 ))]="$tmp"
 
-    -zcrasis_clear_visual_state
 }
 
 # Moves given instance ($ice) down, i.e. swaps
@@ -478,7 +477,6 @@ local zshrc="$(<$zshrc_path)"
     ZUI[toggle_mode_${mod}_${ice}]="${ZUI[toggle_mode_${mod}_$(( ice+1 ))]}"
     ZUI[toggle_mode_${mod}_$(( ice+1 ))]="$tmp"
 
-    -zcrasis_clear_visual_state
 }
 
 # Enters preview view
