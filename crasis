@@ -80,10 +80,12 @@ TOKEN_TYPES=(
 local -a chosen_plugins
 chosen_plugins=(
     "<Gold Plugins Collection>"
-    "zdharma/history-search-multi-word"
+    "djui/alias-tips"
     "zdharma/fast-syntax-highlighting"
+    "zdharma/history-search-multi-word"
     "zdharma/zredis"
     "zsh-users/zsh-autosuggestions"
+    "zsh-users/zsh-history-substring-search"
     "zsh-users/zsh-syntax-highlighting"
 )
 
