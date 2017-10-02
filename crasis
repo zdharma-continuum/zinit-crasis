@@ -125,6 +125,8 @@ local -a mbegin mend match
 local MATCH; integer MBEGIN MEND
 local internal # to mark inline action as no-ZUI-restart
 local tmp
+typeset -g REPLY
+typeset -ga reply
 
 #
 # Load zshrc
