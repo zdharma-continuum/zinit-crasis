@@ -541,14 +541,9 @@ local zshrc="$(<$zshrc_path)"
         ZUI[zc_delete_mode]=1
     fi
 
-    local rtext=",mod1_ice1,"
-    integer i size=$(( ${#cmdlist} / 3 ))
+    -zcrasis_refresh2_all_string
 
-    for (( i=1; i<=size; ++ i )); do
-        rtext+="mod2_ice${i},"
-    done
-
-    reply=( "$rtext" "" )
+    reply=( "$REPLY" "" )
 }
 
 # Enables ability to edit entries
@@ -1071,18 +1066,15 @@ local zshrc="$(<$zshrc_path)"
 
     # Called from button?
     [[ -n "$id" ]] && {
-        integer i size=$(( ${#cmdlist} / 3 ))
+        integer size=$(( ${#cmdlist} / 3 ))
 
         -zui_std_set_mod_factor 2 "$size"
         -zui_std_set_mod_factor 3 0
         -zui_std_set_mod_factor 4 0
 
-        local rtext=",mod1_ice1,"
-        for (( i=1; i<=size; ++ i )); do
-            rtext+="mod2_ice${i},"
-        done
+        -zcrasis_refresh2_all_string
 
-        reply=( "$rtext" "" )
+        reply=( "$REPLY" "" )
     } || reply=()
 }
 
