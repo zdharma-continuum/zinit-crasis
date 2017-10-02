@@ -403,9 +403,23 @@ local zshrc="$(<$zshrc_path)"
     -zcrasis_dbg_msg ""
 }
 
+# Swaps two variables given by name. Uses (P) substitution
+# flag, can swap e.g. hash entries. For example:
+#   local -A hash_arr=( a b c d )
+#   -zcrasis_util_swap 'hash_arr[a]' 'hash_arr[b]'
+#
+# $1 - name of first variable to swap
+# $2 - name of second variable to swap
+-zcrasis_util_swap() {
+    local __var_name1="$1" __var_name2="$2" __tmp
+    tmp="${(P)__var_name1}"
+    : ${(P)__var_name1::=${(P)__var_name2}}
+    : ${(P)__var_name2::=$tmp}
+}
+
 # Moves given instance ($ice) up, i.e. swaps
 # current and previous instance
--zcrasis_move_up() {
+-zcrasis_action_move_up() {
     local mod="$1" ice="$2" tmp
 
     local -a cmd1 cmd2
@@ -437,7 +451,7 @@ local zshrc="$(<$zshrc_path)"
 
 # Moves given instance ($ice) down, i.e. swaps
 # current and next instance
--zcrasis_move_down() {
+-zcrasis_action_move_down() {
     local mod="$1" ice="$2" tmp
 
     local -a cmd1 cmd2
@@ -852,14 +866,14 @@ local zshrc="$(<$zshrc_path)"
 
     # 1.
     if [[ "$ice" -gt 1 ]]; then
-        -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "${ZUI[YELLOW]}[Up]${ZUI[FMT_END]}" "-zcrasis_move_up $mod $ice" output
+        -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "${ZUI[YELLOW]}[Up]${ZUI[FMT_END]}" "-zcrasis_action_move_up $mod $ice" output
     else
         output+=( "[Up]" )
     fi
 
     # 2.
     if [[ "$ice" -lt $(( ${#cmdlist} / 3 )) ]]; then
-        -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "${ZUI[YELLOW]}[Down]${ZUI[FMT_END]}" "-zcrasis_move_down $mod $ice" output
+        -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "${ZUI[YELLOW]}[Down]${ZUI[FMT_END]}" "-zcrasis_action_move_down $mod $ice" output
     else
         output+=( "[Down]" )
     fi
