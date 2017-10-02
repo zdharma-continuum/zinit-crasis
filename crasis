@@ -468,7 +468,7 @@ local zshrc="$(<$zshrc_path)"
 }
 
 # Enters preview view
--zcrasis_preview_action() {
+-zcrasis_action_preview() {
     -zui_std_set_mod_factor 4 0
     ZUI[in_debug]=0
     if [[ "${ZUI[in_preview]}" != 1 ]]; then
@@ -486,7 +486,7 @@ local zshrc="$(<$zshrc_path)"
 }
 
 # Enters debug view
--zcrasis_debug_action() {
+-zcrasis_action_debug_view() {
     -zui_std_set_mod_factor 3 0
     ZUI[in_preview]=0
 
@@ -517,7 +517,7 @@ local zshrc="$(<$zshrc_path)"
 
 # Removes given entry from $cmdlist and orders
 # full regeneration of commands-section
--zcrasis_delete_action() {
+-zcrasis_action_delete() {
     local id="$1" mod="$2" ice="$3"
     cmdlist[(ice-1)*3+1,ice*3]=()
 
@@ -536,7 +536,7 @@ local zshrc="$(<$zshrc_path)"
 }
 
 # Enables ability to delete entries
--zcrasis_delete_mode_action() {
+-zcrasis_action_delete_mode() {
     if [[ -n "${ZUI[zc_delete_mode]}" ]]; then
         (( ZUI[zc_delete_mode] = 1 - ZUI[zc_delete_mode] ))
     else
@@ -549,7 +549,7 @@ local zshrc="$(<$zshrc_path)"
 }
 
 # Enables ability to edit entries
--zcrasis_edit_mode_action() {
+-zcrasis_action_edit_mode() {
     if [[ -n "${ZUI[zc_edit_mode]}" ]]; then
         (( ZUI[zc_edit_mode] = 1 - ZUI[zc_edit_mode] ))
     else
@@ -561,7 +561,7 @@ local zshrc="$(<$zshrc_path)"
 }
 
 # Switches the entry list to compact-mode
--zcrasis_compact_mode_action() {
+-zcrasis_action_compact_mode() {
     if [[ -n "${ZUI[zc_compact_mode]}" ]]; then
         (( ZUI[zc_compact_mode] = 1 - ZUI[zc_compact_mode] ))
     else
@@ -670,7 +670,7 @@ local zshrc="$(<$zshrc_path)"
     reply=( "${(@f)buf}" )
 }
 
--zcrasis_save_action() {
+-zcrasis_action_save() {
     -zcrasis_compose 1 1
     print -rl -- "${reply[@]}" >| "$zshrc_path"
     reply=()
@@ -714,7 +714,7 @@ local zshrc="$(<$zshrc_path)"
 }
 
 # Adds snippet to $cmdlist and refreshes the view
--zcrasis_add_snippet_action() {
+-zcrasis_action_add_snippet() {
     local url="${ZUI[my_tfield3_data]}"
     local -A main_cmd
 
@@ -736,7 +736,7 @@ local zshrc="$(<$zshrc_path)"
 }
 
 # Adds plugin to $cmdlist and refreshes the view
--zcrasis_add_plugin_action() {
+-zcrasis_action_add_plugin() {
     local url="${ZUI[my_tfield3_data]}"
     local -A main_cmd
 
@@ -774,10 +774,10 @@ local zshrc="$(<$zshrc_path)"
     -zui_util_map_bools '[[ "${ZUI[zc_compact_mode]}" = "1" ]]' co_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
 
     # 1. - 4.
-    -zui_std_rc_button "reload" "${ZUI[GREEN]}Reload${ZUI[FMT_END]}" -zcrasis_reload_action
-    -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" '-zcrasis_save_action; internal=1'
-    -zui_std_rc_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_preview_action
-    -zui_std_rc_button "debug" "${dg_col}Debug${ZUI[FMT_END]}" -zcrasis_debug_action
+    -zui_std_rc_button "reload" "${ZUI[GREEN]}Reload${ZUI[FMT_END]}" -zcrasis_action_reload
+    -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" '-zcrasis_action_save; internal=1'
+    -zui_std_rc_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_action_preview
+    -zui_std_rc_button "debug" "${dg_col}Debug${ZUI[FMT_END]}" -zcrasis_action_debug_view
 
     (( ${ZUI[in_preview]} + ZUI[in_debug] == 0 )) && {
         # Variables of the text field
@@ -797,13 +797,13 @@ local zshrc="$(<$zshrc_path)"
         noglob -zui_std_list_box "lbox1_$mod" ZUI[my_lbox1_width] ZUI[my_lbox1_idx] ZUI[my_lbox1_opts] "" "" "" 'ZUI[my_tfield3_data]="${${(s:;:)ZUI[my_lbox1_opts]}[${ZUI[my_lbox1_idx]}]}"; [[ "${ZUI[my_lbox1_idx]}" = 1 ]] && ZUI[my_tfield3_data]="";' optional
 
         # 3. - 4.
-        -zui_std_rc_button "snippet" "${ZUI[GREEN]}Add snippet${ZUI[FMT_END]}" -zcrasis_add_snippet_action optional
-        -zui_std_rc_button "plugin" "${ZUI[GREEN]}Add plugin${ZUI[FMT_END]}" -zcrasis_add_plugin_action optional
+        -zui_std_rc_button "snippet" "${ZUI[GREEN]}Add snippet${ZUI[FMT_END]}" -zcrasis_action_add_snippet optional
+        -zui_std_rc_button "plugin" "${ZUI[GREEN]}Add plugin${ZUI[FMT_END]}" -zcrasis_action_add_plugin optional
 
         # 5. - 6.
-        -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_delete_mode_action optional
-        -zui_std_rc_button "edit_mode" "${ed_col}Edit Mode${ZUI[FMT_END]}" -zcrasis_edit_mode_action optional
-        -zui_std_rc_button "compact_mode" "${co_col}Compact Mode${ZUI[FMT_END]}" -zcrasis_compact_mode_action optional
+        -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_action_delete_mode optional
+        -zui_std_rc_button "edit_mode" "${ed_col}Edit Mode${ZUI[FMT_END]}" -zcrasis_action_edit_mode optional
+        -zui_std_rc_button "compact_mode" "${co_col}Compact Mode${ZUI[FMT_END]}" -zcrasis_action_compact_mode optional
 
         local line1="${optional[5]} ${optional[6]} ${optional[7]}"
         local line2="${optional[1]} ${optional[3]} ${optional[4]}  Choose: ${optional[2]}"
@@ -874,7 +874,7 @@ local zshrc="$(<$zshrc_path)"
     -zui_std_rc_button "toggle_dis_${mod}_${ice}" "${dis_col}${disabled_text}${ZUI[FMT_END]}" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
     # 4. Delete
-    -zui_std_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "${ZUI[RED]}[X]${ZUI[FMT_END]}" -zcrasis_delete_action output
+    -zui_std_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "${ZUI[RED]}[X]${ZUI[FMT_END]}" -zcrasis_action_delete output
     if (( ZUI[zc_delete_mode] )); then
         output[4]+=" "
     else
@@ -1036,7 +1036,7 @@ local zshrc="$(<$zshrc_path)"
 # Ran at startup and after [Reload] button press.
 # Performs full zshrc processing, recognizes normal
 # and zplugin-related zshrc parts.
--zcrasis_reload_action() {
+-zcrasis_action_reload() {
     local id="$1" msg
     float -F 2 sum=0.0
     local -a stats
@@ -1091,7 +1091,7 @@ local zshrc="$(<$zshrc_path)"
     } || reply=()
 }
 
--zcrasis_reload_action
+-zcrasis_action_reload
 
 # Create needed local parameters
 integer i
