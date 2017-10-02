@@ -5,7 +5,7 @@ all: zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc
 
 doc: crasis
 	rm -rf zsdoc/data zsdoc/*.adoc
-	FPATH="`pwd`:$$FPATH" zsd -v crasis
+	zsd -v --fpath `pwd` crasis
 
 clean:
 	rm -f -- zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc
