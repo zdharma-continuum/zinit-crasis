@@ -156,6 +156,10 @@ local zshrc="$(<$zshrc_path)"
 # - block preceding zplugin commands
 # - block with those commands
 # - block following them
+#
+# Uses parameters filled by -zcrasis-process-buffer:
+# - $ZCR_PB_WORDS - tokens
+# - $ZCR_PB_SPACES - spaces in front of each token, +1 at the end
 -zcrasis-process-zsh-rc() {
     integer i j size="${#ZCR_PB_WORDS}"
 
@@ -304,6 +308,10 @@ local zshrc="$(<$zshrc_path)"
 # -zcrasis-process-zsh-rc() and generates $cmdlist
 # array which holds serialized hashes of every zplugin
 # invocation, mixed-in additional commands, comments.
+#
+# Uses parameters filled by -zcrasis-process-buffer:
+# - $ZCR_PB_WORDS - tokens
+# - $ZCR_PB_SPACES - spaces in front of each token, +1 at the end
 -zcrasis-process-zplugin-commands() {
     integer i
     cmd3=()
@@ -417,8 +425,11 @@ local zshrc="$(<$zshrc_path)"
     : ${(P)__var_name2::=$tmp}
 }
 
-# Moves given instance ($ice) up, i.e. swaps
+# Moves given instance ($2) up, i.e. swaps
 # current and previous instance
+#
+# $1 - module index (will be 2)
+# $2 - instance index
 -zcrasis_action_move_up() {
     local mod="$1" ice="$2" tmp
 
@@ -438,6 +449,9 @@ local zshrc="$(<$zshrc_path)"
 
 # Moves given instance ($ice) down, i.e. swaps
 # current and next instance
+#
+# $1 - module index (will be 2)
+# $2 - instance index
 -zcrasis_action_move_down() {
     local mod="$1" ice="$2" tmp
 
@@ -455,7 +469,10 @@ local zshrc="$(<$zshrc_path)"
     noglob -zcrasis_util_swap ZUI[toggle_mode_${mod}_${ice}] ZUI[toggle_mode_${mod}_$(( ice+1 ))]
 }
 
-# Enters preview view
+# Enters or leaves preview view. It basically sets
+# preview module's instance to be created, once.
+# At the same time, plugin list module is set to 0
+# instances.
 -zcrasis_action_preview() {
     -zui_std_set_mod_factor 4 0
     ZUI[in_debug]=0
@@ -473,7 +490,7 @@ local zshrc="$(<$zshrc_path)"
     reply=( ",mod1_ice1,mod3_ice1," "" )
 }
 
-# Enters debug view
+# Enters or leaves debug view.
 -zcrasis_action_debug_view() {
     -zui_std_set_mod_factor 3 0
     ZUI[in_preview]=0
@@ -505,6 +522,10 @@ local zshrc="$(<$zshrc_path)"
 
 # Removes given entry from $cmdlist and orders
 # full regeneration of commands-section
+#
+# $1 - widget id
+# $2 - module's index
+# $3 - module's instance index
 -zcrasis_action_delete() {
     local id="$1" mod="$2" ice="$3"
     cmdlist[(ice-1)*3+1,ice*3]=()
@@ -523,7 +544,8 @@ local zshrc="$(<$zshrc_path)"
     reply=( "$rtext" "" )
 }
 
-# Enables ability to delete entries
+# Enables ability to delete entries - adds [X] button
+# to each plugin, snippet, etc.
 -zcrasis_action_delete_mode() {
     if [[ -n "${ZUI[zc_delete_mode]}" ]]; then
         (( ZUI[zc_delete_mode] = 1 - ZUI[zc_delete_mode] ))
@@ -536,7 +558,8 @@ local zshrc="$(<$zshrc_path)"
     reply=( "$REPLY" "" )
 }
 
-# Enables ability to edit entries
+# Enables ability to edit entries - strings with plugin name,
+# snippet url, etc. turn into text fields for manual editing.
 -zcrasis_action_edit_mode() {
     if [[ -n "${ZUI[zc_edit_mode]}" ]]; then
         (( ZUI[zc_edit_mode] = 1 - ZUI[zc_edit_mode] ))
@@ -548,7 +571,8 @@ local zshrc="$(<$zshrc_path)"
     reply=( "$REPLY" "" )
 }
 
-# Switches the entry list to compact-mode
+# Switches the entry list to compact-mode. In this mode,
+# only a single line per plugin/snippet/etc. is displayed.
 -zcrasis_action_compact_mode() {
     if [[ -n "${ZUI[zc_compact_mode]}" ]]; then
         (( ZUI[zc_compact_mode] = 1 - ZUI[zc_compact_mode] ))
@@ -560,9 +584,8 @@ local zshrc="$(<$zshrc_path)"
     reply=( "$REPLY" "" )
 }
 
-# Returns string that when passed to ZUI
-# causes to regenerate all instances of
-# module 2 and module 1 (menu "bar")
+# Returns string that when passed to ZUI causes to regenerate
+# all instances of module 2 and module 1 (the menu bar)
 -zcrasis_refresh2_all_string() {
     local rtext=",mod1_ice1,"
     integer i size=$(( ${#cmdlist} / 3 ))
@@ -577,6 +600,11 @@ local zshrc="$(<$zshrc_path)"
 # Constructs text with zplugin commands, optionally
 # including original Zshrc blocks (in order to create
 # full zshrc).
+#
+# $1 - zero or 1 - whether to include comments
+# $2 - zero or 1 - whether to generate complete zshrc
+#
+# $reply - lines of created code
 -zcrasis_compose() {
     local with_comments="$1" whole="$2"
     local buf="" tmp comment
@@ -658,6 +686,8 @@ local zshrc="$(<$zshrc_path)"
     reply=( "${(@f)buf}" )
 }
 
+# Called when [Save] pressed. Composes zshrc, performs the save,
+# outputs status message.
 -zcrasis_action_save() {
     -zcrasis_compose 1 1
     print -rl -- "${reply[@]}" >| "$zshrc_path"
@@ -686,7 +716,7 @@ local zshrc="$(<$zshrc_path)"
 }
 
 # Clears generators' working variables to
-# trigger refresh from model-structures
+# trigger refresh from model-structures.
 -zcrasis_clear_visual_state() {
     integer i size=$(( ${#cmdlist} / 3 ))
     for (( i=1; i<=size+15; i++ )); do
@@ -701,7 +731,7 @@ local zshrc="$(<$zshrc_path)"
     done
 }
 
-# Adds snippet to $cmdlist and refreshes the view
+# Adds snippet to $cmdlist and refreshes the view.
 -zcrasis_action_add_snippet() {
     local url="${ZUI[my_tfield3_data]}"
     local -A main_cmd
@@ -723,7 +753,7 @@ local zshrc="$(<$zshrc_path)"
     reply=( "$REPLY" "" )
 }
 
-# Adds plugin to $cmdlist and refreshes the view
+# Adds plugin to $cmdlist and refreshes the view.
 -zcrasis_action_add_plugin() {
     local url="${ZUI[my_tfield3_data]}"
     local -A main_cmd
