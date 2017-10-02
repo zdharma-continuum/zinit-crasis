@@ -85,6 +85,7 @@ chosen_plugins=(
     "zdharma/history-search-multi-word"
     "zdharma/zredis"
     "zsh-users/zsh-autosuggestions"
+    "zsh-users/zsh-completions"
     "zsh-users/zsh-history-substring-search"
     "zsh-users/zsh-syntax-highlighting"
 )
