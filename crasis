@@ -939,7 +939,7 @@ local zshrc="$(<$zshrc_path)"
         #
 
         reply+=( "$num ${output[1]} ${output[2]} ${dis_col2}S${ZUI[FMT_END]} ${output[5]}" )
-        reply+=( "${output[4]}${output[3]} ${output[6]} ${output[7]}" )
+        reply+=( "${output[4]:-    }${output[3]} ${output[6]} ${output[7]}" )
 
         [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[-1]=()
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
@@ -978,17 +978,17 @@ local zshrc="$(<$zshrc_path)"
         #
 
         reply+=( "$num ${output[1]} ${output[2]} ${dis_col2}P${ZUI[FMT_END]} ${output[5]}" )
-        reply+=( "${output[4]}${output[3]} ${output[6]} ${output[7]}" )
+        reply+=( "${output[4]:-    }${output[3]} ${output[6]} ${output[7]}" )
 
         [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[-1]=()
     elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdreplay" )
-        reply+=( "${output[4]}${output[3]}" )
+        reply+=( "${output[4]:-    }${output[3]}" )
 
         [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[-1]=()
     elif [[ "${main_cmd[sub]}" = "cdclear" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdclear" )
-        reply+=( "${output[4]}${output[3]}" )
+        reply+=( "${output[4]:-    }${output[3]}" )
 
         [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[-1]=()
     else
@@ -1003,7 +1003,7 @@ local zshrc="$(<$zshrc_path)"
         done
         [[ -n "${main_cmd[unkn]}" ]] && text+=" (${ZUI[RED]}unknown Zplugin subcommand${ZUI[FMT_END]})"
         reply+=( "$num ${output[1]} ${output[2]} $text" )
-        reply+=( "${output[4]}${output[3]}" )
+        reply+=( "${output[4]:-    }${output[3]}" )
 
         [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[-1]=()
     fi
