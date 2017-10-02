@@ -849,7 +849,7 @@ local zshrc="$(<$zshrc_path)"
     local -a cmd output
     local -A ice_cmd main_cmd
     local var_name1 var_name2
-    local num dis_col dis_col2 mode_col command_col force_col disabled_text
+    local num dis_col dis_col2 mode_col mode_text command_col force_col disabled_text
 
     cmd=( "${(@)cmdlist[(ice-1)*3+1,ice*3]}" )
     comment="${cmd[1]}"
@@ -964,8 +964,8 @@ local zshrc="$(<$zshrc_path)"
 
         [[ -z "${ZUI[toggle_mode_${mod}_${ice}]}" ]] && ZUI[toggle_mode_${mod}_${ice}]="${main_cmd[sub]}" || -zcrasis_update_main sub "${ZUI[toggle_mode_${mod}_${ice}]}" $ice
         -zui_util_map_bools "[[ \"${ZUI[toggle_mode_${mod}_${ice}]}\" = light ]]" "mode_col" "${ZUI[YELLOW]}" "${ZUI[GREEN]}"
-        local mode_text="Mode: ${mode_col}${main_cmd[sub]}${ZUI[FMT_END]}"
-        -zui_std_rc_button "toggle_mode_${mod}_${ice}" "$mode_text" '[[ ${ZUI[toggle_mode_'"${mod}_${ice}"']} = light ]] && ZUI[toggle_mode_'"${mod}_${ice}"']=load || ZUI[toggle_mode_'"${mod}_${ice}"']=light; -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
+        -zui_util_map_bools "[[ \"${ZUI[toggle_mode_${mod}_${ice}]}\" = light ]]" "mode_text" light normal
+        -zui_std_rc_button "toggle_mode_${mod}_${ice}" "Mode: ${mode_col}${mode_text}${ZUI[FMT_END]}" '[[ ${ZUI[toggle_mode_'"${mod}_${ice}"']} = light ]] && ZUI[toggle_mode_'"${mod}_${ice}"']=load || ZUI[toggle_mode_'"${mod}_${ice}"']=light; -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
         #
         # Compile
