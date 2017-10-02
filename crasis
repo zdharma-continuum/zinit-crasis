@@ -832,10 +832,11 @@ local zshrc="$(<$zshrc_path)"
     reply=(
         "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]}"
         "$line1"
+        ""
         "$line2"
     )
 
-    [[ -z "$line1" && -z "$line2" ]] && reply[2,3]=()
+    [[ -z "$line1" && -z "$line2" ]] && reply[2,4]=()
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
