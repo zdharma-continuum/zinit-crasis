@@ -1011,7 +1011,7 @@ local zshrc="$(<$zshrc_path)"
     (( ${+ZUI[my_tfield1_data]} == 0 )) && ZUI[my_tfield1_data]="$HOME/crasis-report.txt"
 
     noglob -zui_std_text_field "report_path" ZUI[my_tfield1_width] ZUI[my_tfield1_start] ZUI[my_tfield1_data] "" "" "" ''
-    -zui_std_rc_button "save_report" "${ZUI[YELLOW]}Save${ZUI[FMT_END]}" 'print -rl -- "${ZCR_DEBUG_MSGS[@]}" >| "${ZUI[my_tfield1_data]}"; -zui_std_stalog "Report written to: " "\`${ZUI[my_tfield1_data]}'"'"'";'
+    -zui_std_rc_button "save_report" "${ZUI[YELLOW]}Save${ZUI[FMT_END]}" 'print -rl -- "${ZCR_DEBUG_MSGS[@]}" >| "${ZUI[my_tfield1_data]}"; -zui_std_stalog "Report written to: " "\`${ZUI[my_tfield1_data]}'"'"'"; internal=1;'
 
     reply=( "Send reports to: ${ZUI[YELLOW]}psprint${ZUI[FMT_END]}${ZUI[BOLD]}${ZUI[YELLOW]}@${ZUI[FMT_END]}${ZUI[YELLOW]}zdharma.org${ZUI[FMT_END]}. Please include Zshrc if possible."
         ""
