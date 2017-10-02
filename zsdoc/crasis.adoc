@@ -45,7 +45,7 @@ DETAILS
 Script Body
 ~~~~~~~~~~~
 
-Has 110 line(s). Calls functions:
+Has 115 line(s). Calls functions:
 
  Script-Body
  |-- -zcrasis_dbg_msg
@@ -57,7 +57,8 @@ Has 110 line(s). Calls functions:
      |   `-- -zcrasis-process-buffer
      |       `-- -zcrasis_dbg_msg
      |-- -zcrasis_clear_visual_state
-     `-- -zcrasis_dbg_msg
+     |-- -zcrasis_dbg_msg
+     `-- -zcrasis_refresh2_all_string
 
 -zcrasis-process-zplugin-commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -245,7 +246,10 @@ ____
  # Enables ability to delete entries
 ____
 
-Has 14 line(s). Doesn't call other functions.
+Has 9 line(s). Calls functions:
+
+ -zcrasis_delete_mode_action
+ `-- -zcrasis_refresh2_all_string
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
@@ -358,7 +362,9 @@ Called by:
  -zcrasis_add_plugin_action
  -zcrasis_add_snippet_action
  -zcrasis_compact_mode_action
+ -zcrasis_delete_mode_action
  -zcrasis_edit_mode_action
+ -zcrasis_reload_action
 
 -zcrasis_reload_action
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -369,7 +375,7 @@ ____
  # and zplugin-related zshrc parts.
 ____
 
-Has 53 line(s). Calls functions:
+Has 50 line(s). Calls functions:
 
  -zcrasis_reload_action
  |-- -zcrasis-process-zplugin-commands
@@ -379,7 +385,8 @@ Has 53 line(s). Calls functions:
  |   `-- -zcrasis-process-buffer
  |       `-- -zcrasis_dbg_msg
  |-- -zcrasis_clear_visual_state
- `-- -zcrasis_dbg_msg
+ |-- -zcrasis_dbg_msg
+ `-- -zcrasis_refresh2_all_string
 
 Called by:
 
