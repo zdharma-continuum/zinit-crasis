@@ -29,6 +29,6 @@ zplugin light zdharma/zplugin-crasis
 
 `Crasis` is a [ZUI](http://github.com/zdharma/zui/) application. `ZUI` is a pure-Zshell library
 where user generates simple text with hyperlinks, which is then turned into active document with
-buttons. Check out code documentation:
-[asciidoc](https://github.com/zdharma/zplugin-crasis/blob/master/zsdoc/crasis.adoc),
+buttons. Check out `Crasis` code documentation:
+[Asciidoc](https://github.com/zdharma/zplugin-crasis/blob/master/zsdoc/crasis.adoc),
 [PDF](http://zdharma.org/zplugin-crasis/crasis.pdf).
