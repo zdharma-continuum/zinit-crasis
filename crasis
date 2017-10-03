@@ -134,7 +134,7 @@ typeset -ga reply
 local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
 #
-# Load zshrc
+# Examine zshrc
 #
 
 [[ ! -e "$zshrc_path" ]] && { print "No such file \`$zshrc_path'${ZDOTDIR:+ (using \$ZDOTDIR)}"; return 1; }
@@ -143,12 +143,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 [[ ! -w "$zshrc_path" ]] && { print "No write permissions to \`$zshrc_path'${ZDOTDIR:+ (using \$ZDOTDIR)}"; return 1; }
 [[ ! -s "$zshrc_path" ]] && { print "File \`$zshrc_path' is empty, aborting"; return 1; }
 
--zcrasis_dbg_msg "Loading \`$zshrc_path'..."
-
-local zshrc="$(<$zshrc_path)"
-
--zcrasis_dbg_msg "Read <ZSHRCSIZE> bytes (<ZSHRCLINES> lines)"
--zcrasis_dbg_msg ""
+local zshrc
 
 # Runs -zcrasis-process-buffer() on $zshrc (containing
 # the loaded zshrc)
@@ -1071,6 +1066,11 @@ local zshrc="$(<$zshrc_path)"
     local id="$1" msg
     float -F 2 sum=0.0
     local -a stats
+
+    -zcrasis_dbg_msg "Loading \`$zshrc_path'..."
+    zshrc="$(<$zshrc_path)"
+    -zcrasis_dbg_msg "Read <ZSHRCSIZE> bytes (<ZSHRCLINES> lines)"
+    -zcrasis_dbg_msg ""
 
     -zcrasis_clear_visual_state
 
