@@ -148,8 +148,6 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 [[ ! -w "$zshrc_path" ]] && { print "No write permissions to \`$zshrc_path'${ZDOTDIR:+ (using \$ZDOTDIR)}"; return 1; }
 [[ ! -s "$zshrc_path" ]] && { print "File \`$zshrc_path' is empty, aborting"; return 1; }
 
-local zshrc
-
 # Runs -zcrasis-process-buffer() on $zshrc (containing
 # the loaded zshrc)
 -zcrasis-tokenize-zsh-rc() {
