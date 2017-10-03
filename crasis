@@ -19,8 +19,9 @@ autoload -- -zcrasis-process-buffer
 # Debug array, for debug view
 local -a ZCR_DEBUG_MSGS
 
-# Appends message to the debug view
+# Append message(s) to the debug view
 -zcrasis_dbg_msg() { ZCR_DEBUG_MSGS+=( "$*" ); }
+-zcrasis_dbg_msg_arr() { ZCR_DEBUG_MSGS+=( "$@" ); }
 
 # Initial debug message
 -zcrasis_dbg_msg "ZSH version: $ZSH_VERSION ($ZSH_PATCHLEVEL), machine: $CPUTYPE $VENDOR $OSTYPE, LANG: $LANG"
@@ -30,6 +31,10 @@ if [[ ${+ZPLGM} = 1 ]]; then
 else
     -zcrasis_dbg_msg "${ZUI[RED]}Zplugin not loaded${ZUI[FMT_END]}"
 fi
+
+-zcrasis_dbg_msg ""
+-zcrasis_dbg_msg_arr "Active plugins:" "${ZPLG_REGISTERED_PLUGINS[@]/(#s)/ }"
+-zcrasis_dbg_msg ""
 
 #
 # CONSTANTS
