@@ -23,3 +23,11 @@ Install [Zplugin](https://github.com/zdharma/zplugin) and add following commands
 zplugin light zdharma/zui
 zplugin light zdharma/zplugin-crasis
 ```
+
+# Code documentation
+
+`Crasis` is a [ZUI](http://github.com/zdharma/zui/) application. `ZUI` is a pure-Zshell library
+where user generates simple text with hyperlinks, which is then turned into active document with
+buttons. Check out code documentation:
+[asciidoc](https://github.com/zdharma/zplugin-crasis/blob/master/zsdoc/crasis.adoc),
+[PDF](http://zdharma.org/zplugin-crasis/crasis.pdf).
