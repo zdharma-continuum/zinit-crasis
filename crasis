@@ -1090,12 +1090,12 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
                     (( ${+ZUI[my_tfield4_${ice}_${t}_start]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_start]=1
                     (( ${+ZUI[my_tfield4_${ice}_${t}_data]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_data]="${(Q)ice_cmd[$t]}"
 
-                    ioutput+=( " $t:" )
+                    ioutput+=( " ${ZUI[YELLOW]}$t${ZUI[FMT_END]}:" )
                     noglob -zui_std_text_field "tfield4_${mod}_${ice}_${t}" ZUI[my_tfield4_${ice}_${t}_width] ZUI[my_tfield4_${ice}_${t}_start] ZUI[my_tfield4_${ice}_${t}_data] "" "" "" '-zcrasis_update_ice_cmd '$t' "${ZUI[my_tfield4_'${ice}'_'$t'_data]}" '$ice ioutput
                     ;;
                 (blockf)
                     (( ${+ice_cmd[$t]} == 0 )) && continue
-                    ioutput+=( " [blockf]" )
+                    ioutput+=( " [${ZUI[YELLOW]}blockf${ZUI[FMT_END]}]" )
                     ;;
             esac
         done
