@@ -148,12 +148,14 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 [[ ! -w "$zshrc_path" ]] && { print "No write permissions to \`$zshrc_path'${ZDOTDIR:+ (using \$ZDOTDIR)}"; return 1; }
 [[ ! -s "$zshrc_path" ]] && { print "File \`$zshrc_path' is empty, aborting"; return 1; }
 
+# FUNCTION: -zcrasis-tokenize-zsh-rc {{{
 # Runs -zcrasis-process-buffer() on $zshrc (containing
 # the loaded zshrc)
 -zcrasis-tokenize-zsh-rc() {
     -zcrasis-process-buffer "$zshrc" 1
 }
-
+# }}}
+# FUNCTION: -zcrasis-process-zsh-rc {{{
 # Parses tokens of the loaded zshrc and detects:
 # - functions
 # - block preceding zplugin commands
@@ -306,7 +308,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         done
     }
 }
-
+# }}}
+# FUNCTION: -zcrasis-process-zplugin-commands {{{
 # Processes block with zplugin commands established in
 # -zcrasis-process-zsh-rc() and generates $cmdlist
 # array which holds serialized hashes of every zplugin
@@ -419,7 +422,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
     -zcrasis_dbg_msg ""
 }
-
+# }}}
+# FUNCTION: -zcrasis_util_swap {{{
 # Swaps two variables given by name. Uses (P) substitution
 # flag, can swap e.g. hash entries. For example:
 #   local -A hash_arr=( a b c d )
@@ -433,7 +437,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     : ${(P)__var_name1::=${(P)__var_name2}}
     : ${(P)__var_name2::=$tmp}
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_move_up {{{
 # Moves given instance ($2) up, i.e. swaps
 # current and previous instance
 #
@@ -455,7 +460,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     noglob -zcrasis_util_swap ZUI[toggle_force_${mod}_${ice}] ZUI[toggle_force_${mod}_$(( ice-1 ))]
     noglob -zcrasis_util_swap ZUI[toggle_mode_${mod}_${ice}] ZUI[toggle_mode_${mod}_$(( ice-1 ))]
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_move_down {{{
 # Moves given instance ($ice) down, i.e. swaps
 # current and next instance
 #
@@ -477,7 +483,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     noglob -zcrasis_util_swap ZUI[toggle_force_${mod}_${ice}] ZUI[toggle_force_${mod}_$(( ice+1 ))]
     noglob -zcrasis_util_swap ZUI[toggle_mode_${mod}_${ice}] ZUI[toggle_mode_${mod}_$(( ice+1 ))]
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_preview {{{
 # Enters or leaves preview view. It basically sets
 # preview module's instance to be created, once.
 # At the same time, plugin list module is set to 0
@@ -498,7 +505,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     # Regenerate menu and preview module
     reply=( ",mod1_ice1,mod3_ice1," "" )
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_debug_view {{{
 # Enters or leaves debug view.
 -zcrasis_action_debug_view() {
     -zui_std_set_mod_factor 3 0
@@ -510,7 +518,9 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         ZUI[in_debug]=1
 
         ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCSIZE>/${#zshrc}}" )
-        ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCLINES>/${#${(f@)zshrc}}}" )
+        local -a lines
+        lines=( "${(f@)zshrc}" )
+        ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCLINES>/${#lines}}" )
 
         { local ver="$(<${ZPLGM[BIN_DIR]}/.git/refs/heads/master)" } 2>/dev/null
         [[ -z "$ver" ]] && ver="unknown (no .git/refs/heads/master)" || ver="${ver[1,7]}"
@@ -528,7 +538,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     # Regenerate menu and debug module
     reply=( ",mod1_ice1,mod4_ice1," "" )
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_delete {{{
 # Removes given entry from $cmdlist and orders
 # full regeneration of commands-section
 #
@@ -552,7 +563,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
     reply=( "$rtext" "" )
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_delete_mode {{{
 # Enables ability to delete entries - adds [X] button
 # to each plugin, snippet, etc.
 -zcrasis_action_delete_mode() {
@@ -566,7 +578,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
     reply=( "$REPLY" "" )
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_edit_mode {{{
 # Enables ability to edit entries - strings with plugin name,
 # snippet url, etc. turn into text fields for manual editing.
 -zcrasis_action_edit_mode() {
@@ -579,7 +592,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     -zcrasis_refresh2_all_string
     reply=( "$REPLY" "" )
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_compact_mode {{{
 # Switches the entry list to compact-mode. In this mode,
 # only a single line per plugin/snippet/etc. is displayed.
 -zcrasis_action_compact_mode() {
@@ -592,7 +606,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     -zcrasis_refresh2_all_string
     reply=( "$REPLY" "" )
 }
-
+# }}}
+# FUNCTION: -zcrasis_refresh2_all_string {{{
 # Returns string that when passed to ZUI causes to regenerate
 # all instances of module 2 and module 1 (the menu bar)
 -zcrasis_refresh2_all_string() {
@@ -605,7 +620,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
     REPLY="$rtext"
 }
-
+# }}}
+# FUNCTION: -zcrasis_compose {{{
 # Constructs text with zplugin commands, optionally
 # including original Zshrc blocks (in order to create
 # full zshrc).
@@ -697,7 +713,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
     reply=( "${(@f)buf}" )
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_save {{{
 # Called when [Save] pressed. Composes zshrc, performs the save,
 # outputs status message.
 -zcrasis_action_save() {
@@ -707,7 +724,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
     -zui_std_stalog "Saved to:" "\`$zshrc_path'"
 }
-
+# }}}
+# FUNCTION: -zcrasis_update_main {{{
 # Updates main entry in given ($3) command packet.
 #
 # $1 - key to update in the main command
@@ -726,7 +744,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     cmdlist[idx*3]="${(j: :)${(qkv)main_cmd[@]}}"
     return 0
 }
-
+# }}}
+# FUNCTION: -zcrasis_clear_visual_state {{{
 # Clears generators' working variables to
 # trigger refresh from model-structures.
 -zcrasis_clear_visual_state() {
@@ -742,7 +761,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         unset "ZUI[my_tfield2_${i}_data]"
     done
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_add_snippet {{{
 # Adds snippet to $cmdlist and refreshes the view.
 -zcrasis_action_add_snippet() {
     local url="${ZUI[my_tfield3_data]}"
@@ -764,7 +784,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     -zcrasis_refresh2_all_string
     reply=( "$REPLY" "" )
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_add_plugin {{{
 # Adds plugin to $cmdlist and refreshes the view.
 -zcrasis_action_add_plugin() {
     local url="${ZUI[my_tfield3_data]}"
@@ -786,7 +807,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     -zcrasis_refresh2_all_string
     reply=( "$REPLY" "" )
 }
-
+# }}}
+# FUNCTION: -zcrasis_generator_0 {{{
 # ZUI generator that creates top menu (its hypertext).
 # The menu can differ depending on current view mode
 # (normal, preview, debug).
@@ -853,7 +875,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
 }
-
+# }}}
+# FUNCTION: -zcrasis_generator_A {{{
 # ZUI generator that creates document block for each plugin,
 # snippet or other command. This is module #2, each document
 # block is an instance of this module.
@@ -1028,7 +1051,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( move_up_${mod}_${ice} move_down_${mod}_${ice} )
 }
-
+# }}}
+# FUNCTION: -zcrasis_generator_B {{{
 # ZUI generator that creates preview text. This is module 3.
 # There is 0 or 1 instance of this module, depending on chosen
 # view.
@@ -1038,7 +1062,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
 }
-
+# }}}
+# FUNCTION: -zcrasis_generator_DBG {{{
 # ZUI generator that creates debug-report text. This is module 4.
 # There is 0 or 1 instance of this module, depending on chosen
 # view.
@@ -1063,7 +1088,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
 }
-
+# }}}
+# FUNCTION: -zcrasis_action_reload {{{
 # Ran at startup and after [Reload] button press.
 # Performs full zshrc processing, recognizes normal
 # and zplugin-related zshrc parts.
@@ -1126,7 +1152,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         reply=( "$REPLY" "" )
     } || reply=()
 }
-
+# }}}
 -zcrasis_action_reload
 
 # Create needed local parameters
