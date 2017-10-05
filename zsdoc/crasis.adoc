@@ -37,7 +37,7 @@ FUNCTIONS
  -zcrasis_generator_B
  -zcrasis_generator_DBG
  -zcrasis_refresh2_all_string
- -zcrasis_update_main
+ -zcrasis_update_main_cmd
  -zcrasis_util_swap
 AUTOLOAD -zcrasis-process-buffer
 
@@ -67,10 +67,10 @@ Has 110 line(s). Calls functions:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Processes block with zplugin commands established in
- # -zcrasis-process-zsh-rc() and generates $cmdlist
- # array which holds serialized hashes of every zplugin
- # invocation, mixed-in additional commands, comments.
+ # Processes block with zplugin commands established earlier
+ # in -zcrasis-process-zsh-rc() and generates $cmdlist array
+ # which holds serialized hashes of every zplugin invocation,
+ # mixed-in additional (external) commands, comments.
  #
  # Uses parameters filled by -zcrasis-process-buffer:
  # - $ZCR_PB_WORDS - tokens
@@ -111,8 +111,10 @@ Called by:
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Runs -zcrasis-process-buffer() on $zshrc (containing
- # the loaded zshrc)
+ # Runs -zcrasis-process-buffer() on $zshrc (containing the loaded
+ # .zshrc file). The *-process-buffer() is a general function that
+ # exists in other projects, is an autoload function, and is kept
+ # in separate file "-zcrasis-process-buffer".
 ____
 
 Has 1 line(s). Calls functions:
@@ -129,7 +131,9 @@ Called by:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Adds plugin to $cmdlist and refreshes the view.
+ # Adds plugin to $cmdlist and refreshes the view. So it
+ # creates a packet with "zplg load ..." main command.
+ # Ice command can be added by editing actions.
 ____
 
 Has 18 line(s). Calls functions:
@@ -146,6 +150,8 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 
 ____
  # Adds snippet to $cmdlist and refreshes the view.
+ # So it creates a packet with "zplg snippet ..."
+ # main command.
 ____
 
 Has 18 line(s). Calls functions:
@@ -176,7 +182,11 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Enters or leaves debug view.
+ # Enters or leaves debug view. Plugin-list view is muted
+ # by setting module 2 factor to 0 - factor is the number
+ # of instances of a module to create, i.e. number of calls
+ # to module's generator. Debug module (#4) obtains factor 1.
+ # On disable, normal factors are restored.
 ____
 
 Has 26 line(s). Doesn't call other functions.
@@ -187,8 +197,11 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 ~~~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Removes given entry from $cmdlist and orders
- # full regeneration of commands-section
+ # Removes given entry from $cmdlist and orders full
+ # regeneration of document section holding the zplugin
+ # invocations (the main view). Basically, there will be
+ # one instance of module 2 less (the removed one), and
+ # remaining instances will get refreshed.
  #
  # $1 - widget id
  # $2 - module's index
@@ -207,7 +220,8 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 
 ____
  # Enables ability to delete entries - adds [X] button
- # to each plugin, snippet, etc.
+ # to each plugin, snippet, external command, etc. (main
+ # view).
 ____
 
 Has 9 line(s). Calls functions:
@@ -236,8 +250,12 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Moves given instance ($ice) down, i.e. swaps
- # current and next instance
+ # Moves given instance ($2) down, i.e. swaps current and
+ # next instance. Using "instance" here means: ZUI's
+ # module instance representing single zplugin command
+ # (possibly preceded with "zplugin ice ..." invocation)
+ # by the design of Crasis. Instance = invocation of a
+ # generator with "module_idx" "instance_idx" arguments.
  #
  # $1 - module index (will be 2)
  # $2 - instance index
@@ -254,8 +272,12 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Moves given instance ($2) up, i.e. swaps
- # current and previous instance
+ # Moves given instance ($2) up, i.e. swaps current and
+ # previous instance. Using "instance" here means: ZUI's
+ # module instance representing single zplugin command
+ # (possibly preceded with "zplugin ice ..." invocation)
+ # by the design of Crasis. Instance = invocation of a
+ # generator with "module_idx" "instance_idx" arguments.
  #
  # $1 - module index (will be 2)
  # $2 - instance index
@@ -272,10 +294,10 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Enters or leaves preview view. It basically sets
- # preview module's instance to be created, once.
- # At the same time, plugin list module is set to 0
- # instances.
+ # Enters or leaves preview alternate-view. It basically
+ # sets preview module's instance to be created, once.
+ # At the same time, the plugin-list module is set to 0
+ # instances. Number of instances is the "module factor".
 ____
 
 Has 12 line(s). Doesn't call other functions.
@@ -286,9 +308,10 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 ~~~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Ran at startup and after [Reload] button press.
- # Performs full zshrc processing, recognizes normal
- # and zplugin-related zshrc parts.
+ # Ran at startup and after [Reload] button press. Performs
+ # full zshrc processing, recognizes other and zplugin-related
+ # zshrc parts, forgets user changes because it regenerates
+ # the backend model-structure, the $cmdlist array of hashes.
 ____
 
 Has 55 line(s). Calls functions:
@@ -312,8 +335,8 @@ Called by:
 ~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Called when [Save] pressed. Composes zshrc, performs the save,
- # outputs status message.
+ # Called when [Save] pressed. Composes full .zshrc,
+ # performs the save, outputs status message.
 ____
 
 Has 5 line(s). Calls functions:
@@ -327,8 +350,8 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Clears generators' working variables to
- # trigger refresh from model-structures.
+ # Clears generators' working variables to trigger refresh
+ # from backend, model-structures (like $cmdlist).
 ____
 
 Has 11 line(s). Doesn't call other functions.
@@ -346,7 +369,7 @@ Called by:
 ____
  # Constructs text with zplugin commands, optionally
  # including original Zshrc blocks (in order to create
- # full zshrc).
+ # full .zshrc). Can skip comments (via $1).
  #
  # $1 - zero or 1 - whether to include comments
  # $2 - zero or 1 - whether to generate complete zshrc
@@ -411,13 +434,14 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 ____
  # ZUI generator that creates document block for each plugin,
  # snippet or other command. This is module #2, each document
- # block is an instance of this module.
+ # block is an instance of this module (separated by blank
+ # lines horizontally, by ZUI normal operation).
 ____
 
 Has 118 line(s). Calls functions:
 
  -zcrasis_generator_A
- `-- -zcrasis_update_main
+ `-- -zcrasis_update_main_cmd
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
@@ -455,7 +479,7 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 
 ____
  # Returns string that when passed to ZUI causes to regenerate
- # all instances of module 2 and module 1 (the menu bar)
+ # all instances of module 2 and module 1 (the menu bar).
 ____
 
 Has 8 line(s). Doesn't call other functions.
@@ -469,11 +493,14 @@ Called by:
  -zcrasis_action_edit_mode
  -zcrasis_action_reload
 
--zcrasis_update_main
-~~~~~~~~~~~~~~~~~~~~
+-zcrasis_update_main_cmd
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
- # Updates main entry in given ($3) command packet.
+ # Updates main entry in given ($3) command packet. There
+ # is single command packet per zplugin invocation and it
+ # contains main command, optionally ICE command, and also
+ # optionally a preceding comment.
  #
  # $1 - key to update in the main command
  # $2 - data to store under the key

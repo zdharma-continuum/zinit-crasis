@@ -150,8 +150,10 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 [[ ! -s "$zshrc_path" ]] && { print "File \`$zshrc_path' is empty, aborting"; return 1; }
 
 # FUNCTION: -zcrasis-tokenize-zsh-rc {{{
-# Runs -zcrasis-process-buffer() on $zshrc (containing
-# the loaded zshrc)
+# Runs -zcrasis-process-buffer() on $zshrc (containing the loaded
+# .zshrc file). The *-process-buffer() is a general function that
+# exists in other projects, is an autoload function, and is kept
+# in separate file "-zcrasis-process-buffer".
 -zcrasis-tokenize-zsh-rc() {
     -zcrasis-process-buffer "$zshrc" 1
 }
@@ -311,10 +313,10 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 }
 # }}}
 # FUNCTION: -zcrasis-process-zplugin-commands {{{
-# Processes block with zplugin commands established in
-# -zcrasis-process-zsh-rc() and generates $cmdlist
-# array which holds serialized hashes of every zplugin
-# invocation, mixed-in additional commands, comments.
+# Processes block with zplugin commands established earlier
+# in -zcrasis-process-zsh-rc() and generates $cmdlist array
+# which holds serialized hashes of every zplugin invocation,
+# mixed-in additional (external) commands, comments.
 #
 # Uses parameters filled by -zcrasis-process-buffer:
 # - $ZCR_PB_WORDS - tokens
@@ -440,8 +442,12 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 }
 # }}}
 # FUNCTION: -zcrasis_action_move_up {{{
-# Moves given instance ($2) up, i.e. swaps
-# current and previous instance
+# Moves given instance ($2) up, i.e. swaps current and
+# previous instance. Using "instance" here means: ZUI's
+# module instance representing single zplugin command
+# (possibly preceded with "zplugin ice ..." invocation)
+# by the design of Crasis. Instance = invocation of a
+# generator with "module_idx" "instance_idx" arguments.
 #
 # $1 - module index (will be 2)
 # $2 - instance index
@@ -463,8 +469,12 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 }
 # }}}
 # FUNCTION: -zcrasis_action_move_down {{{
-# Moves given instance ($ice) down, i.e. swaps
-# current and next instance
+# Moves given instance ($2) down, i.e. swaps current and
+# next instance. Using "instance" here means: ZUI's
+# module instance representing single zplugin command
+# (possibly preceded with "zplugin ice ..." invocation)
+# by the design of Crasis. Instance = invocation of a
+# generator with "module_idx" "instance_idx" arguments.
 #
 # $1 - module index (will be 2)
 # $2 - instance index
@@ -486,10 +496,10 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 }
 # }}}
 # FUNCTION: -zcrasis_action_preview {{{
-# Enters or leaves preview view. It basically sets
-# preview module's instance to be created, once.
-# At the same time, plugin list module is set to 0
-# instances.
+# Enters or leaves preview alternate-view. It basically
+# sets preview module's instance to be created, once.
+# At the same time, the plugin-list module is set to 0
+# instances. Number of instances is the "module factor".
 -zcrasis_action_preview() {
     -zui_std_set_mod_factor 4 0
     ZUI[in_debug]=0
@@ -508,7 +518,11 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 }
 # }}}
 # FUNCTION: -zcrasis_action_debug_view {{{
-# Enters or leaves debug view.
+# Enters or leaves debug view. Plugin-list view is muted
+# by setting module 2 factor to 0 - factor is the number
+# of instances of a module to create, i.e. number of calls
+# to module's generator. Debug module (#4) obtains factor 1.
+# On disable, normal factors are restored.
 -zcrasis_action_debug_view() {
     -zui_std_set_mod_factor 3 0
     ZUI[in_preview]=0
@@ -541,8 +555,11 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 }
 # }}}
 # FUNCTION: -zcrasis_action_delete {{{
-# Removes given entry from $cmdlist and orders
-# full regeneration of commands-section
+# Removes given entry from $cmdlist and orders full
+# regeneration of document section holding the zplugin
+# invocations (the main view). Basically, there will be
+# one instance of module 2 less (the removed one), and
+# remaining instances will get refreshed.
 #
 # $1 - widget id
 # $2 - module's index
@@ -567,7 +584,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 # }}}
 # FUNCTION: -zcrasis_action_delete_mode {{{
 # Enables ability to delete entries - adds [X] button
-# to each plugin, snippet, etc.
+# to each plugin, snippet, external command, etc. (main
+# view).
 -zcrasis_action_delete_mode() {
     if [[ -n "${ZUI[zc_delete_mode]}" ]]; then
         (( ZUI[zc_delete_mode] = 1 - ZUI[zc_delete_mode] ))
@@ -610,7 +628,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 # }}}
 # FUNCTION: -zcrasis_refresh2_all_string {{{
 # Returns string that when passed to ZUI causes to regenerate
-# all instances of module 2 and module 1 (the menu bar)
+# all instances of module 2 and module 1 (the menu bar).
 -zcrasis_refresh2_all_string() {
     local rtext=",mod1_ice1,"
     integer i size=$(( ${#cmdlist} / 3 ))
@@ -625,7 +643,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 # FUNCTION: -zcrasis_compose {{{
 # Constructs text with zplugin commands, optionally
 # including original Zshrc blocks (in order to create
-# full zshrc).
+# full .zshrc). Can skip comments (via $1).
 #
 # $1 - zero or 1 - whether to include comments
 # $2 - zero or 1 - whether to generate complete zshrc
@@ -716,8 +734,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 }
 # }}}
 # FUNCTION: -zcrasis_action_save {{{
-# Called when [Save] pressed. Composes zshrc, performs the save,
-# outputs status message.
+# Called when [Save] pressed. Composes full .zshrc,
+# performs the save, outputs status message.
 -zcrasis_action_save() {
     -zcrasis_compose 1 1
     print -rl -- "${reply[@]}" >| "$zshrc_path"
@@ -726,13 +744,16 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     -zui_std_stalog "Saved to:" "\`$zshrc_path'"
 }
 # }}}
-# FUNCTION: -zcrasis_update_main {{{
-# Updates main entry in given ($3) command packet.
+# FUNCTION: -zcrasis_update_main_cmd {{{
+# Updates main entry in given ($3) command packet. There
+# is single command packet per zplugin invocation and it
+# contains main command, optionally ICE command, and also
+# optionally a preceding comment.
 #
 # $1 - key to update in the main command
 # $2 - data to store under the key
 # $3 - index of command pack to alter
--zcrasis_update_main() {
+-zcrasis_update_main_cmd() {
     local key="$1" data="$2" idx="$3"
     local -a cmd
     local -A main_cmd
@@ -747,8 +768,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 }
 # }}}
 # FUNCTION: -zcrasis_clear_visual_state {{{
-# Clears generators' working variables to
-# trigger refresh from model-structures.
+# Clears generators' working variables to trigger refresh
+# from backend, model-structures (like $cmdlist).
 -zcrasis_clear_visual_state() {
     integer i size=$(( ${#cmdlist} / 3 ))
     for (( i=1; i<=size+15; i++ )); do
@@ -765,6 +786,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 # }}}
 # FUNCTION: -zcrasis_action_add_snippet {{{
 # Adds snippet to $cmdlist and refreshes the view.
+# So it creates a packet with "zplg snippet ..."
+# main command.
 -zcrasis_action_add_snippet() {
     local url="${ZUI[my_tfield3_data]}"
     local -A main_cmd
@@ -787,7 +810,9 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 }
 # }}}
 # FUNCTION: -zcrasis_action_add_plugin {{{
-# Adds plugin to $cmdlist and refreshes the view.
+# Adds plugin to $cmdlist and refreshes the view. So it
+# creates a packet with "zplg load ..." main command.
+# Ice command can be added by editing actions.
 -zcrasis_action_add_plugin() {
     local url="${ZUI[my_tfield3_data]}"
     local -A main_cmd
@@ -880,7 +905,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 # FUNCTION: -zcrasis_generator_A {{{
 # ZUI generator that creates document block for each plugin,
 # snippet or other command. This is module #2, each document
-# block is an instance of this module.
+# block is an instance of this module (separated by blank
+# lines horizontally, by ZUI normal operation).
 -zcrasis_generator_A() {
     local mod="$1" ice="$2" comment
     local -a cmd output
@@ -920,7 +946,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     fi
 
     # "DISABLED" or "Enabled"
-    [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || -zcrasis_update_main disabled "${ZUI[toggle_dis_${mod}_${ice}]}" "$ice"
+    [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || -zcrasis_update_main_cmd disabled "${ZUI[toggle_dis_${mod}_${ice}]}" "$ice"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "dis_col" "${ZUI[RED]}" "${ZUI[GREEN]}"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "DISABLED" "Enabled"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "dis_col2" "${ZUI[RED]}" "${ZUI[WHITE]}"
@@ -948,7 +974,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
             (( ${+ZUI[my_tfield2_${ice}_start]} == 0 )) && ZUI[my_tfield2_${ice}_start]=1
             (( ${+ZUI[my_tfield2_${ice}_data]} == 0 )) && ZUI[my_tfield2_${ice}_data]="${main_cmd[url]}"
 
-            noglob -zui_std_text_field "tfield2_${mod}_${ice}" ZUI[my_tfield2_${ice}_width] ZUI[my_tfield2_${ice}_start] ZUI[my_tfield2_${ice}_data] "" "" "" '-zcrasis_update_main url "${ZUI[my_tfield2_'${ice}'_data]}" '$ice output
+            noglob -zui_std_text_field "tfield2_${mod}_${ice}" ZUI[my_tfield2_${ice}_width] ZUI[my_tfield2_${ice}_start] ZUI[my_tfield2_${ice}_data] "" "" "" '-zcrasis_update_main_cmd url "${ZUI[my_tfield2_'${ice}'_data]}" '$ice output
         else
             output+=( ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]} )
         fi
@@ -957,7 +983,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         # command on/off
         #
 
-        [[ -z "${ZUI[toggle_command_${mod}_${ice}]}" ]] && ZUI[toggle_command_${mod}_${ice}]="${main_cmd[--command]:-0}" || -zcrasis_update_main --command "${ZUI[toggle_command_${mod}_${ice}]}" $ice
+        [[ -z "${ZUI[toggle_command_${mod}_${ice}]}" ]] && ZUI[toggle_command_${mod}_${ice}]="${main_cmd[--command]:-0}" || -zcrasis_update_main_cmd --command "${ZUI[toggle_command_${mod}_${ice}]}" $ice
         -zui_util_map_bools "[[ \"${ZUI[toggle_command_${mod}_${ice}]}\" = 1 ]]" "command_col" "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
         local command_text="${command_col}as-command${ZUI[FMT_END]}"
         -zui_std_rc_button "toggle_command_${mod}_${ice}" "$command_text" '(( ZUI[toggle_command_'"${mod}_${ice}"']=1-${ZUI[toggle_command_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
@@ -966,7 +992,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         # force on/off
         #
 
-        [[ -z "${ZUI[toggle_force_${mod}_${ice}]}" ]] && ZUI[toggle_force_${mod}_${ice}]="${main_cmd[-f]:-0}" || -zcrasis_update_main -f "${ZUI[toggle_force_${mod}_${ice}]}" $ice
+        [[ -z "${ZUI[toggle_force_${mod}_${ice}]}" ]] && ZUI[toggle_force_${mod}_${ice}]="${main_cmd[-f]:-0}" || -zcrasis_update_main_cmd -f "${ZUI[toggle_force_${mod}_${ice}]}" $ice
         -zui_util_map_bools "[[ \"${ZUI[toggle_force_${mod}_${ice}]}\" = 1 ]]" "force_col" "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
         local force_text="${force_col}force${ZUI[FMT_END]}"
         -zui_std_rc_button "toggle_force_${mod}_${ice}" "$force_text" '(( ZUI[toggle_force_'"${mod}_${ice}"']=1-${ZUI[toggle_force_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
@@ -990,7 +1016,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
             (( ${+ZUI[my_tfield2_${ice}_start]} == 0 )) && ZUI[my_tfield2_${ice}_start]=1
             (( ${+ZUI[my_tfield2_${ice}_data]} == 0 )) && ZUI[my_tfield2_${ice}_data]="${main_cmd[url]}"
 
-            noglob -zui_std_text_field "tfield2_${mod}_${ice}" ZUI[my_tfield2_${ice}_width] ZUI[my_tfield2_${ice}_start] ZUI[my_tfield2_${ice}_data] "" "" "" '-zcrasis_update_main url "${ZUI[my_tfield2_'${ice}'_data]}" '$ice output
+            noglob -zui_std_text_field "tfield2_${mod}_${ice}" ZUI[my_tfield2_${ice}_width] ZUI[my_tfield2_${ice}_start] ZUI[my_tfield2_${ice}_data] "" "" "" '-zcrasis_update_main_cmd url "${ZUI[my_tfield2_'${ice}'_data]}" '$ice output
         else
             output+=( "${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
         fi
@@ -999,7 +1025,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         # Mode: light or normal ("load")
         #
 
-        [[ -z "${ZUI[toggle_mode_${mod}_${ice}]}" ]] && ZUI[toggle_mode_${mod}_${ice}]="${main_cmd[sub]}" || -zcrasis_update_main sub "${ZUI[toggle_mode_${mod}_${ice}]}" $ice
+        [[ -z "${ZUI[toggle_mode_${mod}_${ice}]}" ]] && ZUI[toggle_mode_${mod}_${ice}]="${main_cmd[sub]}" || -zcrasis_update_main_cmd sub "${ZUI[toggle_mode_${mod}_${ice}]}" $ice
         -zui_util_map_bools "[[ \"${ZUI[toggle_mode_${mod}_${ice}]}\" = light ]]" "mode_col" "${ZUI[YELLOW]}" "${ZUI[GREEN]}"
         -zui_util_map_bools "[[ \"${ZUI[toggle_mode_${mod}_${ice}]}\" = light ]]" "mode_text" light normal
         -zui_std_rc_button "toggle_mode_${mod}_${ice}" "Mode: ${mode_col}${mode_text}${ZUI[FMT_END]}" '[[ ${ZUI[toggle_mode_'"${mod}_${ice}"']} = light ]] && ZUI[toggle_mode_'"${mod}_${ice}"']=load || ZUI[toggle_mode_'"${mod}_${ice}"']=light; -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
@@ -1091,9 +1117,10 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 }
 # }}}
 # FUNCTION: -zcrasis_action_reload {{{
-# Ran at startup and after [Reload] button press.
-# Performs full zshrc processing, recognizes normal
-# and zplugin-related zshrc parts.
+# Ran at startup and after [Reload] button press. Performs
+# full zshrc processing, recognizes other and zplugin-related
+# zshrc parts, forgets user changes because it regenerates
+# the backend model-structure, the $cmdlist array of hashes.
 -zcrasis_action_reload() {
     local id="$1" msg
     float -F 2 sum=0.0
