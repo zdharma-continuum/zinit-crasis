@@ -31,6 +31,7 @@ FUNCTIONS
  -zcrasis_clear_visual_state
  -zcrasis_compose
  -zcrasis_dbg_msg
+ -zcrasis_dbg_msg_arr
  -zcrasis_generator_0
  -zcrasis_generator_A
  -zcrasis_generator_B
@@ -46,7 +47,7 @@ DETAILS
 Script Body
 ~~~~~~~~~~~
 
-Has 115 line(s). Calls functions:
+Has 110 line(s). Calls functions:
 
  Script-Body
  |-- -zcrasis_action_reload
@@ -59,7 +60,8 @@ Has 115 line(s). Calls functions:
  |   |-- -zcrasis_clear_visual_state
  |   |-- -zcrasis_dbg_msg
  |   `-- -zcrasis_refresh2_all_string
- `-- -zcrasis_dbg_msg
+ |-- -zcrasis_dbg_msg
+ `-- -zcrasis_dbg_msg_arr
 
 -zcrasis-process-zplugin-commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,7 +77,7 @@ ____
  # - $ZCR_PB_SPACES - spaces in front of each token, +1 at the end
 ____
 
-Has 82 line(s). Calls functions:
+Has 86 line(s). Calls functions:
 
  -zcrasis-process-zplugin-commands
  `-- -zcrasis_dbg_msg
@@ -177,7 +179,7 @@ ____
  # Enters or leaves debug view.
 ____
 
-Has 24 line(s). Doesn't call other functions.
+Has 26 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
@@ -289,7 +291,7 @@ ____
  # and zplugin-related zshrc parts.
 ____
 
-Has 50 line(s). Calls functions:
+Has 55 line(s). Calls functions:
 
  -zcrasis_action_reload
  |-- -zcrasis-process-zplugin-commands
@@ -352,7 +354,7 @@ ____
  # $reply - lines of created code
 ____
 
-Has 71 line(s). Doesn't call other functions.
+Has 74 line(s). Doesn't call other functions.
 
 Called by:
 
@@ -363,7 +365,7 @@ Called by:
 ~~~~~~~~~~~~~~~~
 
 ____
- # Appends message to the debug view
+ # Append message to the debug view
 ____
 
 Has 1 line(s). Doesn't call other functions.
@@ -377,6 +379,19 @@ Called by:
  -zcrasis_action_reload
  Script-Body
 
+-zcrasis_dbg_msg_arr
+~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Append multiple messages to the debug view
+____
+
+Has 1 line(s). Doesn't call other functions.
+
+Called by:
+
+ Script-Body
+
 -zcrasis_generator_0
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -386,7 +401,7 @@ ____
  # (normal, preview, debug).
 ____
 
-Has 45 line(s). Doesn't call other functions.
+Has 46 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 

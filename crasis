@@ -19,8 +19,9 @@ autoload -- -zcrasis-process-buffer
 # Debug array, for debug view
 local -a ZCR_DEBUG_MSGS
 
-# Append message(s) to the debug view
+# Append message to the debug view
 -zcrasis_dbg_msg() { ZCR_DEBUG_MSGS+=( "$*" ); }
+# Append multiple messages to the debug view
 -zcrasis_dbg_msg_arr() { ZCR_DEBUG_MSGS+=( "$@" ); }
 
 # Initial debug message
