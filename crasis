@@ -96,6 +96,9 @@ chosen_plugins=(
     "zsh-users/zsh-syntax-highlighting"
 )
 
+local -a ice_order
+ice_order=( proto from if blockf atclone atload atpull )
+#
 #
 # PARAMETERS
 #
@@ -672,15 +675,18 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         [[ "$with_comments" = "1" && -n "$comment" ]] && buf+="${comment#$'\n'}"
 
         # ICE
-        if [[ "${#ice_cmd}" -ge 1 ]]; then
+        # Something more than [c]=zplugin [sub]=ice [comment]=comment
+        if (( ${#ice_cmd} > 2 && ${+ice_cmd[comment]} == 0 || ${#ice_cmd} > 3 && ${+ice_cmd[comment]} == 1 )); then
             (( ice_cmd[disabled] || main_cmd[disabled] )) && buf+=": "
             buf+="zplugin ice"
-            for tmp in "${(ok@)ice_cmd}"; do
+            for tmp in "${ice_order[@]}"; do
                 case "$tmp" in
                     (from|proto|report|depth|atload|atpull|atclone|if)
-                        buf+=" $tmp${ice_cmd[$tmp]}"
+                        [[ -z "${ice_cmd[$tmp]}" || "${ice_cmd[$tmp]}" = "<empty>"* ]] && continue
+                        buf+=" $tmp${(qqq)ice_cmd[$tmp]}"
                         ;;
                     (blockf)
+                        (( ${+ice_cmd[$tmp]} == 0 )) && continue
                         buf+=" $tmp"
                         ;;
                 esac
@@ -759,12 +765,50 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     local -A main_cmd
 
     cmd=( "${(@)cmdlist[(idx-1)*3+1,idx*3]}" )
-    [[ -n "${cmd[3]}" ]] && main_cmd=( "${(z@)cmd[3]}" ) || return 1
-    main_cmd=( "${(Qkv)main_cmd[@]}" )
+    if [[ -n "${cmd[3]}" ]]; then
+        main_cmd=( "${(z@)cmd[3]}" )
+        main_cmd=( "${(Qkv)main_cmd[@]}" )
+    fi
     main_cmd[$key]="$data"
 
     cmdlist[idx*3]="${(j: :)${(qkv)main_cmd[@]}}"
     return 0
+}
+# }}}
+# FUNCTION: -zcrasis_update_ice_cmd {{{
+# Updates ICE entry in given ($3) command packet. There
+# is single command packet per zplugin invocation and it
+# contains main command, optionally ICE command, and also
+# optionally a preceding comment.
+#
+# $1 - key to update in the ice command
+# $2 - data to store under the key
+# $3 - index of command pack to alter
+-zcrasis_update_ice_cmd() {
+    local key="$1" data="$2" idx="$3"
+    local -a cmd
+    local -A ice_cmd
+
+    cmd=( "${(@)cmdlist[(idx-1)*3+1,idx*3]}" )
+    if [[ -n "${cmd[2]}" ]]; then
+        ice_cmd=( "${(z@)cmd[2]}" )
+        ice_cmd=( "${(Qkv)ice_cmd[@]}" )
+    fi
+    if [[ "$data" = " delete " ]]; then
+        unset "ice_cmd[$key]"
+    else
+        ice_cmd[$key]="$data"
+    fi
+
+    local -a other
+    other=( "${(@)ice_cmd[(I)(proto|from|if|depth|blockf|atclone|atload|atpull)]}" )
+    if (( ${#other} == 0 )); then
+        ice_cmd=( comment "${ice_cmd[comment]}" )
+    else
+        ice_cmd+=( c "zplugin" sub "ice" )
+    fi
+
+    cmdlist[idx*3-1]="${(j: :)${(qkv)ice_cmd[@]}}"
 }
 # }}}
 # FUNCTION: -zcrasis_clear_visual_state {{{
@@ -772,6 +816,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 # from backend, model-structures (like $cmdlist).
 -zcrasis_clear_visual_state() {
     integer i size=$(( ${#cmdlist} / 3 ))
+    local -a keys
+    local k
     for (( i=1; i<=size+15; i++ )); do
         unset "ZUI[toggle_dis_2_${i}]"
         unset "ZUI[toggle_command_2_${i}]"
@@ -781,6 +827,19 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         unset "ZUI[my_tfield2_${i}_width]"
         unset "ZUI[my_tfield2_${i}_start]"
         unset "ZUI[my_tfield2_${i}_data]"
+
+        unset "ZUI[my_lbox2_2_${i}_width]"
+        unset "ZUI[my_lbox2_2_${i}_idx]"
+        unset "ZUI[my_lbox2_2_${i}_opts]"
+
+        unset "ZUI[my_lbox3_2_${i}_width]"
+        unset "ZUI[my_lbox3_2_${i}_idx]"
+        unset "ZUI[my_lbox3_2_${i}_opts]"
+
+        keys=( ${ZUI[(I)my_tfield4_${i}_*_width]} ${ZUI[(I)my_tfield4_${i}_*_start]} ${ZUI[(I)my_tfield4_${i}_*_data]} )
+        for k in "${keys[@]}"; do
+            unset "ZUI[$k]"
+        done
     done
 }
 # }}}
@@ -908,11 +967,26 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 # block is an instance of this module (separated by blank
 # lines horizontally, by ZUI normal operation).
 -zcrasis_generator_A() {
-    local mod="$1" ice="$2" comment
+    local mod="$1" ice="$2" arg="$3" comment t c ce
     local -a cmd output
     local -A ice_cmd main_cmd
     local var_name1 var_name2
     local num dis_col dis_col2 mode_col mode_text command_col force_col disabled_text
+    integer short_idx
+
+    # Ice addition request?
+    if [[ "$arg" = newice-* ]]; then
+        local newice="${arg#newice-}"
+        -zui_std_strip_color_codes "$newice"
+        newice="$REPLY"
+
+        -zcrasis_update_ice_cmd "$newice" "<empty>" "$ice"
+    elif [[ "$arg" = delice-* ]]; then
+        local delice="${arg#delice-}"
+        -zui_std_strip_color_codes "$delice"
+        delice="$REPLY"
+        -zcrasis_update_ice_cmd "$delice" " delete " "$ice"
+    fi
 
     cmd=( "${(@)cmdlist[(ice-1)*3+1,ice*3]}" )
     comment="${cmd[1]}"
@@ -962,10 +1036,64 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         output[4]=""
     fi
 
+    #
+    # 5. Add ice
+    #
+
+    c="${ZUI[MAGENTA]}" ce="${ZUI[FMT_END]}"
+
+    # Variables of the list box
+    (( ${+ZUI[my_lbox2_${mod}_${ice}_width]} == 0 )) && ZUI[my_lbox2_${mod}_${ice}_width]=8
+    (( ${+ZUI[my_lbox2_${mod}_${ice}_idx]} == 0 )) && ZUI[my_lbox2_${mod}_${ice}_idx]=1
+    (( ${+ZUI[my_lbox2_${mod}_${ice}_opts]} == 0 )) && ZUI[my_lbox2_${mod}_${ice}_opts]="${c}<+ICE>${ce};${c}proto${ce};${c}from${ce};${c}if${ce};${c}blockf${ce};${c}atclone${ce};${c}atload${ce};${c}atpull${ce}"
+
+    noglob -zui_std_list_box "lbox2_${mod}_${ice}" ZUI[my_lbox2_${mod}_${ice}_width] ZUI[my_lbox2_${mod}_${ice}_idx] ZUI[my_lbox2_${mod}_${ice}_opts] "" "" "" '-zui_std_fly_mod_regen '$mod' '$ice' newice-"${${(s:;:)ZUI[my_lbox2_'${mod}'_'${ice}'_opts]}[${ZUI[my_lbox2_'${mod}'_'${ice}'_idx]}]}";' output
+
+    #
+    # 6. Remove ice
+    #
+
+    c="${ZUI[MAGENTA]}" ce="${ZUI[FMT_END]}"
+
+    # Variables of the list box
+    (( ${+ZUI[my_lbox3_${mod}_${ice}_width]} == 0 )) && ZUI[my_lbox3_${mod}_${ice}_width]=8
+    (( ${+ZUI[my_lbox3_${mod}_${ice}_idx]} == 0 )) && ZUI[my_lbox3_${mod}_${ice}_idx]=1
+    (( ${+ZUI[my_lbox3_${mod}_${ice}_opts]} == 0 )) && ZUI[my_lbox3_${mod}_${ice}_opts]="${c}<-ICE>${ce};${c}proto${ce};${c}from${ce};${c}if${ce};${c}blockf${ce};${c}atclone${ce};${c}atload${ce};${c}atpull${ce}"
+
+    noglob -zui_std_list_box "lbox3_${mod}_${ice}" ZUI[my_lbox3_${mod}_${ice}_width] ZUI[my_lbox3_${mod}_${ice}_idx] ZUI[my_lbox3_${mod}_${ice}_opts] "" "" "" '-zui_std_fly_mod_regen '$mod' '$ice' delice-"${${(s:;:)ZUI[my_lbox3_'${mod}'_'${ice}'_opts]}[${ZUI[my_lbox3_'${mod}'_'${ice}'_idx]}]}";' output
+
+    ##
+    ## Ice list
+    ##
+
+    local -a ioutput
+    # Something more than [c]=zplugin [sub]=ice [comment]=comment
+    (( ${#ice_cmd} > 2 && ${+ice_cmd[comment]} == 0 || ${#ice_cmd} > 3 && ${+ice_cmd[comment]} == 1 )) && {
+        ioutput=( "  " )
+        for t in "${ice_order[@]}"; do
+            case "$t" in
+                (proto|from|if|depth|atload|atpull|atclone)
+                    [[ -z "${ice_cmd[$t]}" ]] && continue
+                    # Variables of the text field
+                    (( ${+ZUI[my_tfield4_${ice}_${t}_width]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_width]=$(( ${#${(Q)ice_cmd[$t]}} + 1 ))
+                    (( ${+ZUI[my_tfield4_${ice}_${t}_start]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_start]=1
+                    (( ${+ZUI[my_tfield4_${ice}_${t}_data]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_data]="${(Q)ice_cmd[$t]}"
+
+                    ioutput+=( " $t:" )
+                    noglob -zui_std_text_field "tfield4_${mod}_${ice}_${t}" ZUI[my_tfield4_${ice}_${t}_width] ZUI[my_tfield4_${ice}_${t}_start] ZUI[my_tfield4_${ice}_${t}_data] "" "" "" '-zcrasis_update_ice_cmd '$t' "${ZUI[my_tfield4_'${ice}'_'$t'_data]}" '$ice ioutput
+                    ;;
+                (blockf)
+                    (( ${+ice_cmd[$t]} == 0 )) && continue
+                    ioutput+=( "[blockf]" )
+                    ;;
+            esac
+        done
+    }
+
     reply=()
     if [[ "${main_cmd[sub]}" = "snippet" ]]; then
         #
-        # Url, edited in edit-mode
+        # 7. Url, edited in edit-mode
         #
 
         if [[ "${ZUI[zc_edit_mode]}" = 1 ]]; then
@@ -976,11 +1104,11 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
             noglob -zui_std_text_field "tfield2_${mod}_${ice}" ZUI[my_tfield2_${ice}_width] ZUI[my_tfield2_${ice}_start] ZUI[my_tfield2_${ice}_data] "" "" "" '-zcrasis_update_main_cmd url "${ZUI[my_tfield2_'${ice}'_data]}" '$ice output
         else
-            output+=( ${ZUI[MAGENTA]}${main_cmd[url]}${ZUI[FMT_END]} )
+            output+=( ${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]} )
         fi
 
         #
-        # command on/off
+        # 8. command on/off
         #
 
         [[ -z "${ZUI[toggle_command_${mod}_${ice}]}" ]] && ZUI[toggle_command_${mod}_${ice}]="${main_cmd[--command]:-0}" || -zcrasis_update_main_cmd --command "${ZUI[toggle_command_${mod}_${ice}]}" $ice
@@ -989,7 +1117,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         -zui_std_rc_button "toggle_command_${mod}_${ice}" "$command_text" '(( ZUI[toggle_command_'"${mod}_${ice}"']=1-${ZUI[toggle_command_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
         #
-        # force on/off
+        # 9. force on/off
         #
 
         [[ -z "${ZUI[toggle_force_${mod}_${ice}]}" ]] && ZUI[toggle_force_${mod}_${ice}]="${main_cmd[-f]:-0}" || -zcrasis_update_main_cmd -f "${ZUI[toggle_force_${mod}_${ice}]}" $ice
@@ -998,16 +1126,18 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         -zui_std_rc_button "toggle_force_${mod}_${ice}" "$force_text" '(( ZUI[toggle_force_'"${mod}_${ice}"']=1-${ZUI[toggle_force_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
         #
-        # Document
+        # The Resulting Document
         #
 
-        reply+=( "$num ${output[1]} ${output[2]} ${dis_col2}S${ZUI[FMT_END]} ${output[5]}" )
-        reply+=( "${output[4]:-    }${output[3]} ${output[6]} ${output[7]}" )
+        reply+=( "$num ${output[1]} ${output[2]} ${dis_col2}S${ZUI[FMT_END]} ${output[7]}" )
+        short_idx=${#reply}
+        reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} ${output[5]} ${output[6]}" )
+        [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
 
-        [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[-1]=()
+        [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[short_idx+1,-1]=()
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
         #
-        # Url, edited in edit-mode
+        # 7. Url, edited in edit-mode
         #
 
         if [[ "${ZUI[zc_edit_mode]}" = 1 ]]; then
@@ -1022,7 +1152,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         fi
 
         #
-        # Mode: light or normal ("load")
+        # 8. Mode: light or normal ("load")
         #
 
         [[ -z "${ZUI[toggle_mode_${mod}_${ice}]}" ]] && ZUI[toggle_mode_${mod}_${ice}]="${main_cmd[sub]}" || -zcrasis_update_main_cmd sub "${ZUI[toggle_mode_${mod}_${ice}]}" $ice
@@ -1031,19 +1161,21 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         -zui_std_rc_button "toggle_mode_${mod}_${ice}" "Mode: ${mode_col}${mode_text}${ZUI[FMT_END]}" '[[ ${ZUI[toggle_mode_'"${mod}_${ice}"']} = light ]] && ZUI[toggle_mode_'"${mod}_${ice}"']=load || ZUI[toggle_mode_'"${mod}_${ice}"']=light; -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
         #
-        # Compile
+        # 9. Compile
         #
 
         -zui_std_rc_button "compile_${mod}_${ice}" "${ZUI[YELLOW]}Compile${ZUI[FMT_END]}" 'zplugin compile '${main_cmd[url]}'; print Done.; builtin read tmp;' output
 
         #
-        # Document
+        # The Resulting Document
         #
 
-        reply+=( "$num ${output[1]} ${output[2]} ${dis_col2}P${ZUI[FMT_END]} ${output[5]}" )
-        reply+=( "${output[4]:-    }${output[3]} ${output[6]} ${output[7]}" )
+        reply+=( "$num ${output[1]} ${output[2]} ${dis_col2}P${ZUI[FMT_END]} ${output[7]}" )
+        short_idx=${#reply}
+        reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} ${output[5]} ${output[6]}" )
+        [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
 
-        [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[-1]=()
+        [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[short_idx+1,-1]=()
     elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdreplay" )
         reply+=( "${output[4]:-    }${output[3]}" )
