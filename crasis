@@ -967,7 +967,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 # block is an instance of this module (separated by blank
 # lines horizontally, by ZUI normal operation).
 -zcrasis_generator_A() {
-    local mod="$1" ice="$2" arg="$3" comment t c ce
+    local mod="$1" ice="$2" arg="$3" comment t c ce ice_add_remove
     local -a cmd output
     local -A ice_cmd main_cmd
     local var_name1 var_name2
@@ -1041,26 +1041,37 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     #
 
     c="${ZUI[MAGENTA]}" ce="${ZUI[FMT_END]}"
+    local -a existing toadd
+    existing=( "${(@)ice_cmd[(I)(proto|from|if|depth|blockf|atclone|atload|atpull)]}" )
+    toadd=( ${(@)ice_order:|existing} )
 
     # Variables of the list box
     (( ${+ZUI[my_lbox2_${mod}_${ice}_width]} == 0 )) && ZUI[my_lbox2_${mod}_${ice}_width]=8
     (( ${+ZUI[my_lbox2_${mod}_${ice}_idx]} == 0 )) && ZUI[my_lbox2_${mod}_${ice}_idx]=1
-    (( ${+ZUI[my_lbox2_${mod}_${ice}_opts]} == 0 )) && ZUI[my_lbox2_${mod}_${ice}_opts]="${c}<+ICE>${ce};${c}proto${ce};${c}from${ce};${c}if${ce};${c}blockf${ce};${c}atclone${ce};${c}atload${ce};${c}atpull${ce}"
+    ZUI[my_lbox2_${mod}_${ice}_opts]="${c}<+ICE>${ce};${(j:;:)toadd}"
 
-    noglob -zui_std_list_box "lbox2_${mod}_${ice}" ZUI[my_lbox2_${mod}_${ice}_width] ZUI[my_lbox2_${mod}_${ice}_idx] ZUI[my_lbox2_${mod}_${ice}_opts] "" "" "" '-zui_std_fly_mod_regen '$mod' '$ice' newice-"${${(s:;:)ZUI[my_lbox2_'${mod}'_'${ice}'_opts]}[${ZUI[my_lbox2_'${mod}'_'${ice}'_idx]}]}";' output
+    (( ${#toadd} )) && noglob -zui_std_list_box "lbox2_${mod}_${ice}" ZUI[my_lbox2_${mod}_${ice}_width] ZUI[my_lbox2_${mod}_${ice}_idx] ZUI[my_lbox2_${mod}_${ice}_opts] "" "" "" '-zui_std_fly_mod_regen '$mod' '$ice' newice-"${${(s:;:)ZUI[my_lbox2_'${mod}'_'${ice}'_opts]}[${ZUI[my_lbox2_'${mod}'_'${ice}'_idx]}]}"; ZUI[my_lbox2_'${mod}'_'${ice}'_idx]=1;' output || output+=( "" )
 
     #
     # 6. Remove ice
     #
 
     c="${ZUI[MAGENTA]}" ce="${ZUI[FMT_END]}"
+    local -a toremove
+    toremove=( ${(@)ice_order:*existing} )
 
     # Variables of the list box
     (( ${+ZUI[my_lbox3_${mod}_${ice}_width]} == 0 )) && ZUI[my_lbox3_${mod}_${ice}_width]=8
     (( ${+ZUI[my_lbox3_${mod}_${ice}_idx]} == 0 )) && ZUI[my_lbox3_${mod}_${ice}_idx]=1
-    (( ${+ZUI[my_lbox3_${mod}_${ice}_opts]} == 0 )) && ZUI[my_lbox3_${mod}_${ice}_opts]="${c}<-ICE>${ce};${c}proto${ce};${c}from${ce};${c}if${ce};${c}blockf${ce};${c}atclone${ce};${c}atload${ce};${c}atpull${ce}"
+    ZUI[my_lbox3_${mod}_${ice}_opts]="${c}<-ICE>${ce};${(j:;:)toremove}"
 
-    noglob -zui_std_list_box "lbox3_${mod}_${ice}" ZUI[my_lbox3_${mod}_${ice}_width] ZUI[my_lbox3_${mod}_${ice}_idx] ZUI[my_lbox3_${mod}_${ice}_opts] "" "" "" '-zui_std_fly_mod_regen '$mod' '$ice' delice-"${${(s:;:)ZUI[my_lbox3_'${mod}'_'${ice}'_opts]}[${ZUI[my_lbox3_'${mod}'_'${ice}'_idx]}]}";' output
+    (( ${#toremove} )) && noglob -zui_std_list_box "lbox3_${mod}_${ice}" ZUI[my_lbox3_${mod}_${ice}_width] ZUI[my_lbox3_${mod}_${ice}_idx] ZUI[my_lbox3_${mod}_${ice}_opts] "" "" "" '-zui_std_fly_mod_regen '$mod' '$ice' delice-"${${(s:;:)ZUI[my_lbox3_'${mod}'_'${ice}'_opts]}[${ZUI[my_lbox3_'${mod}'_'${ice}'_idx]}]}"; ZUI[my_lbox3_'${mod}'_'${ice}'_idx]=1;' output || output+=( "" )
+
+    if [[ -n "${output[-2]}" && -n "${output[-1]}" ]]; then
+        ice_add_remove="${output[-2]} ${output[-1]}"
+    else
+        ice_add_remove="${output[-2]}${output[-1]}"
+    fi
 
     ##
     ## Ice list
@@ -1084,7 +1095,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
                     ;;
                 (blockf)
                     (( ${+ice_cmd[$t]} == 0 )) && continue
-                    ioutput+=( "[blockf]" )
+                    ioutput+=( " [blockf]" )
                     ;;
             esac
         done
@@ -1131,7 +1142,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
         reply+=( "$num ${output[1]} ${output[2]} ${dis_col2}S${ZUI[FMT_END]} ${output[7]}" )
         short_idx=${#reply}
-        reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} ${output[5]} ${output[6]}" )
+        reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
         [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
 
         [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[short_idx+1,-1]=()
@@ -1172,7 +1183,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
         reply+=( "$num ${output[1]} ${output[2]} ${dis_col2}P${ZUI[FMT_END]} ${output[7]}" )
         short_idx=${#reply}
-        reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} ${output[5]} ${output[6]}" )
+        reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
         [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
 
         [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[short_idx+1,-1]=()
