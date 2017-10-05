@@ -650,6 +650,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
                         ;;
                 esac
             done
+            [[ "$with_comments" = "1" && -n "${ice_cmd[comment]}" ]] && buf+="${ice_cmd[comment]}"
             buf+=$'\n'
         fi
 
@@ -663,6 +664,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
                     [[ "${main_cmd[-f]}" = "1" ]] && buf+=" -f"
                     [[ "${main_cmd[-q]}" = "1" ]] && buf+=" -q"
                     [[ -n "${main_cmd[url]}" ]] && buf+=" ${main_cmd[url]}"
+                    [[ "$with_comments" = "1" && -n "${main_cmd[comment]}" ]] && buf+="${main_cmd[comment]}"
                 else
                     # Unknown subcommand
                     local -a keys
