@@ -913,10 +913,10 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     -zui_util_map_bools '[[ "${ZUI[zc_compact_mode]}" = "1" ]]' co_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
 
     # 1. - 4.
-    -zui_std_rc_button "reload" "${ZUI[GREEN]}Reload${ZUI[FMT_END]}" -zcrasis_action_reload
-    -zui_std_rc_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" '-zcrasis_action_save; internal=1'
-    -zui_std_rc_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_action_preview
-    -zui_std_rc_button "debug" "${dg_col}Debug${ZUI[FMT_END]}" -zcrasis_action_debug_view
+    -zui_std_button "reload" "${ZUI[GREEN]}Reload${ZUI[FMT_END]}" -zcrasis_action_reload
+    -zui_std_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" '-zcrasis_action_save; internal=1'
+    -zui_std_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_action_preview
+    -zui_std_button "debug" "${dg_col}Debug${ZUI[FMT_END]}" -zcrasis_action_debug_view
 
     (( ${ZUI[in_preview]} + ZUI[in_debug] == 0 )) && {
         # Variables of the text field
@@ -936,13 +936,13 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         noglob -zui_std_list_box "lbox1_$mod" ZUI[my_lbox1_width] ZUI[my_lbox1_idx] ZUI[my_lbox1_opts] "" "" "" 'ZUI[my_tfield3_data]="${${(s:;:)ZUI[my_lbox1_opts]}[${ZUI[my_lbox1_idx]}]}"; [[ "${ZUI[my_lbox1_idx]}" = 1 ]] && ZUI[my_tfield3_data]="";' optional
 
         # 3. - 4.
-        -zui_std_rc_button "snippet" "${ZUI[GREEN]}Add snippet${ZUI[FMT_END]}" -zcrasis_action_add_snippet optional
-        -zui_std_rc_button "plugin" "${ZUI[GREEN]}Add plugin${ZUI[FMT_END]}" -zcrasis_action_add_plugin optional
+        -zui_std_button "snippet" "${ZUI[GREEN]}Add snippet${ZUI[FMT_END]}" -zcrasis_action_add_snippet optional
+        -zui_std_button "plugin" "${ZUI[GREEN]}Add plugin${ZUI[FMT_END]}" -zcrasis_action_add_plugin optional
 
         # 5. - 6.
-        -zui_std_rc_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_action_delete_mode optional
-        -zui_std_rc_button "edit_mode" "${ed_col}Edit Mode${ZUI[FMT_END]}" -zcrasis_action_edit_mode optional
-        -zui_std_rc_button "compact_mode" "${co_col}Compact Mode${ZUI[FMT_END]}" -zcrasis_action_compact_mode optional
+        -zui_std_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_action_delete_mode optional
+        -zui_std_button "edit_mode" "${ed_col}Edit Mode${ZUI[FMT_END]}" -zcrasis_action_edit_mode optional
+        -zui_std_button "compact_mode" "${co_col}Compact Mode${ZUI[FMT_END]}" -zcrasis_action_compact_mode optional
 
         local line1="${optional[5]} ${optional[6]} ${optional[7]}"
         local line2="${optional[1]} ${optional[3]} ${optional[4]}  Choose: ${optional[2]}"
@@ -1009,16 +1009,16 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
     # 1.
     if [[ "$ice" -gt 1 ]]; then
-        -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "${ZUI[YELLOW]}[Up]${ZUI[FMT_END]}" "-zcrasis_action_move_up $mod $ice" output
+        -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "${ZUI[YELLOW]}↑${ZUI[FMT_END]}" "-zcrasis_action_move_up $mod $ice" output
     else
-        output+=( "[Up]" )
+        output+=( "↑" )
     fi
 
     # 2.
     if [[ "$ice" -lt $(( ${#cmdlist} / 3 )) ]]; then
-        -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "${ZUI[YELLOW]}[Down]${ZUI[FMT_END]}" "-zcrasis_action_move_down $mod $ice" output
+        -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "${ZUI[YELLOW]}↓${ZUI[FMT_END]}" "-zcrasis_action_move_down $mod $ice" output
     else
-        output+=( "[Down]" )
+        output+=( "↓" )
     fi
 
     # "DISABLED" or "Enabled"
@@ -1028,7 +1028,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "dis_col2" "${ZUI[RED]}" "${ZUI[WHITE]}"
 
     # 3.
-    -zui_std_rc_button "toggle_dis_${mod}_${ice}" "${dis_col}${disabled_text}${ZUI[FMT_END]}" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
+    -zui_std_button "toggle_dis_${mod}_${ice}" "${dis_col}${disabled_text}${ZUI[FMT_END]}" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
     # 4. Delete
     -zui_std_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "${ZUI[RED]}[X]${ZUI[FMT_END]}" -zcrasis_action_delete output
@@ -1127,7 +1127,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         [[ -z "${ZUI[toggle_command_${mod}_${ice}]}" ]] && ZUI[toggle_command_${mod}_${ice}]="${main_cmd[--command]:-0}" || -zcrasis_update_main_cmd --command "${ZUI[toggle_command_${mod}_${ice}]}" $ice
         -zui_util_map_bools "[[ \"${ZUI[toggle_command_${mod}_${ice}]}\" = 1 ]]" "command_col" "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
         local command_text="${command_col}as-command${ZUI[FMT_END]}"
-        -zui_std_rc_button "toggle_command_${mod}_${ice}" "$command_text" '(( ZUI[toggle_command_'"${mod}_${ice}"']=1-${ZUI[toggle_command_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
+        -zui_std_button "toggle_command_${mod}_${ice}" "$command_text" '(( ZUI[toggle_command_'"${mod}_${ice}"']=1-${ZUI[toggle_command_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
         #
         # 9. force on/off
@@ -1136,7 +1136,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         [[ -z "${ZUI[toggle_force_${mod}_${ice}]}" ]] && ZUI[toggle_force_${mod}_${ice}]="${main_cmd[-f]:-0}" || -zcrasis_update_main_cmd -f "${ZUI[toggle_force_${mod}_${ice}]}" $ice
         -zui_util_map_bools "[[ \"${ZUI[toggle_force_${mod}_${ice}]}\" = 1 ]]" "force_col" "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
         local force_text="${force_col}force${ZUI[FMT_END]}"
-        -zui_std_rc_button "toggle_force_${mod}_${ice}" "$force_text" '(( ZUI[toggle_force_'"${mod}_${ice}"']=1-${ZUI[toggle_force_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
+        -zui_std_button "toggle_force_${mod}_${ice}" "$force_text" '(( ZUI[toggle_force_'"${mod}_${ice}"']=1-${ZUI[toggle_force_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
         #
         # The Resulting Document
@@ -1171,13 +1171,13 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         [[ -z "${ZUI[toggle_mode_${mod}_${ice}]}" ]] && ZUI[toggle_mode_${mod}_${ice}]="${main_cmd[sub]}" || -zcrasis_update_main_cmd sub "${ZUI[toggle_mode_${mod}_${ice}]}" $ice
         -zui_util_map_bools "[[ \"${ZUI[toggle_mode_${mod}_${ice}]}\" = light ]]" "mode_col" "${ZUI[YELLOW]}" "${ZUI[GREEN]}"
         -zui_util_map_bools "[[ \"${ZUI[toggle_mode_${mod}_${ice}]}\" = light ]]" "mode_text" light normal
-        -zui_std_rc_button "toggle_mode_${mod}_${ice}" "Mode: ${mode_col}${mode_text}${ZUI[FMT_END]}" '[[ ${ZUI[toggle_mode_'"${mod}_${ice}"']} = light ]] && ZUI[toggle_mode_'"${mod}_${ice}"']=load || ZUI[toggle_mode_'"${mod}_${ice}"']=light; -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
+        -zui_std_button "toggle_mode_${mod}_${ice}" "Mode: ${mode_col}${mode_text}${ZUI[FMT_END]}" '[[ ${ZUI[toggle_mode_'"${mod}_${ice}"']} = light ]] && ZUI[toggle_mode_'"${mod}_${ice}"']=load || ZUI[toggle_mode_'"${mod}_${ice}"']=light; -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
         #
         # 9. Compile
         #
 
-        -zui_std_rc_button "compile_${mod}_${ice}" "${ZUI[YELLOW]}Compile${ZUI[FMT_END]}" 'zplugin compile '${main_cmd[url]}'; print Done.; builtin read tmp;' output
+        -zui_std_button "compile_${mod}_${ice}" "${ZUI[YELLOW]}Compile${ZUI[FMT_END]}" 'zplugin compile '${main_cmd[url]}'; print Done.; builtin read tmp;' output
 
         #
         # The Resulting Document
@@ -1248,7 +1248,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     (( ${+ZUI[my_tfield1_data]} == 0 )) && ZUI[my_tfield1_data]="$HOME/crasis-report.txt"
 
     noglob -zui_std_text_field "report_path" ZUI[my_tfield1_width] ZUI[my_tfield1_start] ZUI[my_tfield1_data] "" "" "" ''
-    -zui_std_rc_button "save_report" "${ZUI[YELLOW]}Save${ZUI[FMT_END]}" 'print -rl -- "${ZCR_DEBUG_MSGS[@]}" >| "${ZUI[my_tfield1_data]}"; -zui_std_stalog "Report written to: " "\`${ZUI[my_tfield1_data]}'"'"'"; internal=1;'
+    -zui_std_button "save_report" "${ZUI[YELLOW]}Save${ZUI[FMT_END]}" 'print -rl -- "${ZCR_DEBUG_MSGS[@]}" >| "${ZUI[my_tfield1_data]}"; -zui_std_stalog "Report written to: " "\`${ZUI[my_tfield1_data]}'"'"'"; internal=1;'
 
     reply=( "Send reports to: ${ZUI[YELLOW]}psprint${ZUI[FMT_END]}${ZUI[BOLD]}${ZUI[YELLOW]}@${ZUI[FMT_END]}${ZUI[YELLOW]}zdharma.org${ZUI[FMT_END]}. Please include Zshrc if possible."
         ""
