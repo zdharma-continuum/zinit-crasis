@@ -97,7 +97,7 @@ chosen_plugins=(
 )
 
 local -a ice_order
-ice_order=( proto from if blockf atclone atload atpull )
+ice_order=( proto from depth if blockf atclone atload atpull )
 #
 #
 # PARAMETERS
@@ -682,7 +682,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
             buf+="zplugin ice"
             for tmp in "${ice_order[@]}"; do
                 case "$tmp" in
-                    (from|proto|report|depth|atload|atpull|atclone|if)
+                    (proto|from|depth|if|atclone|atload|atpull)
                         [[ -z "${ice_cmd[$tmp]}" || "${ice_cmd[$tmp]}" = "<empty>"* ]] && continue
                         # Also quote the ice modifier
                         buf+=" $tmp${(qqq)ice_cmd[$tmp]}"
@@ -803,7 +803,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     fi
 
     local -a other
-    other=( "${(@)ice_cmd[(I)(proto|from|if|depth|blockf|atclone|atload|atpull)]}" )
+    other=( "${(@)ice_cmd[(I)(proto|from|depth|if|blockf|atclone|atload|atpull)]}" )
     if (( ${#other} == 0 )); then
         ice_cmd=( comment "${ice_cmd[comment]}" )
     else
@@ -1044,7 +1044,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
     t="<+ICE>"
     local -a existing toadd
-    existing=( "${(@)ice_cmd[(I)(proto|from|if|depth|blockf|atclone|atload|atpull)]}" )
+    existing=( "${(@)ice_cmd[(I)(proto|from|depth|if|blockf|atclone|atload|atpull)]}" )
     toadd=( ${(@)ice_order:|existing} )
 
     # Variables of the list box
@@ -1085,7 +1085,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
         ioutput=( "  " )
         for t in "${ice_order[@]}"; do
             case "$t" in
-                (proto|from|if|depth|atload|atpull|atclone)
+                (proto|from|depth|if|atload|atpull|atclone)
                     [[ -z "${ice_cmd[$t]}" ]] && continue
                     # Variables of the text field
                     (( ${+ZUI[my_tfield4_${ice}_${t}_width]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_width]=$(( ${#ice_cmd[$t]} + 1 ))
