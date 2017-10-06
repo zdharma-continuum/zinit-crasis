@@ -376,7 +376,8 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
             fi
         else
             if [[ "${cmd3[sub]}" = "ice" ]]; then
-                [[ "$token" = (#b)(from|proto|report|depth|blockf|atload|atpull|atclone|if)(*) ]] && cmd3[${match[1]}]="${match[2]}"
+                # Also dequote the ice modifier
+                [[ "$token" = (#b)(from|proto|if|depth|blockf|atclone|atload|atpull)(*) ]] && cmd3[${match[1]}]="${(Q)match[2]}"
             elif [[ "${cmd3[sub]}" = (load|light) ]]; then
                 if (( in_zplugin == 4 )); then
                     cmd3[url]+="/$token"
@@ -683,6 +684,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
                 case "$tmp" in
                     (from|proto|report|depth|atload|atpull|atclone|if)
                         [[ -z "${ice_cmd[$tmp]}" || "${ice_cmd[$tmp]}" = "<empty>"* ]] && continue
+                        # Also quote the ice modifier
                         buf+=" $tmp${(qqq)ice_cmd[$tmp]}"
                         ;;
                     (blockf)
@@ -1086,9 +1088,9 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
                 (proto|from|if|depth|atload|atpull|atclone)
                     [[ -z "${ice_cmd[$t]}" ]] && continue
                     # Variables of the text field
-                    (( ${+ZUI[my_tfield4_${ice}_${t}_width]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_width]=$(( ${#${(Q)ice_cmd[$t]}} + 1 ))
+                    (( ${+ZUI[my_tfield4_${ice}_${t}_width]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_width]=$(( ${#ice_cmd[$t]} + 1 ))
                     (( ${+ZUI[my_tfield4_${ice}_${t}_start]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_start]=1
-                    (( ${+ZUI[my_tfield4_${ice}_${t}_data]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_data]="${(Q)ice_cmd[$t]}"
+                    (( ${+ZUI[my_tfield4_${ice}_${t}_data]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_data]="${ice_cmd[$t]}"
 
                     ioutput+=( " ${ZUI[YELLOW]}$t${ZUI[FMT_END]}:" )
                     noglob -zui_std_text_field "tfield4_${mod}_${ice}_${t}" ZUI[my_tfield4_${ice}_${t}_width] ZUI[my_tfield4_${ice}_${t}_start] ZUI[my_tfield4_${ice}_${t}_data] "" "" "" '-zcrasis_update_ice_cmd '$t' "${ZUI[my_tfield4_'${ice}'_'$t'_data]}" '$ice ioutput
