@@ -165,11 +165,11 @@ thcol_entries=(
     # Add bar
     add-snippet add-plugin gold-choose
     # Listing
-    index enabled disabled up down
+    index enabled disabled up down delete plus-ice minus-ice
     # Snippet item
-    s-url s-marker s-marker-disabled s-as-command s-force s-plus-ice s-minus-ice
+    s-url s-marker s-marker-disabled s-as-command s-force
     # Plugin item
-    p-id p-marker p-marker-disabled p-compile p-plus-ice p-minus-ice
+    p-id p-marker p-marker-disabled p-compile
     # Debug view
     d-save
 )
@@ -183,6 +183,7 @@ thtxt_entries=(
     add-snippet-text add-plugin-text new-id-url-text gold-choose-text gold-list-info-text
     # Listing
     enabled-text disabled-text enabled-unicode disabled-unicode up-text down-text up-unicode down-unicode
+    delete-text delete-unicode
     # Snippet item
     s-marker-text s-marker-disabled-text
     # Plugin item
@@ -205,6 +206,7 @@ function process_theme() {
 
     source "$ZCRASIS_REPO_DIR/themes/${CRASIS_THEME}.cr-theme"
     theme=( "${(kv)my_crasis_theme_data[@]}" )
+    theme[i-blockf]="${${(s;:;)theme[i-id]}[5]}"
 
     # Stats on color settings
     local -a provided missing
@@ -219,7 +221,7 @@ function process_theme() {
 
     # Convert colors' symbolic names like "green"
     local ckey cval nval
-    for ckey in "${thcol_entries[@]}"; do
+    for ckey in "${thcol_entries[@]}" i-blockf; do
         cval=${(U)theme[$ckey]}
         [[ -z "$cval" ]] && continue
         nval=${ZUI[$cval]}
@@ -1143,7 +1145,7 @@ process_theme
     local -a cmd output
     local -A ice_cmd main_cmd
     local var_name1 var_name2
-    local num dis_col dis_col2 mode_col mode_text command_col force_col disabled_text
+    local num dis_col dis_col2s dis_col2p mode_text command_col force_col disabled_text
     integer short_idx
 
     # Ice addition request?
@@ -1179,29 +1181,30 @@ process_theme
 
     # 1.
     if [[ "$ice" -gt 1 ]]; then
-        -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "${ZUI[YELLOW]}↑${ZUI[FMT_END]}" "-zcrasis_action_move_up $mod $ice" output
+        -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "$theme[up-unicode-c]" "-zcrasis_action_move_up $mod $ice" output
     else
-        output+=( "↑" )
+        output+=( "$theme[up-unicode]" )
     fi
 
     # 2.
     if [[ "$ice" -lt $(( ${#cmdlist} / 3 )) ]]; then
-        -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "${ZUI[YELLOW]}↓${ZUI[FMT_END]}" "-zcrasis_action_move_down $mod $ice" output
+        -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "$theme[down-unicode-c]" "-zcrasis_action_move_down $mod $ice" output
     else
-        output+=( "↓" )
+        output+=( "$theme[down-unicode]" )
     fi
 
     # "DISABLED" or "Enabled"
     [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || -zcrasis_update_main_cmd disabled "${ZUI[toggle_dis_${mod}_${ice}]}" "$ice"
-    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "dis_col" "${ZUI[RED]}" "${ZUI[GREEN]}"
-    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "DISABLED" "Enabled"
-    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "dis_col2" "${ZUI[RED]}" "${ZUI[WHITE]}"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "dis_col" "$theme[disabled]" "$theme[enabled]"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "$theme[disabled-text]" "$theme[enabled-text]"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "dis_col2s" "$theme[s-marker-disabled]" "${ZUI[WHITE]}"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "dis_col2p" "$theme[p-marker-disabled]" "${ZUI[WHITE]}"
 
     # 3.
     -zui_std_button "toggle_dis_${mod}_${ice}" "${dis_col}${disabled_text}${ZUI[FMT_END]}" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
     # 4. Delete
-    -zui_std_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "${ZUI[RED]}[X]${ZUI[FMT_END]}" -zcrasis_action_delete output
+    -zui_std_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "$theme[delete-text-c]" -zcrasis_action_delete output
     if (( ZUI[zc_delete_mode] )); then
         output[4]+=" "
     else
@@ -1213,6 +1216,7 @@ process_theme
     #
 
     t="<+ICE>"
+    [[ -n "$theme[plus-ice]" ]] && t="$theme[plus-ice]$t${ZUI[FMT_END]}"
     local -a existing toadd
     existing=( "${(@)ice_cmd[(I)(proto|from|depth|if|blockf|atclone|atload|atpull)]}" )
     toadd=( ${(@)ice_order:|existing} )
@@ -1229,6 +1233,7 @@ process_theme
     #
 
     t="<-ICE>"
+    [[ -n "$theme[minus-ice]" ]] && t="$theme[minus-ice]$t${ZUI[FMT_END]}"
     local -a toremove
     toremove=( ${(@)ice_order:*existing} )
 
@@ -1250,10 +1255,12 @@ process_theme
     ##
 
     local -a ioutput
+    integer index=0
     # Something more than [c]=zplugin [sub]=ice [comment]=comment
     (( ${#ice_cmd} > 2 && ${+ice_cmd[comment]} == 0 || ${#ice_cmd} > 3 && ${+ice_cmd[comment]} == 1 )) && {
         ioutput=( "  " )
         for t in "${ice_order[@]}"; do
+            index+=1
             case "$t" in
                 (proto|from|depth|if|atload|atpull|atclone)
                     [[ -z "${ice_cmd[$t]}" ]] && continue
@@ -1262,12 +1269,12 @@ process_theme
                     (( ${+ZUI[my_tfield4_${ice}_${t}_start]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_start]=1
                     (( ${+ZUI[my_tfield4_${ice}_${t}_data]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_data]="${ice_cmd[$t]}"
 
-                    ioutput+=( " ${ZUI[YELLOW]}$t${ZUI[FMT_END]}:" )
+                    [[ -n "$theme[i-id-${index}]" ]] && ioutput+=( " $theme[i-id-${index}]$t${ZUI[FMT_END]}:" ) || ioutput+=( " $t" )
                     noglob -zui_std_text_field "tfield4_${mod}_${ice}_${t}" ZUI[my_tfield4_${ice}_${t}_width] ZUI[my_tfield4_${ice}_${t}_start] ZUI[my_tfield4_${ice}_${t}_data] "" "" "" '-zcrasis_update_ice_cmd '$t' "${ZUI[my_tfield4_'${ice}'_'$t'_data]}" '$ice ioutput
                     ;;
                 (blockf)
                     (( ${+ice_cmd[$t]} == 0 )) && continue
-                    ioutput+=( " [${ZUI[YELLOW]}blockf${ZUI[FMT_END]}]" )
+                    ioutput+=( " $theme[i-blockf-text-c]" )
                     ;;
             esac
         done
@@ -1287,7 +1294,7 @@ process_theme
 
             noglob -zui_std_text_field "tfield2_${mod}_${ice}" ZUI[my_tfield2_${ice}_width] ZUI[my_tfield2_${ice}_start] ZUI[my_tfield2_${ice}_data] "" "" "" '-zcrasis_update_main_cmd url "${ZUI[my_tfield2_'${ice}'_data]}" '$ice output
         else
-            output+=( ${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]} )
+            [[ -n "$theme[s-url]" ]] && output+=( "$theme[s-url]${main_cmd[url]}${ZUI[FMT_END]}" ) || output+=( "${main_cmd[url]}" )
         fi
 
         #
@@ -1295,7 +1302,7 @@ process_theme
         #
 
         [[ -z "${ZUI[toggle_command_${mod}_${ice}]}" ]] && ZUI[toggle_command_${mod}_${ice}]="${main_cmd[--command]:-0}" || -zcrasis_update_main_cmd --command "${ZUI[toggle_command_${mod}_${ice}]}" $ice
-        -zui_util_map_bools "[[ \"${ZUI[toggle_command_${mod}_${ice}]}\" = 1 ]]" "command_col" "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
+        -zui_util_map_bools "[[ \"${ZUI[toggle_command_${mod}_${ice}]}\" = 1 ]]" "command_col" "${ZUI[BG_BLUE]}" "$theme[s-as-command]"
         local command_text="${command_col}as-command${ZUI[FMT_END]}"
         -zui_std_button "toggle_command_${mod}_${ice}" "$command_text" '(( ZUI[toggle_command_'"${mod}_${ice}"']=1-${ZUI[toggle_command_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
@@ -1304,7 +1311,7 @@ process_theme
         #
 
         [[ -z "${ZUI[toggle_force_${mod}_${ice}]}" ]] && ZUI[toggle_force_${mod}_${ice}]="${main_cmd[-f]:-0}" || -zcrasis_update_main_cmd -f "${ZUI[toggle_force_${mod}_${ice}]}" $ice
-        -zui_util_map_bools "[[ \"${ZUI[toggle_force_${mod}_${ice}]}\" = 1 ]]" "force_col" "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
+        -zui_util_map_bools "[[ \"${ZUI[toggle_force_${mod}_${ice}]}\" = 1 ]]" "force_col" "${ZUI[BG_BLUE]}" "$theme[s-force]"
         local force_text="${force_col}force${ZUI[FMT_END]}"
         -zui_std_button "toggle_force_${mod}_${ice}" "$force_text" '(( ZUI[toggle_force_'"${mod}_${ice}"']=1-${ZUI[toggle_force_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
@@ -1312,7 +1319,7 @@ process_theme
         # The Resulting Document
         #
 
-        reply+=( "$num ${output[1]} ${output[2]} ${dis_col2}S${ZUI[FMT_END]} ${output[7]}" )
+        reply+=( "$num ${output[1]} ${output[2]} ${dis_col2s}S${ZUI[FMT_END]} ${output[7]}" )
         short_idx=${#reply}
         reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
         [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
@@ -1331,7 +1338,7 @@ process_theme
 
             noglob -zui_std_text_field "tfield2_${mod}_${ice}" ZUI[my_tfield2_${ice}_width] ZUI[my_tfield2_${ice}_start] ZUI[my_tfield2_${ice}_data] "" "" "" '-zcrasis_update_main_cmd url "${ZUI[my_tfield2_'${ice}'_data]}" '$ice output
         else
-            output+=( "${ZUI[CYAN]}${main_cmd[url]}${ZUI[FMT_END]}" )
+            [[ -n "$theme[p-id]" ]] && output+=( "$theme[p-id]${main_cmd[url]}${ZUI[FMT_END]}" ) || output+=( "${main_cmd[url]}" )
         fi
 
         #
@@ -1339,21 +1346,20 @@ process_theme
         #
 
         [[ -z "${ZUI[toggle_mode_${mod}_${ice}]}" ]] && ZUI[toggle_mode_${mod}_${ice}]="${main_cmd[sub]}" || -zcrasis_update_main_cmd sub "${ZUI[toggle_mode_${mod}_${ice}]}" $ice
-        -zui_util_map_bools "[[ \"${ZUI[toggle_mode_${mod}_${ice}]}\" = light ]]" "mode_col" "${ZUI[YELLOW]}" "${ZUI[GREEN]}"
-        -zui_util_map_bools "[[ \"${ZUI[toggle_mode_${mod}_${ice}]}\" = light ]]" "mode_text" light normal
-        -zui_std_button "toggle_mode_${mod}_${ice}" "Mode: ${mode_col}${mode_text}${ZUI[FMT_END]}" '[[ ${ZUI[toggle_mode_'"${mod}_${ice}"']} = light ]] && ZUI[toggle_mode_'"${mod}_${ice}"']=load || ZUI[toggle_mode_'"${mod}_${ice}"']=light; -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
+        -zui_util_map_bools "[[ \"${ZUI[toggle_mode_${mod}_${ice}]}\" = light ]]" "mode_text" "$theme[p-mode-text-c-1]" "$theme[p-mode-text-c-2]"
+        -zui_std_button "toggle_mode_${mod}_${ice}" "$mode_text" '[[ ${ZUI[toggle_mode_'"${mod}_${ice}"']} = light ]] && ZUI[toggle_mode_'"${mod}_${ice}"']=load || ZUI[toggle_mode_'"${mod}_${ice}"']=light; -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
         #
         # 9. Compile
         #
 
-        -zui_std_button "compile_${mod}_${ice}" "${ZUI[YELLOW]}Compile${ZUI[FMT_END]}" 'zplugin compile '${main_cmd[url]}'; print Done.; builtin read tmp;' output
+        -zui_std_button "compile_${mod}_${ice}" "$theme[p-compile-text-c]" 'zplugin compile '${main_cmd[url]}'; print Done.; builtin read tmp;' output
 
         #
         # The Resulting Document
         #
 
-        reply+=( "$num ${output[1]} ${output[2]} ${dis_col2}P${ZUI[FMT_END]} ${output[7]}" )
+        reply+=( "$num ${output[1]} ${output[2]} ${dis_col2p}P${ZUI[FMT_END]} ${output[7]}" )
         short_idx=${#reply}
         reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
         [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
