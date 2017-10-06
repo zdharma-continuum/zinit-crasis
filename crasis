@@ -152,6 +152,170 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 [[ ! -w "$zshrc_path" ]] && { print "No write permissions to \`$zshrc_path'${ZDOTDIR:+ (using \$ZDOTDIR)}"; return 1; }
 [[ ! -s "$zshrc_path" ]] && { print "File \`$zshrc_path' is empty, aborting"; return 1; }
 
+#
+# Load and process theme
+#
+
+typeset -g CRASIS_THEME="${CRASIS_THEME:-default}"
+
+local -a thcol_entries thcol_entries2 thtxt_entries thtxt_entries2
+thcol_entries=(
+    # Top bar
+    reload save preview debug delete-mode edit-mode compact-mode
+    # Add bar
+    add-snippet add-plugin gold-choose
+    # Listing
+    index enabled disabled up down
+    # Snippet item
+    s-url s-marker s-marker-disabled s-as-command s-force s-plus-ice s-minus-ice
+    # Plugin item
+    p-id p-marker p-marker-disabled p-compile p-plus-ice p-minus-ice
+    # Debug view
+    d-save
+)
+
+thcol_entries2=( p-mode i-id d-email )
+
+thtxt_entries=(
+    # Top bar
+    reload-text save-text preview-text debug-text delete-mode-text edit-mode-text compact-mode-text
+    # Add bar
+    add-snippet-text add-plugin-text new-id-url-text gold-choose-text gold-list-info-text
+    # Listing
+    enabled-text disabled-text up-text down-text
+    # Snippet item
+    s-marker-text s-marker-disabled-text
+    # Plugin item
+    p-marker-text p-marker-disabled-text p-compile-text
+    # Ice listing
+    i-blockf-text
+    # Debug view
+    d-save-text
+)
+
+thtxt_entries2=( p-mode-text )
+
+local -A crasis_theme_data
+
+# Theme file contains a little complex data and
+# this functions converts it to be ready to use
+function process_theme() {
+    typeset -F 3 SECONDS=0
+
+    source "$ZCRASIS_REPO_DIR/themes/${CRASIS_THEME}.cr-theme"
+    crasis_theme_data=( "${(kv)my_crasis_theme_data[@]}" )
+
+    # Stats on color settings
+    local -a provided missing
+    provided=( "${(@)crasis_theme_data[(I)(${(~j:|:)thcol_entries})]}" "${(@)crasis_theme_data[(I)(${(~j:|:)thcol_entries2})]}" )
+    missing=( ${thcol_entries:|provided} ${thcol_entries2:|provided} )
+    -zcrasis_dbg_msg "Theme provided ${#provided} color entries (out of $(( ${#thcol_entries} + ${#thcol_entries2} )) required, missing keys: ${missing:-none})"
+
+    # Stats on text settings
+    provided=( "${(@)crasis_theme_data[(I)(${(~j:|:)thtxt_entries})]}" "${(@)crasis_theme_data[(I)(${(~j:|:)thtxt_entries2})]}" )
+    missing=( ${thtxt_entries:|provided} ${thtxt_entries2:|provided} )
+    -zcrasis_dbg_msg "Theme provided ${#provided} text entries (out of $(( ${#thtxt_entries} + ${#thtxt_entries2} )) required, missing keys: ${missing:-none})"
+
+    # Convert colors' symbolic names like "green"
+    local ckey cval nval
+    for ckey in "${thcol_entries[@]}"; do
+        cval=${(U)crasis_theme_data[$ckey]}
+        [[ -z "$cval" ]] && continue
+        nval=${ZUI[$cval]}
+
+        if [[ -n "$nval" ]]; then
+            crasis_theme_data[$ckey]="$nval"
+        else
+            cval="${cval#B}"
+            nval=${ZUI[$cval]}
+            [[ -n "$nval" ]] && crasis_theme_data[$ckey]="${ZUI[BOLD]}$nval" || crasis_theme_data[$ckey]=""
+        fi
+    done
+
+    # Convert array-colors specifications
+    local mkey
+    local -a thsplit
+    integer index
+    for mkey in "${thcol_entries2[@]}"; do
+        thsplit=( "${(@Us;:;)crasis_theme_data[$mkey]}" )
+        index=0
+        for cval in "${thsplit[@]}"; do
+            index+=1
+            nval=${ZUI[$cval]}
+
+            if [[ -n "$nval" ]]; then
+                crasis_theme_data[${mkey}-${index}]="$nval"
+            else
+                cval="${cval#B}"
+                nval="${ZUI[$cval]}"
+                [[ -n "$nval" ]] && crasis_theme_data[${mkey}-${index}]="${ZUI[BOLD]}$nval" || crasis_theme_data[${mkey}-${index}]=""
+            fi
+        done
+    done
+
+    # Convert non-semicolon texts to colored ones
+    local tkey tval
+    for tkey in "${thtxt_entries[@]}"; do
+        tval="${crasis_theme_data[$tkey]}"
+
+        # %s conversion
+        if [[ "${tval/\%s/}" != "$tval" ]]; then
+            thsplit=( "${(@s:,:)tval}" )
+
+            cval="${crasis_theme_data[${tkey%-text}]}"
+            if [[ -n "$cval" ]]; then
+                [[ -n "${thsplit[2]}" ]] && thsplit[2]="${cval}${thsplit[2]}${ZUI[FMT_END]}"
+                [[ -n "${thsplit[3]}" ]] && thsplit[3]="${cval}${thsplit[3]}${ZUI[FMT_END]}"
+            fi
+
+            tval=`printf "${thsplit[@]}"`
+            crasis_theme_data[${tkey}-c]="$tval"
+        else
+            cval="${crasis_theme_data[${tkey%-text}]}"
+            if [[ -n "$cval" ]]; then
+                crasis_theme_data[${tkey}-c]="${cval}$tval${ZUI[FMT_END]}"
+            else
+                crasis_theme_data[${tkey}-c]="$tval"
+            fi
+        fi
+    done
+
+    # Convert semicolon texts to colored ones
+    local -a thsplit2
+    for mkey in "${thtxt_entries2[@]}"; do
+        thsplit=( "${(@s:;:)crasis_theme_data[$mkey]}" )
+
+        index=0
+        for tval in "${thsplit[@]}"; do
+            index+=1
+            # %s conversion
+            if [[ "${tval/\%s/}" != "$tval" ]]; then
+                thsplit=( "${(@s:,:)tval}" )
+
+                cval="${crasis_theme_data[${mkey%-text}-${index}]}"
+                if [[ -n "$cval" ]]; then
+                    [[ -n "${thsplit[2]}" ]] && thsplit[2]="${cval}${thsplit[2]}${ZUI[FMT_END]}"
+                    [[ -n "${thsplit[3]}" ]] && thsplit[3]="${cval}${thsplit[3]}${ZUI[FMT_END]}"
+                fi
+
+                tval=`printf "${thsplit[@]}"`
+                crasis_theme_data[${mkey}-c-${index}]="$tval"
+            else
+                cval="${crasis_theme_data[${mkey%-text}-${index}]}"
+                if [[ -n "$cval" ]]; then
+                    crasis_theme_data[${mkey}-c-${index}]="${cval}$tval${ZUI[FMT_END]}"
+                else
+                    crasis_theme_data[${mkey}-c-${index}]="$tval"
+                fi
+            fi
+        done
+    done
+
+    -zcrasis_dbg_msg_arr "Theme processing time: $SECONDS" ""
+}
+
+process_theme
+
 # FUNCTION: -zcrasis-tokenize-zsh-rc {{{
 # Runs -zcrasis-process-buffer() on $zshrc (containing the loaded
 # .zshrc file). The *-process-buffer() is a general function that
