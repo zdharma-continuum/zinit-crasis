@@ -967,7 +967,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 # block is an instance of this module (separated by blank
 # lines horizontally, by ZUI normal operation).
 -zcrasis_generator_A() {
-    local mod="$1" ice="$2" arg="$3" comment t c ce ice_add_remove
+    local mod="$1" ice="$2" arg="$3" comment t ice_add_remove
     local -a cmd output
     local -A ice_cmd main_cmd
     local var_name1 var_name2
@@ -1040,15 +1040,15 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     # 5. Add ice
     #
 
-    c="${ZUI[MAGENTA]}" ce="${ZUI[FMT_END]}"
+    t="<+ICE>"
     local -a existing toadd
     existing=( "${(@)ice_cmd[(I)(proto|from|if|depth|blockf|atclone|atload|atpull)]}" )
     toadd=( ${(@)ice_order:|existing} )
 
     # Variables of the list box
-    (( ${+ZUI[my_lbox2_${mod}_${ice}_width]} == 0 )) && ZUI[my_lbox2_${mod}_${ice}_width]=8
+    (( ${+ZUI[my_lbox2_${mod}_${ice}_width]} == 0 )) && ZUI[my_lbox2_${mod}_${ice}_width]=${#t}
     (( ${+ZUI[my_lbox2_${mod}_${ice}_idx]} == 0 )) && ZUI[my_lbox2_${mod}_${ice}_idx]=1
-    ZUI[my_lbox2_${mod}_${ice}_opts]="${c}<+ICE>${ce};${(j:;:)toadd}"
+    ZUI[my_lbox2_${mod}_${ice}_opts]="$t;${(j:;:)toadd}"
 
     (( ${#toadd} )) && noglob -zui_std_list_box "lbox2_${mod}_${ice}" ZUI[my_lbox2_${mod}_${ice}_width] ZUI[my_lbox2_${mod}_${ice}_idx] ZUI[my_lbox2_${mod}_${ice}_opts] "" "" "" '-zui_std_fly_mod_regen '$mod' '$ice' newice-"${${(s:;:)ZUI[my_lbox2_'${mod}'_'${ice}'_opts]}[${ZUI[my_lbox2_'${mod}'_'${ice}'_idx]}]}"; ZUI[my_lbox2_'${mod}'_'${ice}'_idx]=1;' output || output+=( "" )
 
@@ -1056,14 +1056,14 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
     # 6. Remove ice
     #
 
-    c="${ZUI[MAGENTA]}" ce="${ZUI[FMT_END]}"
+    t="<-ICE>"
     local -a toremove
     toremove=( ${(@)ice_order:*existing} )
 
     # Variables of the list box
-    (( ${+ZUI[my_lbox3_${mod}_${ice}_width]} == 0 )) && ZUI[my_lbox3_${mod}_${ice}_width]=8
+    (( ${+ZUI[my_lbox3_${mod}_${ice}_width]} == 0 )) && ZUI[my_lbox3_${mod}_${ice}_width]=${#t}
     (( ${+ZUI[my_lbox3_${mod}_${ice}_idx]} == 0 )) && ZUI[my_lbox3_${mod}_${ice}_idx]=1
-    ZUI[my_lbox3_${mod}_${ice}_opts]="${c}<-ICE>${ce};${(j:;:)toremove}"
+    ZUI[my_lbox3_${mod}_${ice}_opts]="$t;${(j:;:)toremove}"
 
     (( ${#toremove} )) && noglob -zui_std_list_box "lbox3_${mod}_${ice}" ZUI[my_lbox3_${mod}_${ice}_width] ZUI[my_lbox3_${mod}_${ice}_idx] ZUI[my_lbox3_${mod}_${ice}_opts] "" "" "" '-zui_std_fly_mod_regen '$mod' '$ice' delice-"${${(s:;:)ZUI[my_lbox3_'${mod}'_'${ice}'_opts]}[${ZUI[my_lbox3_'${mod}'_'${ice}'_idx]}]}"; ZUI[my_lbox3_'${mod}'_'${ice}'_idx]=1;' output || output+=( "" )
 
