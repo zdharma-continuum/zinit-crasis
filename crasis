@@ -182,7 +182,7 @@ thtxt_entries=(
     # Add bar
     add-snippet-text add-plugin-text new-id-url-text gold-choose-text gold-list-info-text
     # Listing
-    enabled-text disabled-text up-text down-text
+    enabled-text disabled-text enabled-unicode disabled-unicode up-text down-text up-unicode down-unicode
     # Snippet item
     s-marker-text s-marker-disabled-text
     # Plugin item
@@ -263,7 +263,7 @@ function process_theme() {
         if [[ "${tval/\%s/}" != "$tval" ]]; then
             thsplit=( "${(@s:,:)tval}" )
 
-            cval="${theme[${tkey%-text}]}"
+            cval="${theme[${tkey%(-text|-unicode)}]}"
             if [[ -n "$cval" ]]; then
                 [[ -n "${thsplit[2]}" ]] && thsplit[2]="${cval}${thsplit[2]}${ZUI[FMT_END]}"
                 [[ -n "${thsplit[3]}" ]] && thsplit[3]="${cval}${thsplit[3]}${ZUI[FMT_END]}"
@@ -272,7 +272,7 @@ function process_theme() {
             tval=`printf "${thsplit[@]}"`
             theme[${tkey}-c]="$tval"
         else
-            cval="${theme[${tkey%-text}]}"
+            cval="${theme[${tkey%(-text|-unicode)}]}"
             if [[ -n "$cval" ]]; then
                 theme[${tkey}-c]="${cval}$tval${ZUI[FMT_END]}"
             else
@@ -293,7 +293,7 @@ function process_theme() {
             if [[ "${tval/\%s/}" != "$tval" ]]; then
                 thsplit=( "${(@s:,:)tval}" )
 
-                cval="${theme[${mkey%-text}-${index}]}"
+                cval="${theme[${mkey%(-text|-unicode)}-${index}]}"
                 if [[ -n "$cval" ]]; then
                     [[ -n "${thsplit[2]}" ]] && thsplit[2]="${cval}${thsplit[2]}${ZUI[FMT_END]}"
                     [[ -n "${thsplit[3]}" ]] && thsplit[3]="${cval}${thsplit[3]}${ZUI[FMT_END]}"
@@ -302,7 +302,7 @@ function process_theme() {
                 tval=`printf "${thsplit[@]}"`
                 theme[${mkey}-c-${index}]="$tval"
             else
-                cval="${theme[${mkey%-text}-${index}]}"
+                cval="${theme[${mkey%(-text|-unicode)}-${index}]}"
                 if [[ -n "$cval" ]]; then
                     theme[${mkey}-c-${index}]="${cval}$tval${ZUI[FMT_END]}"
                 else
