@@ -195,7 +195,7 @@ thtxt_entries=(
 
 thtxt_entries2=( p-mode-text )
 
-local -A crasis_theme_data
+local -A theme
 
 # Theme file contains a little complex data and
 # this functions converts it to be ready to use
@@ -203,32 +203,32 @@ function process_theme() {
     typeset -F 3 SECONDS=0
 
     source "$ZCRASIS_REPO_DIR/themes/${CRASIS_THEME}.cr-theme"
-    crasis_theme_data=( "${(kv)my_crasis_theme_data[@]}" )
+    theme=( "${(kv)my_crasis_theme_data[@]}" )
 
     # Stats on color settings
     local -a provided missing
-    provided=( "${(@)crasis_theme_data[(I)(${(~j:|:)thcol_entries})]}" "${(@)crasis_theme_data[(I)(${(~j:|:)thcol_entries2})]}" )
+    provided=( "${(@)theme[(I)(${(~j:|:)thcol_entries})]}" "${(@)theme[(I)(${(~j:|:)thcol_entries2})]}" )
     missing=( ${thcol_entries:|provided} ${thcol_entries2:|provided} )
     -zcrasis_dbg_msg "Theme provided ${#provided} color entries (out of $(( ${#thcol_entries} + ${#thcol_entries2} )) required, missing keys: ${missing:-none})"
 
     # Stats on text settings
-    provided=( "${(@)crasis_theme_data[(I)(${(~j:|:)thtxt_entries})]}" "${(@)crasis_theme_data[(I)(${(~j:|:)thtxt_entries2})]}" )
+    provided=( "${(@)theme[(I)(${(~j:|:)thtxt_entries})]}" "${(@)theme[(I)(${(~j:|:)thtxt_entries2})]}" )
     missing=( ${thtxt_entries:|provided} ${thtxt_entries2:|provided} )
     -zcrasis_dbg_msg "Theme provided ${#provided} text entries (out of $(( ${#thtxt_entries} + ${#thtxt_entries2} )) required, missing keys: ${missing:-none})"
 
     # Convert colors' symbolic names like "green"
     local ckey cval nval
     for ckey in "${thcol_entries[@]}"; do
-        cval=${(U)crasis_theme_data[$ckey]}
+        cval=${(U)theme[$ckey]}
         [[ -z "$cval" ]] && continue
         nval=${ZUI[$cval]}
 
         if [[ -n "$nval" ]]; then
-            crasis_theme_data[$ckey]="$nval"
+            theme[$ckey]="$nval"
         else
             cval="${cval#B}"
             nval=${ZUI[$cval]}
-            [[ -n "$nval" ]] && crasis_theme_data[$ckey]="${ZUI[BOLD]}$nval" || crasis_theme_data[$ckey]=""
+            [[ -n "$nval" ]] && theme[$ckey]="${ZUI[BOLD]}$nval" || theme[$ckey]=""
         fi
     done
 
@@ -237,18 +237,18 @@ function process_theme() {
     local -a thsplit
     integer index
     for mkey in "${thcol_entries2[@]}"; do
-        thsplit=( "${(@Us;:;)crasis_theme_data[$mkey]}" )
+        thsplit=( "${(@Us;:;)theme[$mkey]}" )
         index=0
         for cval in "${thsplit[@]}"; do
             index+=1
             nval=${ZUI[$cval]}
 
             if [[ -n "$nval" ]]; then
-                crasis_theme_data[${mkey}-${index}]="$nval"
+                theme[${mkey}-${index}]="$nval"
             else
                 cval="${cval#B}"
                 nval="${ZUI[$cval]}"
-                [[ -n "$nval" ]] && crasis_theme_data[${mkey}-${index}]="${ZUI[BOLD]}$nval" || crasis_theme_data[${mkey}-${index}]=""
+                [[ -n "$nval" ]] && theme[${mkey}-${index}]="${ZUI[BOLD]}$nval" || theme[${mkey}-${index}]=""
             fi
         done
     done
@@ -256,26 +256,26 @@ function process_theme() {
     # Convert non-semicolon texts to colored ones
     local tkey tval
     for tkey in "${thtxt_entries[@]}"; do
-        tval="${crasis_theme_data[$tkey]}"
+        tval="${theme[$tkey]}"
 
         # %s conversion
         if [[ "${tval/\%s/}" != "$tval" ]]; then
             thsplit=( "${(@s:,:)tval}" )
 
-            cval="${crasis_theme_data[${tkey%-text}]}"
+            cval="${theme[${tkey%-text}]}"
             if [[ -n "$cval" ]]; then
                 [[ -n "${thsplit[2]}" ]] && thsplit[2]="${cval}${thsplit[2]}${ZUI[FMT_END]}"
                 [[ -n "${thsplit[3]}" ]] && thsplit[3]="${cval}${thsplit[3]}${ZUI[FMT_END]}"
             fi
 
             tval=`printf "${thsplit[@]}"`
-            crasis_theme_data[${tkey}-c]="$tval"
+            theme[${tkey}-c]="$tval"
         else
-            cval="${crasis_theme_data[${tkey%-text}]}"
+            cval="${theme[${tkey%-text}]}"
             if [[ -n "$cval" ]]; then
-                crasis_theme_data[${tkey}-c]="${cval}$tval${ZUI[FMT_END]}"
+                theme[${tkey}-c]="${cval}$tval${ZUI[FMT_END]}"
             else
-                crasis_theme_data[${tkey}-c]="$tval"
+                theme[${tkey}-c]="$tval"
             fi
         fi
     done
@@ -283,7 +283,7 @@ function process_theme() {
     # Convert semicolon texts to colored ones
     local -a thsplit2
     for mkey in "${thtxt_entries2[@]}"; do
-        thsplit=( "${(@s:;:)crasis_theme_data[$mkey]}" )
+        thsplit=( "${(@s:;:)theme[$mkey]}" )
 
         index=0
         for tval in "${thsplit[@]}"; do
@@ -292,20 +292,20 @@ function process_theme() {
             if [[ "${tval/\%s/}" != "$tval" ]]; then
                 thsplit=( "${(@s:,:)tval}" )
 
-                cval="${crasis_theme_data[${mkey%-text}-${index}]}"
+                cval="${theme[${mkey%-text}-${index}]}"
                 if [[ -n "$cval" ]]; then
                     [[ -n "${thsplit[2]}" ]] && thsplit[2]="${cval}${thsplit[2]}${ZUI[FMT_END]}"
                     [[ -n "${thsplit[3]}" ]] && thsplit[3]="${cval}${thsplit[3]}${ZUI[FMT_END]}"
                 fi
 
                 tval=`printf "${thsplit[@]}"`
-                crasis_theme_data[${mkey}-c-${index}]="$tval"
+                theme[${mkey}-c-${index}]="$tval"
             else
-                cval="${crasis_theme_data[${mkey%-text}-${index}]}"
+                cval="${theme[${mkey%-text}-${index}]}"
                 if [[ -n "$cval" ]]; then
-                    crasis_theme_data[${mkey}-c-${index}]="${cval}$tval${ZUI[FMT_END]}"
+                    theme[${mkey}-c-${index}]="${cval}$tval${ZUI[FMT_END]}"
                 else
-                    crasis_theme_data[${mkey}-c-${index}]="$tval"
+                    theme[${mkey}-c-${index}]="$tval"
                 fi
             fi
         done
