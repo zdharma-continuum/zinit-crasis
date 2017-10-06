@@ -1,0 +1,82 @@
+# -*- mode: shell-script -*-
+# vim:ft=zsh
+
+local -A my_crasis_theme_data
+my_crasis_theme_data=(
+    # Top menu bar
+    reload              green
+    reload-text         "Reload"
+    save                red
+    save-text           "Save"
+    preview             green
+    preview-text        "Preview"
+    debug               green
+    debug-text          "Debug"
+    delete-mode         green
+    delete-mode-text    "Delete Mode"
+    edit-mode           green
+    edit-mode-text      "Edit Mode"
+    compact-mode        green
+    compact-mode-text   "Compact Mode"
+
+    # Main view add-plugin submenu
+    add-snippet         green
+    add-snippet-text    "Add snippet"
+    add-plugin          green
+    add-plugin-text     "Add plugin"
+    new-id-url-text     "<Enter or select a plugin to add>"
+    new-id-url-width    50
+    gold-choose         ""
+    gold-choose-text    "Choose: "
+    gold-list-info-text "<Gold Plugins Collection>"
+    gold-list-width     50
+
+    # Main listing
+    index               ""
+    enabled             green
+    enabled-text        "Enabled"
+    enabled-unicode     "●"
+    disabled            red
+    disabled-text       "DISABLED"
+    disabled-unicode    "●"
+    up                  yellow
+    up-text             "Up"
+    up-unicode          "↑"
+    down                yellow
+    down-text           "Down"
+    down-unicode        "↓"
+
+    # Snippet item in the main listing
+    s-url               cyan
+    s-marker            ""
+    s-marker-text       "S"
+    s-marker-disabled   red
+    s-marker-disabled-text "S"
+    s-as-command        green
+    s-force             green
+    s-plus-ice          ""
+    s-minus-ice         ""
+
+    # Plugin item in the main listing
+    p-id                cyan
+    p-marker            ""
+    p-marker-text       "P"
+    p-marker-disabled   red
+    p-marker-disabled-text "P"
+    p-mode              green:yellow
+    p-mode-text         "Mode: %s",normal\;"Mode: %s",light
+    p-compile           yellow
+    p-compile-text      "Compile"
+    p-plus-ice          ""
+    p-minus-ice         ""
+
+    # Ice enumeration in snippet and plugin items
+    #                   proto  from   depth  if     blockf atclo. atload atpull
+    i-id                yellow:yellow:yellow:yellow:yellow:yellow:yellow:yellow
+    i-blockf-text       "[%s]",blockf
+
+    # Debug view
+    d-email             yellow:byellow:yellow
+    d-save              yellow
+    d-save-text         "Save"
+)
