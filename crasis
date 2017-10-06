@@ -197,6 +197,7 @@ thtxt_entries2=( p-mode-text )
 
 local -A theme
 
+# FUNCTION: process_theme {{{
 # Theme file contains a little complex data and
 # this functions converts it to be ready to use
 function process_theme() {
@@ -311,8 +312,10 @@ function process_theme() {
         done
     done
 
+    chosen_plugins[1]="$theme[gold-list-info-text]"
     -zcrasis_dbg_msg_arr "Theme processing time: $SECONDS" ""
 }
+# }}}
 
 process_theme
 
@@ -1070,29 +1073,29 @@ process_theme
 
     reply=()
 
-    -zui_util_map_bools '[[ ${ZUI[in_preview]} = 1 ]]' pv_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
-    -zui_util_map_bools '[[ ${ZUI[in_debug]} = 1 ]]' dg_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
-    -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col "${ZUI[BG_BLUE]}" "${ZUI[RED]}"
-    -zui_util_map_bools '[[ "${ZUI[zc_edit_mode]}" = "1" ]]' ed_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
-    -zui_util_map_bools '[[ "${ZUI[zc_compact_mode]}" = "1" ]]' co_col "${ZUI[BG_BLUE]}" "${ZUI[GREEN]}"
+    -zui_util_map_bools '[[ ${ZUI[in_preview]} = 1 ]]' pv_col "${ZUI[BG_BLUE]}" "$theme[preview]"
+    -zui_util_map_bools '[[ ${ZUI[in_debug]} = 1 ]]' dg_col "${ZUI[BG_BLUE]}" "$theme[debug]"
+    -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col "${ZUI[BG_BLUE]}" "$theme[delete-mode]"
+    -zui_util_map_bools '[[ "${ZUI[zc_edit_mode]}" = "1" ]]' ed_col "${ZUI[BG_BLUE]}" "$theme[edit-mode]"
+    -zui_util_map_bools '[[ "${ZUI[zc_compact_mode]}" = "1" ]]' co_col "${ZUI[BG_BLUE]}" "$theme[compact-mode]"
 
     # 1. - 4.
-    -zui_std_button "reload" "${ZUI[GREEN]}Reload${ZUI[FMT_END]}" -zcrasis_action_reload
-    -zui_std_button "save" "${ZUI[RED]}Save${ZUI[FMT_END]}" '-zcrasis_action_save; internal=1'
-    -zui_std_button "preview" "${pv_col}Preview${ZUI[FMT_END]}" -zcrasis_action_preview
-    -zui_std_button "debug" "${dg_col}Debug${ZUI[FMT_END]}" -zcrasis_action_debug_view
+    -zui_std_button "reload" "$theme[reload-text-c]" -zcrasis_action_reload
+    -zui_std_button "save" "$theme[save-text-c]" '-zcrasis_action_save; internal=1'
+    -zui_std_button "preview" "${pv_col}$theme[preview-text]${ZUI[FMT_END]}" -zcrasis_action_preview
+    -zui_std_button "debug" "${dg_col}$theme[debug-text]${ZUI[FMT_END]}" -zcrasis_action_debug_view
 
     (( ${ZUI[in_preview]} + ZUI[in_debug] == 0 )) && {
         # Variables of the text field
-        (( ${+ZUI[my_tfield3_width]} == 0 )) && ZUI[my_tfield3_width]=34
+        (( ${+ZUI[my_tfield3_width]} == 0 )) && ZUI[my_tfield3_width]=${#theme[new-id-url-text]}
         (( ${+ZUI[my_tfield3_start]} == 0 )) && ZUI[my_tfield3_start]=1
-        (( ${+ZUI[my_tfield3_data]} == 0 )) && ZUI[my_tfield3_data]="<Enter or select plugin to add>"
+        (( ${+ZUI[my_tfield3_data]} == 0 )) && ZUI[my_tfield3_data]="$theme[new-id-url-text]"
 
         # 1.
         noglob -zui_std_text_field "tfield3_$mod" ZUI[my_tfield3_width] ZUI[my_tfield3_start] ZUI[my_tfield3_data] "" "" "" '' optional
 
         # Variables of the list box
-        (( ${+ZUI[my_lbox1_width]} == 0 )) && ZUI[my_lbox1_width]=25
+        (( ${+ZUI[my_lbox1_width]} == 0 )) && ZUI[my_lbox1_width]=$(( 25 < ${#chosen_plugins[1]} ? ${#chosen_plugins[1]} : 25 ))
         (( ${+ZUI[my_lbox1_idx]} == 0 )) && ZUI[my_lbox1_idx]=1
         (( ${+ZUI[my_lbox1_opts]} == 0 )) && ZUI[my_lbox1_opts]="${(j:;:)chosen_plugins}"
 
@@ -1100,16 +1103,19 @@ process_theme
         noglob -zui_std_list_box "lbox1_$mod" ZUI[my_lbox1_width] ZUI[my_lbox1_idx] ZUI[my_lbox1_opts] "" "" "" 'ZUI[my_tfield3_data]="${${(s:;:)ZUI[my_lbox1_opts]}[${ZUI[my_lbox1_idx]}]}"; [[ "${ZUI[my_lbox1_idx]}" = 1 ]] && ZUI[my_tfield3_data]="";' optional
 
         # 3. - 4.
-        -zui_std_button "snippet" "${ZUI[GREEN]}Add snippet${ZUI[FMT_END]}" -zcrasis_action_add_snippet optional
-        -zui_std_button "plugin" "${ZUI[GREEN]}Add plugin${ZUI[FMT_END]}" -zcrasis_action_add_plugin optional
+        -zui_std_button "snippet" "$theme[add-snippet-text-c]" -zcrasis_action_add_snippet optional
+        -zui_std_button "plugin" "$theme[add-plugin-text-c]" -zcrasis_action_add_plugin optional
 
-        # 5. - 6.
-        -zui_std_button "delete_mode" "${dl_col}Delete Mode${ZUI[FMT_END]}" -zcrasis_action_delete_mode optional
-        -zui_std_button "edit_mode" "${ed_col}Edit Mode${ZUI[FMT_END]}" -zcrasis_action_edit_mode optional
-        -zui_std_button "compact_mode" "${co_col}Compact Mode${ZUI[FMT_END]}" -zcrasis_action_compact_mode optional
+        # 5. - 7.
+        -zui_std_button "delete_mode" "${dl_col}$theme[delete-mode-text]${ZUI[FMT_END]}" -zcrasis_action_delete_mode optional
+        -zui_std_button "edit_mode" "${ed_col}$theme[edit-mode-text]${ZUI[FMT_END]}" -zcrasis_action_edit_mode optional
+        -zui_std_button "compact_mode" "${co_col}$theme[compact-mode-text]${ZUI[FMT_END]}" -zcrasis_action_compact_mode optional
+
+        # 8.
+        -zui_std_special_text "$theme[gold-choose-text-c]" optional
 
         local line1="${optional[5]} ${optional[6]} ${optional[7]}"
-        local line2="${optional[1]} ${optional[3]} ${optional[4]}  Choose: ${optional[2]}"
+        local line2="${optional[1]} ${optional[3]} ${optional[4]}  ${optional[8]} ${optional[2]}"
     } || {
         local line1="" line2=""
     }

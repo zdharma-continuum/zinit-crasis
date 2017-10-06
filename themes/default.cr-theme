@@ -12,7 +12,7 @@ my_crasis_theme_data=(
     preview-text        "Preview"
     debug               green
     debug-text          "Debug"
-    delete-mode         green
+    delete-mode         red
     delete-mode-text    "Delete Mode"
     edit-mode           green
     edit-mode-text      "Edit Mode"
@@ -27,9 +27,8 @@ my_crasis_theme_data=(
     new-id-url-text     "<Enter or select a plugin to add>"
     new-id-url-width    50
     gold-choose         ""
-    gold-choose-text    "Choose: "
+    gold-choose-text    "Choose:"
     gold-list-info-text "<Gold Plugins Collection>"
-    gold-list-width     50
 
     # Main listing
     index               ""
