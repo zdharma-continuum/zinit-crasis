@@ -65,7 +65,7 @@ my_crasis_theme_data=(
     p-marker-text       "P"
     p-marker-disabled   red
     p-marker-disabled-text "P"
-    p-mode              yellow:green
+    p-mode              yellow:green                        # two colors, for light and load Zplugin subcommands
     p-mode-text         "Mode: %s",light\;"Mode: %s",normal
     p-compile           yellow
     p-compile-text      "Compile"
