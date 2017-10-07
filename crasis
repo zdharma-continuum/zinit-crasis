@@ -1,4 +1,6 @@
 # -*- mode: shell-script -*-
+# vim:ft=zsh:sw=4:sts=4:et
+
 # Started from Zle or from command line
 #
 # Copyright (c) 2017 Sebastian Gniazdowski
@@ -1634,5 +1636,3 @@ zui-event-loop 1:-zcrasis_generator_0 $(( ${#cmdlist} / 3 )):-zcrasis_generator_
 -zui_std_cleanup serialize
 
 return 0
-
-# vim:ft=zsh
