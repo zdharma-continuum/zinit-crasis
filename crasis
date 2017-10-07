@@ -327,7 +327,7 @@ function -zcrasis_process_theme() {
     done
 
     chosen_plugins[1]="$theme[gold-list-info-text]"
-    -zcrasis_dbg_msg_arr "Theme processing time: $SECONDS" ""
+    -zcrasis_dbg_msg_arr "Theme processing time: $SECONDS seconds" ""
 
     return 0
 }
