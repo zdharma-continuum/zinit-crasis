@@ -318,8 +318,22 @@ function process_theme() {
     -zcrasis_dbg_msg_arr "Theme processing time: $SECONDS" ""
 }
 # }}}
+# FUNCTION: set_zui_palette {{{
+# If theme provides palette-string, it is
+# applied to ZUI settings of this application
+function set_zui_palette() {
+    [[ -z "$theme[palette-string]" ]] && return
+    autoload is-at-least
+    if [[ "$theme[palette-string]" = *[[:digit:]]* ]] && ! is-at-least 5.3; then
+        -zui_std_stalog "256-color palette needs " "Zsh >= 5.3, " "" "it hasn't been applied"
+        return
+    fi
+    zstyle ":plugin:zui:app:${ZUI[app]}" palette "$theme[palette-string]"
+}
+# }}}
 
 process_theme
+set_zui_palette
 
 # FUNCTION: -zcrasis-tokenize-zsh-rc {{{
 # Runs -zcrasis-process-buffer() on $zshrc (containing the loaded
