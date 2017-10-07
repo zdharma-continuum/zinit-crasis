@@ -33,7 +33,7 @@ my_crasis_theme_data=(
     # Main listing
     index               ""
     enabled             green
-    enabled-text        "Enabled"
+    enabled-text        "Enabled "
     enabled-unicode     "●"
     disabled            red
     disabled-text       "DISABLED"
