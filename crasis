@@ -204,6 +204,18 @@ local -A theme
 function -zcrasis_process_theme() {
     typeset -F 3 SECONDS=0
 
+    [[ ! -f "$ZCRASIS_REPO_DIR/themes/${CRASIS_THEME}.cr-theme" ]] && {
+        -zui_std_stalog "No such theme: " "$CRASIS_THEME," "" " reverted to default"
+        CRASIS_THEME="default"
+
+        [[ ! -f "$ZCRASIS_REPO_DIR/themes/${CRASIS_THEME}.cr-theme" ]] && {
+            print "Couldn't find theme \`$CRASIS_THEME', have to abort.."
+            print "Looked for file: $ZCRASIS_REPO_DIR/themes/${CRASIS_THEME}.cr-theme"
+            return 1
+        }
+    }
+
+
     source "$ZCRASIS_REPO_DIR/themes/${CRASIS_THEME}.cr-theme"
     theme=( "${(kv)my_crasis_theme_data[@]}" )
     theme[i-blockf]="${${(s;:;)theme[i-id]}[5]}"
@@ -316,6 +328,8 @@ function -zcrasis_process_theme() {
 
     chosen_plugins[1]="$theme[gold-list-info-text]"
     -zcrasis_dbg_msg_arr "Theme processing time: $SECONDS" ""
+
+    return 0
 }
 # }}}
 # FUNCTION: -zcrasis_set_zui_palette {{{
@@ -332,7 +346,7 @@ function -zcrasis_set_zui_palette() {
 }
 # }}}
 
--zcrasis_process_theme
+-zcrasis_process_theme || return 1
 -zcrasis_set_zui_palette
 
 # FUNCTION: -zcrasis-tokenize-zsh-rc {{{
