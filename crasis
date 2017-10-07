@@ -198,10 +198,10 @@ thtxt_entries2=( p-mode-text )
 
 local -A theme
 
-# FUNCTION: process_theme {{{
+# FUNCTION: -zcrasis_process_theme {{{
 # Theme file contains a little complex data and
 # this functions converts it to be ready to use
-function process_theme() {
+function -zcrasis_process_theme() {
     typeset -F 3 SECONDS=0
 
     source "$ZCRASIS_REPO_DIR/themes/${CRASIS_THEME}.cr-theme"
@@ -318,10 +318,10 @@ function process_theme() {
     -zcrasis_dbg_msg_arr "Theme processing time: $SECONDS" ""
 }
 # }}}
-# FUNCTION: set_zui_palette {{{
+# FUNCTION: -zcrasis_set_zui_palette {{{
 # If theme provides palette-string, it is
 # applied to ZUI settings of this application
-function set_zui_palette() {
+function -zcrasis_set_zui_palette() {
     [[ -z "$theme[palette-string]" ]] && return
     autoload is-at-least
     if [[ "$theme[palette-string]" = *[[:digit:]]* ]] && ! is-at-least 5.3; then
@@ -332,8 +332,8 @@ function set_zui_palette() {
 }
 # }}}
 
-process_theme
-set_zui_palette
+-zcrasis_process_theme
+-zcrasis_set_zui_palette
 
 # FUNCTION: -zcrasis-tokenize-zsh-rc {{{
 # Runs -zcrasis-process-buffer() on $zshrc (containing the loaded

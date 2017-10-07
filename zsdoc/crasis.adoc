@@ -36,12 +36,12 @@ FUNCTIONS
  -zcrasis_generator_A
  -zcrasis_generator_B
  -zcrasis_generator_DBG
+ -zcrasis_process_theme
  -zcrasis_refresh2_all_string
+ -zcrasis_set_zui_palette
  -zcrasis_update_ice_cmd
  -zcrasis_update_main_cmd
  -zcrasis_util_swap
- process_theme
- set_zui_palette
 AUTOLOAD -zcrasis-process-buffer
 AUTOLOAD is-at-least
 
@@ -66,10 +66,10 @@ Has 145 line(s). Calls functions:
  |   `-- -zcrasis_refresh2_all_string
  |-- -zcrasis_dbg_msg
  |-- -zcrasis_dbg_msg_arr
- |-- process_theme
+ |-- -zcrasis_process_theme
  |   |-- -zcrasis_dbg_msg
  |   `-- -zcrasis_dbg_msg_arr
- `-- set_zui_palette
+ `-- -zcrasis_set_zui_palette
      `-- is-at-least
 
 -zcrasis-process-zplugin-commands
@@ -409,8 +409,8 @@ Called by:
  -zcrasis_action_add_plugin
  -zcrasis_action_add_snippet
  -zcrasis_action_reload
+ -zcrasis_process_theme
  Script-Body
- process_theme
 
 -zcrasis_dbg_msg_arr
 ~~~~~~~~~~~~~~~~~~~~
@@ -423,8 +423,8 @@ Has 1 line(s). Doesn't call other functions.
 
 Called by:
 
+ -zcrasis_process_theme
  Script-Body
- process_theme
 
 -zcrasis_generator_0
 ~~~~~~~~~~~~~~~~~~~~
@@ -486,6 +486,26 @@ Has 15 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
+-zcrasis_process_theme
+~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Theme file contains a little complex data and
+ # this functions converts it to be ready to use
+____
+
+Has 99 line(s). Calls functions:
+
+ -zcrasis_process_theme
+ |-- -zcrasis_dbg_msg
+ `-- -zcrasis_dbg_msg_arr
+
+Uses feature(s): _source_
+
+Called by:
+
+ Script-Body
+
 -zcrasis_refresh2_all_string
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -504,6 +524,25 @@ Called by:
  -zcrasis_action_delete_mode
  -zcrasis_action_edit_mode
  -zcrasis_action_reload
+
+-zcrasis_set_zui_palette
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # If theme provides palette-string, it is
+ # applied to ZUI settings of this application
+____
+
+Has 7 line(s). Calls functions:
+
+ -zcrasis_set_zui_palette
+ `-- is-at-least
+
+Uses feature(s): _autoload_, _zstyle_
+
+Called by:
+
+ Script-Body
 
 -zcrasis_update_ice_cmd
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -565,45 +604,6 @@ Called by:
  -zcrasis_action_move_down
  -zcrasis_action_move_up
 
-process_theme
-~~~~~~~~~~~~~
-
-____
- # Theme file contains a little complex data and
- # this functions converts it to be ready to use
-____
-
-Has 99 line(s). Calls functions:
-
- process_theme
- |-- -zcrasis_dbg_msg
- `-- -zcrasis_dbg_msg_arr
-
-Uses feature(s): _source_
-
-Called by:
-
- Script-Body
-
-set_zui_palette
-~~~~~~~~~~~~~~~
-
-____
- # If theme provides palette-string, it is
- # applied to ZUI settings of this application
-____
-
-Has 7 line(s). Calls functions:
-
- set_zui_palette
- `-- is-at-least
-
-Uses feature(s): _autoload_, _zstyle_
-
-Called by:
-
- Script-Body
-
 -zcrasis-process-buffer
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -627,5 +627,5 @@ Has 56 line(s). Doesn't call other functions.
 
 Called by:
 
- set_zui_palette
+ -zcrasis_set_zui_palette
 
