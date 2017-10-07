@@ -1145,7 +1145,7 @@ process_theme
     local -a cmd output
     local -A ice_cmd main_cmd
     local var_name1 var_name2
-    local num dis_col dis_col2s dis_col2p mode_text command_col force_col disabled_text
+    local num dis_col smarker_text pmarker_text mode_text command_col force_col disabled_text
     integer short_idx
 
     # Ice addition request?
@@ -1197,8 +1197,8 @@ process_theme
     [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || -zcrasis_update_main_cmd disabled "${ZUI[toggle_dis_${mod}_${ice}]}" "$ice"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "dis_col" "$theme[disabled]" "$theme[enabled]"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "$theme[disabled-text]" "$theme[enabled-text]"
-    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "dis_col2s" "$theme[s-marker-disabled]" "${ZUI[WHITE]}"
-    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "dis_col2p" "$theme[p-marker-disabled]" "${ZUI[WHITE]}"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "smarker_text" "$theme[s-marker-disabled-text-c]" "$theme[s-marker-text-c]"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "pmarker_text" "$theme[p-marker-disabled-text-c]" "$theme[p-marker-text-c]"
 
     # 3.
     -zui_std_button "toggle_dis_${mod}_${ice}" "${dis_col}${disabled_text}${ZUI[FMT_END]}" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
@@ -1319,7 +1319,7 @@ process_theme
         # The Resulting Document
         #
 
-        reply+=( "$num ${output[1]} ${output[2]} ${dis_col2s}S${ZUI[FMT_END]} ${output[7]}" )
+        reply+=( "$num ${output[1]} ${output[2]} $smarker_text ${output[7]}" )
         short_idx=${#reply}
         reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
         [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
@@ -1359,7 +1359,7 @@ process_theme
         # The Resulting Document
         #
 
-        reply+=( "$num ${output[1]} ${output[2]} ${dis_col2p}P${ZUI[FMT_END]} ${output[7]}" )
+        reply+=( "$num ${output[1]} ${output[2]} $pmarker_text ${output[7]}" )
         short_idx=${#reply}
         reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
         [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
