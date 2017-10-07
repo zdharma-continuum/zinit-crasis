@@ -10,6 +10,8 @@ my_crasis_theme_data=(
     save-text           "Save"
     preview             green
     preview-text        "Preview"
+    options             green
+    options-text        " Options "
     debug               green
     debug-text          "Debug"
     delete-mode         red
@@ -75,8 +77,15 @@ my_crasis_theme_data=(
     i-id                yellow:yellow:yellow:yellow:yellow:yellow:yellow:yellow
     i-blockf-text       "[%s]",blockf
 
+    # Options view
+    o-switch            yellow
+    o-switch-text       "Switch"
+
     # Debug view
     d-email             yellow:byellow:yellow
     d-save              yellow
     d-save-text         "Save"
+
+    # No change to default palette
+    palette-string      "black:red:green:yellow:blue:magenta:cyan:white"
 )

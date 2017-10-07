@@ -161,7 +161,7 @@ typeset -g CRASIS_THEME="${CRASIS_THEME:-default}"
 local -a thcol_entries thcol_entries2 thtxt_entries thtxt_entries2
 thcol_entries=(
     # Top bar
-    reload save preview debug delete-mode edit-mode compact-mode
+    reload save preview options debug delete-mode edit-mode compact-mode
     # Add bar
     add-snippet add-plugin gold-choose
     # Listing
@@ -170,6 +170,8 @@ thcol_entries=(
     s-url s-marker s-marker-disabled s-as-command s-force
     # Plugin item
     p-id p-marker p-marker-disabled p-compile
+    # Options view
+    o-switch
     # Debug view
     d-save
 )
@@ -178,7 +180,7 @@ thcol_entries2=( p-mode i-id d-email )
 
 thtxt_entries=(
     # Top bar
-    reload-text save-text preview-text debug-text delete-mode-text edit-mode-text compact-mode-text
+    reload-text save-text preview-text options-text debug-text delete-mode-text edit-mode-text compact-mode-text
     # Add bar
     add-snippet-text add-plugin-text new-id-url-text gold-choose-text gold-list-info-text
     # Listing
@@ -190,6 +192,8 @@ thtxt_entries=(
     p-marker-text p-marker-disabled-text p-compile-text
     # Ice listing
     i-blockf-text
+    # Options view
+    o-switch-text
     # Debug view
     d-save-text
 )
@@ -343,6 +347,17 @@ function -zcrasis_set_zui_palette() {
         return
     fi
     zstyle ":plugin:zui:app:${ZUI[app]}" palette "$theme[palette-string]"
+}
+# }}}
+# FUNCTION: -zcrasis_switch_theme {{{
+# Switches theme during operation of Crasis (not
+# at startup).
+#
+# $1 - theme name (not a path, no .cr-theme extension)
+-zcrasis_switch_theme() {
+    CRASIS_THEME="$1"
+    -zcrasis_process_theme
+    -zcrasis_set_zui_palette
 }
 # }}}
 
@@ -703,7 +718,9 @@ function -zcrasis_set_zui_palette() {
 # instances. Number of instances is the "module factor".
 -zcrasis_action_preview() {
     -zui_std_set_mod_factor 4 0
+    -zui_std_set_mod_factor 5 0
     ZUI[in_debug]=0
+    ZUI[in_options]=0
     if [[ "${ZUI[in_preview]}" != 1 ]]; then
         -zui_std_set_mod_factor 2 0
         -zui_std_set_mod_factor 3 1
@@ -714,8 +731,43 @@ function -zcrasis_set_zui_palette() {
         ZUI[in_preview]=0
     fi
 
-    # Regenerate menu and preview module
-    reply=( ",mod1_ice1,mod3_ice1," "" )
+    if [[ "${ZUI[in_preview]}" = "0" && "$CRASIS_THEME" != "${ZUI[my_prev_theme]}" ]]; then
+        ZUI[my_prev_theme]="$CRASIS_THEME"
+        # Regenerate all modules with active instances - it will be mod1 and mod2
+        reply=( ",all," "" )
+    else
+        # Regenerate menu and preview module
+        reply=( ",mod1_ice1,mod3_ice1," "" )
+    fi
+}
+# }}}
+# FUNCTION: -zcrasis_action_options_view {{{
+# Enters or leaves options alternate-view. It basically
+# sets option module's instance to be created, once (when
+# entering) - by changing the module factor.
+-zcrasis_action_options_view() {
+    -zui_std_set_mod_factor 3 0
+    -zui_std_set_mod_factor 4 0
+    ZUI[in_debug]=0
+    ZUI[in_preview]=0
+    if [[ "${ZUI[in_options]}" != 1 ]]; then
+        -zui_std_set_mod_factor 2 0 # plugin list
+        -zui_std_set_mod_factor 5 1 # options
+        ZUI[in_options]=1
+    else
+        -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
+        -zui_std_set_mod_factor 5 0
+        ZUI[in_options]=0
+    fi
+
+    if [[ "${ZUI[in_options]}" = "0" && "$CRASIS_THEME" != "${ZUI[my_prev_theme]}" ]]; then
+        ZUI[my_prev_theme]="$CRASIS_THEME"
+        # Regenerate all modules with active instances - it will be mod1 and mod2
+        reply=( ",all," "" )
+    else
+        # Regenerate menu and options module
+        reply=( ",mod1_ice1,mod5_ice1," "" )
+    fi
 }
 # }}}
 # FUNCTION: -zcrasis_action_debug_view {{{
@@ -726,7 +778,9 @@ function -zcrasis_set_zui_palette() {
 # On disable, normal factors are restored.
 -zcrasis_action_debug_view() {
     -zui_std_set_mod_factor 3 0
+    -zui_std_set_mod_factor 5 0
     ZUI[in_preview]=0
+    ZUI[in_options]=0
 
     if [[ "${ZUI[in_debug]}" != 1 ]]; then
         -zui_std_set_mod_factor 2 0
@@ -751,8 +805,14 @@ function -zcrasis_set_zui_palette() {
         ZUI[in_debug]=0
     fi
 
-    # Regenerate menu and debug module
-    reply=( ",mod1_ice1,mod4_ice1," "" )
+    if [[ "${ZUI[in_debug]}" = "0" && "$CRASIS_THEME" != "${ZUI[my_prev_theme]}" ]]; then
+        ZUI[my_prev_theme]="$CRASIS_THEME"
+        # Regenerate all modules with active instances - it will be mod1 and mod2
+        reply=( ",all," "" )
+    else
+        # Regenerate menu and debug module
+        reply=( ",mod1_ice1,mod4_ice1," "" )
+    fi
 }
 # }}}
 # FUNCTION: -zcrasis_action_delete {{{
@@ -1098,24 +1158,26 @@ function -zcrasis_set_zui_palette() {
 # (normal, preview, debug).
 -zcrasis_generator_0() {
     local mod="$1" ice="$2"
-    local pv_col dg_col dl_col ed_col co_col
+    local pv_col op_col dg_col dl_col ed_col co_col
     local -a optional
 
     reply=()
 
     -zui_util_map_bools '[[ ${ZUI[in_preview]} = 1 ]]' pv_col "${ZUI[BG_BLUE]}" "$theme[preview]"
+    -zui_util_map_bools '[[ ${ZUI[in_options]} = 1 ]]' op_col "${ZUI[BG_BLUE]}" "$theme[options]"
     -zui_util_map_bools '[[ ${ZUI[in_debug]} = 1 ]]' dg_col "${ZUI[BG_BLUE]}" "$theme[debug]"
     -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col "${ZUI[BG_BLUE]}" "$theme[delete-mode]"
     -zui_util_map_bools '[[ "${ZUI[zc_edit_mode]}" = "1" ]]' ed_col "${ZUI[BG_BLUE]}" "$theme[edit-mode]"
     -zui_util_map_bools '[[ "${ZUI[zc_compact_mode]}" = "1" ]]' co_col "${ZUI[BG_BLUE]}" "$theme[compact-mode]"
 
-    # 1. - 4.
+    # 1. - 5.
     -zui_std_button "reload" "$theme[reload-text-c]" -zcrasis_action_reload
     -zui_std_button "save" "$theme[save-text-c]" '-zcrasis_action_save; internal=1'
     -zui_std_button "preview" "${pv_col}$theme[preview-text]${ZUI[FMT_END]}" -zcrasis_action_preview
+    -zui_std_button "options" "${op_col}$theme[options-text]${ZUI[FMT_END]}" -zcrasis_action_options_view
     -zui_std_button "debug" "${dg_col}$theme[debug-text]${ZUI[FMT_END]}" -zcrasis_action_debug_view
 
-    (( ${ZUI[in_preview]} + ZUI[in_debug] == 0 )) && {
+    (( ${ZUI[in_preview]} + ZUI[in_debug] + ZUI[in_options] == 0 )) && {
         # Variables of the text field
         (( ${+ZUI[my_tfield3_width]} == 0 )) && ZUI[my_tfield3_width]=${theme[new-id-url-width]}
         (( ${+ZUI[my_tfield3_start]} == 0 )) && ZUI[my_tfield3_start]=1
@@ -1151,7 +1213,7 @@ function -zcrasis_set_zui_palette() {
     }
 
     reply=(
-        "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]}"
+        "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]} ${reply[5]}"
         "$line1"
         ""
         "$line2"
@@ -1439,6 +1501,30 @@ function -zcrasis_set_zui_palette() {
     reply2=( )               reply3=( 1 )                reply4=( )
 }
 # }}}
+# FUNCTION: -zcrasis_generator_OPT {{{
+-zcrasis_generator_OPT() {
+    local -a thms tnames
+    thms=( "$ZCRASIS_REPO_DIR"/themes/*.cr-theme )
+    tnames=( "${(@)${thms[@]:t}%.cr-theme}" )
+
+    # Variables of the list box
+    (( ${+ZUI[my_lbox4_width]} == 0 )) && ZUI[my_lbox4_width]=16
+    ZUI[my_lbox4_idx]=${tnames[(i)$CRASIS_THEME]}
+    (( ${+ZUI[my_lbox4_opts]} == 0 )) && ZUI[my_lbox4_opts]="${(j:;:)tnames}"
+
+    reply=()
+
+    noglob -zui_std_list_box "lbox4_$mod" ZUI[my_lbox4_width] ZUI[my_lbox4_idx] ZUI[my_lbox4_opts] "" "" "" ''
+    -zui_std_button "switch_theme" "$theme[o-switch-text-c]" 'ZUI[my_prev_theme]="$CRASIS_THEME"; -zcrasis_switch_theme "${${(s:;:)ZUI[my_lbox4_opts]}[${ZUI[my_lbox4_idx]}]}"; reply=( ",all," "" );'
+
+    reply=(
+        "Available themes: ${reply[1]} ${reply[2]}"
+    )
+
+    # Non-selectable lines   Hops to jump with [ and ]   Local anchors
+    reply2=( )               reply3=( 1 )                reply4=( )
+}
+# }}}
 # FUNCTION: -zcrasis_generator_DBG {{{
 # ZUI generator that creates debug-report text. This is module 4.
 # There is 0 or 1 instance of this module, depending on chosen
@@ -1543,7 +1629,7 @@ ZUI[reset_current_segment]="no"
 
 ## Start application ##
 zui-event-loop 1:-zcrasis_generator_0 $(( ${#cmdlist} / 3 )):-zcrasis_generator_A \
-               0:-zcrasis_generator_B 0:-zcrasis_generator_DBG
+               0:-zcrasis_generator_B 0:-zcrasis_generator_DBG 0:-zcrasis_generator_OPT
 
 -zui_std_cleanup serialize
 
