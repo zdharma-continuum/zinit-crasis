@@ -1089,7 +1089,7 @@ process_theme
 
     (( ${ZUI[in_preview]} + ZUI[in_debug] == 0 )) && {
         # Variables of the text field
-        (( ${+ZUI[my_tfield3_width]} == 0 )) && ZUI[my_tfield3_width]=${#theme[new-id-url-text]}
+        (( ${+ZUI[my_tfield3_width]} == 0 )) && ZUI[my_tfield3_width]=${theme[new-id-url-width]}
         (( ${+ZUI[my_tfield3_start]} == 0 )) && ZUI[my_tfield3_start]=1
         (( ${+ZUI[my_tfield3_data]} == 0 )) && ZUI[my_tfield3_data]="$theme[new-id-url-text]"
 
@@ -1173,7 +1173,7 @@ process_theme
     output=()
 
     # Command number
-    num="${(l:2::0:)ice}."
+    [[ -n "$theme[index]" ]] && num="$theme[index]${(l:2::0:)ice}${ZUI[FMT_END]}." || num="${(l:2::0:)ice}."
 
     # "Up", "Down"
     var_name1="my_mod${mod}_ice$(( ice-1 ))_size"

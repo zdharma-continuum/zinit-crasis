@@ -25,7 +25,7 @@ my_crasis_theme_data=(
     add-plugin          green
     add-plugin-text     "Add plugin"
     new-id-url-text     "<Enter or select a plugin to add>"
-    new-id-url-width    50
+    new-id-url-width    37
     gold-choose         ""
     gold-choose-text    "Choose:"
     gold-list-info-text "<Gold Plugins Collection>"
