@@ -1,4 +1,4 @@
-all: zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc
+all: zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc themes/default.cr-theme.zwc
 
 %.zwc : %
 	share/zcompile -- $<
