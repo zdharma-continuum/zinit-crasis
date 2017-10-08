@@ -348,7 +348,7 @@ function -zcrasis_set_zui_palette() {
         -zui_std_stalog "256-color palette needs " "Zsh >= 5.3, " "" "it hasn't been applied"
         return
     fi
-    zstyle ":plugin:zui:app:${ZUI[app]}" palette "$theme[palette-string]"
+    ZUI[palette]="$theme[palette-string]"
 }
 # }}}
 # FUNCTION: -zcrasis_switch_theme {{{
@@ -1631,7 +1631,8 @@ ZUI[reset_current_segment]="no"
 
 ## Start application ##
 zui-event-loop 1:-zcrasis_generator_0 $(( ${#cmdlist} / 3 )):-zcrasis_generator_A \
-               0:-zcrasis_generator_B 0:-zcrasis_generator_DBG 0:-zcrasis_generator_OPT
+               0:-zcrasis_generator_B 0:-zcrasis_generator_DBG 0:-zcrasis_generator_OPT \
+               cfg-refresh:palette
 
 -zui_std_cleanup serialize
 
