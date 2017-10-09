@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 
+emulate -LR zsh -o warncreateglobal -o typesetsilent -o extendedglob
+
 source zsdoc/data/test_body
 fpath+=( $PWD $PWD/zsdoc/data/functions/crasis )
 
