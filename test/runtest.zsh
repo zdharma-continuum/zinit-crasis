@@ -24,7 +24,7 @@ coidx=1
 stats=()
 
 cd "$1"
-command cp -v "zshrc" "zshrc.test"
+command cp -vf "zshrc" "zshrc.test"
 zshrc_path=`pwd`/"zshrc.test"
 
 source ./script
