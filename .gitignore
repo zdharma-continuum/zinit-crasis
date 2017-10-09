@@ -8,7 +8,7 @@ compile_commands.json
 CTestTestfile.cmake
 *.zwc
 *.swp
-TODO
+/TODO
 zsdoc
 crasis.conf
 test/-zcrasis-process-buffer

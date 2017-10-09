@@ -1,6 +1,6 @@
 all: test
 
-test: prepare test1 test2 test3
+test: prepare test1 test2 test3 test4 test5
 
 prepare: ../crasis ../-zcrasis-process-buffer
 	cp ../crasis ../-zcrasis-process-buffer .
