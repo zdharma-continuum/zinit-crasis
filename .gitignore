@@ -9,3 +9,9 @@ CTestTestfile.cmake
 *.zwc
 *.swp
 TODO
+zsdoc
+crasis.conf
+test/-zcrasis-process-buffer
+test/crasis
+test/zsdoc
+test/test*/*.test

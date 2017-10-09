@@ -1,7 +1,10 @@
-all: zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc themes/default.cr-theme.zwc themes/zdharma.cr-theme.zwc
+all: zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc themes/default.cr-theme.zwc themes/zdharma.cr-theme.zwc test
 
 %.zwc : %
 	share/zcompile -- $<
+
+test:
+	make -C test test
 
 doc: crasis
 	rm -rf zsdoc/data zsdoc/*.adoc
@@ -11,5 +14,5 @@ clean:
 	rm -f -- zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc
 	rm -rf zsdoc/data
 
-.PHONY: clean
+.PHONY: all test clean
 # vim:noet:sts=8:ts=8
