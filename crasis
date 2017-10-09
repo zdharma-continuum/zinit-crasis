@@ -158,7 +158,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 # Load and process theme
 #
 
-typeset -g CRASIS_THEME="${CRASIS_THEME:-default}"
+local CRASIS_THEME="$CRASIS_THEME"
 
 local -a thcol_entries thcol_entries2 thtxt_entries thtxt_entries2
 thcol_entries=(
@@ -173,7 +173,7 @@ thcol_entries=(
     # Plugin item
     p-id p-marker p-marker-disabled p-compile
     # Options view
-    o-switch
+    o-theme-box o-switch o-save
     # Debug view
     d-save
 )
@@ -195,7 +195,7 @@ thtxt_entries=(
     # Ice listing
     i-blockf-text
     # Options view
-    o-switch-text
+    o-switch-text o-save-text
     # Debug view
     d-save-text
 )
@@ -210,6 +210,25 @@ local -A theme
 function -zcrasis_process_theme() {
     typeset -F 3 SECONDS=0
 
+    local -A theme_save
+    theme_save=( "${(kv@)theme[(I)*-unicode-bool]}" )
+
+    [[ -f "$ZCRASIS_REPO_DIR/crasis.conf" ]] && {
+        source "$ZCRASIS_REPO_DIR/crasis.conf"
+        # Global and from-interface $CRASIS_THEME overrides configuration file
+        CRASIS_THEME=${CRASIS_THEME:-$theme_name}
+        # For unicode glyphs, respect configuration file only at start
+        theme_save[ud-unicode-bool]="${theme_save[ud-unicode-bool]:-$move_unicode_buttons}"
+        theme_save[ed-unicode-bool]="${theme_save[ed-unicode-bool]:-$toggle_unicode_buttons}"
+    }
+
+    theme=( "${(kv@)theme_save}" )
+
+    # Mostly initial values, but also error check
+    [[ "${theme[ud-unicode-bool]}" != [0-1] ]] && theme[ud-unicode-bool]=1
+    [[ "${theme[ed-unicode-bool]}" != [0-1] ]] && theme[ed-unicode-bool]=1
+
+    # Fallback path for theme name
     [[ ! -f "$ZCRASIS_REPO_DIR/themes/${CRASIS_THEME}.cr-theme" ]] && {
         -zui_std_stalog "No such theme: " "$CRASIS_THEME," "" " reverted to default"
         CRASIS_THEME="default"
@@ -223,7 +242,7 @@ function -zcrasis_process_theme() {
 
 
     source "$ZCRASIS_REPO_DIR/themes/${CRASIS_THEME}.cr-theme"
-    theme=( "${(kv)my_crasis_theme_data[@]}" )
+    theme+=( "${(kv)my_crasis_theme_data[@]}" )
     theme[i-blockf]="${${(s;:;)theme[i-id]}[5]}"
 
     # Stats on color settings
@@ -333,6 +352,7 @@ function -zcrasis_process_theme() {
     done
 
     chosen_plugins[1]="$theme[gold-list-info-text]"
+
     -zcrasis_dbg_msg_arr "Theme processing time: $SECONDS seconds" ""
 
     return 0
@@ -357,9 +377,21 @@ function -zcrasis_set_zui_palette() {
 #
 # $1 - theme name (not a path, no .cr-theme extension)
 -zcrasis_switch_theme() {
-    CRASIS_THEME="$1"
+    -zui_std_strip_color_codes "$1"
+    CRASIS_THEME="$REPLY"
     -zcrasis_process_theme
     -zcrasis_set_zui_palette
+}
+# }}}
+# FUNCTION: -zcrasis_action_save_options {{{
+# Stores current settings to $ZCRASIS_REPO_DIR/crasis.conf.
+# Outputs status message.
+-zcrasis_action_save_options() {
+    local out="$ZCRASIS_REPO_DIR/crasis.conf"
+    print -r -- "local theme_name=${CRASIS_THEME}   # Name of active theme. \$CRASIS_THEME overrides." >| "$out"
+    print -r -- "local move_unicode_buttons=${theme[ud-unicode-bool]}   # Use unicode glyphs for up & down buttons?" >>| "$out"
+    print -r -- "local toggle_unicode_buttons=${theme[ed-unicode-bool]} # Use unicode glyphs for enable & disable buttons?" >>| "$out"
+    -zui_std_stalog "Configuration saved to: " "$out"
 }
 # }}}
 
@@ -733,8 +765,8 @@ function -zcrasis_set_zui_palette() {
         ZUI[in_preview]=0
     fi
 
-    if [[ "${ZUI[in_preview]}" = "0" && "$CRASIS_THEME" != "${ZUI[my_prev_theme]}" ]]; then
-        ZUI[my_prev_theme]="$CRASIS_THEME"
+    if [[ "${ZUI[in_preview]}" = "0" && "${ZUI[my_rerender]}" = "1" ]]; then
+        ZUI[my_rerender]=0
         # Regenerate all modules with active instances - it will be mod1 and mod2
         reply=( ",all," "" )
     else
@@ -762,8 +794,8 @@ function -zcrasis_set_zui_palette() {
         ZUI[in_options]=0
     fi
 
-    if [[ "${ZUI[in_options]}" = "0" && "$CRASIS_THEME" != "${ZUI[my_prev_theme]}" ]]; then
-        ZUI[my_prev_theme]="$CRASIS_THEME"
+    if [[ "${ZUI[in_preview]}" = "0" && "${ZUI[my_rerender]}" = "1" ]]; then
+        ZUI[my_rerender]=0
         # Regenerate all modules with active instances - it will be mod1 and mod2
         reply=( ",all," "" )
     else
@@ -807,8 +839,8 @@ function -zcrasis_set_zui_palette() {
         ZUI[in_debug]=0
     fi
 
-    if [[ "${ZUI[in_debug]}" = "0" && "$CRASIS_THEME" != "${ZUI[my_prev_theme]}" ]]; then
-        ZUI[my_prev_theme]="$CRASIS_THEME"
+    if [[ "${ZUI[in_preview]}" = "0" && "${ZUI[my_rerender]}" = "1" ]]; then
+        ZUI[my_rerender]=0
         # Regenerate all modules with active instances - it will be mod1 and mod2
         reply=( ",all," "" )
     else
@@ -1237,7 +1269,7 @@ function -zcrasis_set_zui_palette() {
     local -a cmd output
     local -A ice_cmd main_cmd
     local var_name1 var_name2
-    local num dis_col smarker_text pmarker_text mode_text command_col force_col disabled_text
+    local num smarker_text pmarker_text mode_text command_col force_col disabled_text
     integer short_idx
 
     # Ice addition request?
@@ -1273,27 +1305,33 @@ function -zcrasis_set_zui_palette() {
 
     # 1.
     if [[ "$ice" -gt 1 ]]; then
-        -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "$theme[up-unicode-c]" "-zcrasis_action_move_up $mod $ice" output
+        (( theme[ud-unicode-bool] )) && local up="$theme[up-unicode-c]" || local up="$theme[up-text-c]"
+        -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "$up" "-zcrasis_action_move_up $mod $ice" output
     else
-        output+=( "$theme[up-unicode]" )
+        (( theme[ud-unicode-bool] )) && local up="$theme[up-unicode]" || local up="$theme[up-text]"
+        output+=( "$up" )
     fi
 
     # 2.
     if [[ "$ice" -lt $(( ${#cmdlist} / 3 )) ]]; then
-        -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "$theme[down-unicode-c]" "-zcrasis_action_move_down $mod $ice" output
+        (( theme[ud-unicode-bool] )) && local down="$theme[down-unicode-c]" || local down="$theme[down-text-c]"
+        -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "$down" "-zcrasis_action_move_down $mod $ice" output
     else
-        output+=( "$theme[down-unicode]" )
+        (( theme[ud-unicode-bool] )) && local down="$theme[down-unicode]" || local down="$theme[down-text]"
+        output+=( "$down" )
     fi
 
-    # "DISABLED" or "Enabled"
+    # "Disabled" or "Enabled"
+    (( theme[ed-unicode-bool] )) && local enabled="$theme[enabled-unicode-c]" || local enabled="$theme[enabled-text-c]"
+    (( theme[ed-unicode-bool] )) && local disabled="$theme[disabled-unicode-c]" || local disabled="$theme[disabled-text-c]"
+
     [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || -zcrasis_update_main_cmd disabled "${ZUI[toggle_dis_${mod}_${ice}]}" "$ice"
-    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "dis_col" "$theme[disabled]" "$theme[enabled]"
-    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "$theme[disabled-text]" "$theme[enabled-text]"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "$disabled" "$enabled"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "smarker_text" "$theme[s-marker-disabled-text-c]" "$theme[s-marker-text-c]"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "pmarker_text" "$theme[p-marker-disabled-text-c]" "$theme[p-marker-text-c]"
 
     # 3.
-    -zui_std_button "toggle_dis_${mod}_${ice}" "${dis_col}${disabled_text}${ZUI[FMT_END]}" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
+    -zui_std_button "toggle_dis_${mod}_${ice}" "$disabled_text" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
     # 4. Delete
     -zui_std_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "$theme[delete-text-c]" -zcrasis_action_delete output
@@ -1507,24 +1545,47 @@ function -zcrasis_set_zui_palette() {
 -zcrasis_generator_OPT() {
     local -a thms tnames
     thms=( "$ZCRASIS_REPO_DIR"/themes/*.cr-theme )
-    tnames=( "${(@)${thms[@]:t}%.cr-theme}" )
+    tnames=( "${(o@)${thms[@]:t}%.cr-theme}" )
 
-    # Variables of the list box
-    (( ${+ZUI[my_lbox4_width]} == 0 )) && ZUI[my_lbox4_width]=16
+    # Switch theme list box
+    (( ${+ZUI[my_lbox4_width]} == 0 )) && ZUI[my_lbox4_width]=18
     ZUI[my_lbox4_idx]=${tnames[(i)$CRASIS_THEME]}
-    (( ${+ZUI[my_lbox4_opts]} == 0 )) && ZUI[my_lbox4_opts]="${(j:;:)tnames}"
+    eval "ZUI[my_lbox4_opts]=\"$theme[o-theme-box]\${(j:${ZUI[FMT_END]};${theme[o-theme-box]}:)tnames}${ZUI[FMT_END]}\""
 
     reply=()
 
     noglob -zui_std_list_box "lbox4_$mod" ZUI[my_lbox4_width] ZUI[my_lbox4_idx] ZUI[my_lbox4_opts] "" "" "" ''
-    -zui_std_button "switch_theme" "$theme[o-switch-text-c]" 'ZUI[my_prev_theme]="$CRASIS_THEME"; -zcrasis_switch_theme "${${(s:;:)ZUI[my_lbox4_opts]}[${ZUI[my_lbox4_idx]}]}"; reply=( ",all," "" );'
+    -zui_std_button "switch_theme" "$theme[o-switch-text-c]" 'ZUI[my_rerender]=1; -zcrasis_switch_theme "${${(s:;:)ZUI[my_lbox4_opts]}[${ZUI[my_lbox4_idx]}]}"; reply=( ",all," "" );'
+
+    # Up / Down list box
+    (( ${+ZUI[my_lbox5_width]} == 0 )) && ZUI[my_lbox5_width]=22
+    ZUI[my_lbox5_idx]=$(( theme[ud-unicode-bool] + 1 ))
+    ZUI[my_lbox5_opts]="$theme[up-text-c]/$theme[down-text-c];$theme[up-unicode-c]/$theme[down-unicode-c]"
+
+    noglob -zui_std_list_box "lbox5_$mod" ZUI[my_lbox5_width] ZUI[my_lbox5_idx] ZUI[my_lbox5_opts] "" "" "" 'ZUI[my_rerender]=1; theme[ud-unicode-bool]=$(( ZUI[my_lbox5_idx] - 1 ));'
+
+    # Enabled / Disabled list box
+    (( ${+ZUI[my_lbox6_width]} == 0 )) && ZUI[my_lbox6_width]=22
+    ZUI[my_lbox6_idx]=$(( theme[ed-unicode-bool] + 1 ))
+    ZUI[my_lbox6_opts]="$theme[enabled-text-c]/$theme[disabled-text-c];$theme[enabled-unicode-c]/$theme[disabled-unicode-c]"
+
+    noglob -zui_std_list_box "lbox6_$mod" ZUI[my_lbox6_width] ZUI[my_lbox6_idx] ZUI[my_lbox6_opts] "" "" "" 'ZUI[my_rerender]=1; theme[ed-unicode-bool]=$(( ZUI[my_lbox6_idx] - 1 ));'
+
+    # Save configuration button
+    -zui_std_button "save_options" "$theme[o-save-text-c]" '-zcrasis_action_save_options; internal=1;'
 
     reply=(
         "Available themes: ${reply[1]} ${reply[2]}"
+        ""
+        "Buttons to move plugins in the list: ${reply[3]}"
+        ""
+        "Buttons to enable & disable plugins: ${reply[4]}"
+        ""
+        "${reply[5]}"
     )
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
-    reply2=( )               reply3=( 1 )                reply4=( )
+    reply2=( 2 4 6 )         reply3=( 1 7 )              reply4=( )
 }
 # }}}
 # FUNCTION: -zcrasis_generator_DBG {{{
