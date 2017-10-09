@@ -1,6 +1,6 @@
 all: test
 
-test: prepare test1
+test: prepare test1 test2
 
 prepare: ../crasis ../-zcrasis-process-buffer
 	cp ../crasis ../-zcrasis-process-buffer .
@@ -8,12 +8,12 @@ prepare: ../crasis ../-zcrasis-process-buffer
 	./zsd-transform -q crasis
 	./get-body-part.pl > zsdoc/data/test_body
 
-test1: test1/zshrc test1/script
-	./runtest.zsh test1
-	diff test1/zshrc.result test1/zshrc.test
+test%: _test%/zshrc _test%/script
+	./runtest.zsh _$@
+	diff _$@/zshrc.result _$@/zshrc.test
 
 clean:
 	rm -rf -- zsdoc crasis -zcrasis-process-buffer
-	rm -f test1/zshrc.test
+	rm -f _test*/zshrc.test
 
-.PHONY: all prepare test1 clean
+.PHONY: all test prepare clean

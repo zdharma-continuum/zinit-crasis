@@ -14,4 +14,4 @@ crasis.conf
 test/-zcrasis-process-buffer
 test/crasis
 test/zsdoc
-test/test*/*.test
+test/_test*/*.test
