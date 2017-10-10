@@ -5,11 +5,11 @@ test: prepare test1 test2 test3 test4 test5
 prepare: ../crasis ../-zcrasis-process-buffer
 	cp ../crasis ../-zcrasis-process-buffer .
 	rm -rf zsdoc
-	./zsd-transform -q crasis
-	./get-body-part.pl > zsdoc/data/test_body
+	./bin/zsd-transform -q crasis
+	./bin/get-body-part.pl > zsdoc/data/test_body
 
 test%: _test%/zshrc _test%/script
-	./runtest.zsh _$@
+	./bin/runtest.zsh _$@
 	diff _$@/zshrc.result _$@/zshrc.test
 
 clean:
