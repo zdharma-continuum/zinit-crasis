@@ -106,7 +106,7 @@ ice_order=( proto from depth if blockf atclone atload atpull )
 #
 
 # Document to process
-local zshrc_path="${ZDOTDIR:-$HOME}/.zshrc" zshrc
+local zshrc_path="${1:-${ZDOTDIR:-$HOME}/.zshrc}" zshrc
 
 # The bits returned by -zplg-process-buffer
 local token prev_token spaces prev_spaces next_token next_spaces
