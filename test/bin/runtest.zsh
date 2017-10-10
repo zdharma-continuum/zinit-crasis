@@ -2,8 +2,8 @@
 
 emulate -LR zsh -o warncreateglobal -o typesetsilent -o extendedglob
 
-source zsdoc/data/test_body
-fpath+=( $PWD $PWD/zsdoc/data/functions/crasis )
+source data/test_body
+fpath+=( $PWD $PWD/data/functions/crasis )
 
 autoload -- -zcrasis-process-buffer
 autoload -- -zcrasis_dbg_msg -zcrasis_dbg_msg_arr

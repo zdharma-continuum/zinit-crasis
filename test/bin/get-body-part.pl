@@ -3,7 +3,7 @@
 use strict;
 
 my $enable = 0;
-open (IN, "zsdoc/data/bodies/crasis");
+open (IN, "data/bodies/crasis");
 while (<IN>) {
     if (/local -A TOKEN_TYPES/) {
         $enable = 1;

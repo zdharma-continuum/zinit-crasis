@@ -10,6 +10,7 @@ CTestTestfile.cmake
 *.swp
 /TODO
 zsdoc
+data
 crasis.conf
 test/-zcrasis-process-buffer
 test/crasis
