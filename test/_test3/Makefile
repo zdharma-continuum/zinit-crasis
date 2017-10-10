@@ -8,7 +8,7 @@ test%: ../_test%/zshrc ../_test%/script ../data
 	cd .. && ./bin/runtest.zsh _$@
 	cd .. && diff _$@/zshrc.result _$@/zshrc.test
 
-../data:
+../data: ../../crasis ../../-zcrasis-process-buffer
 	make -C .. prepare
 
 clean:
