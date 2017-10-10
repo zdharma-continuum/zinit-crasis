@@ -584,6 +584,12 @@ function -zcrasis_set_zui_palette() {
         if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [123] ]]; then
             in_zplugin=1
 
+            if [[ "${TOKEN_TYPES[$prev_token]}" = "3" ]]; then
+                # When command ends with explicit command separator,
+                # then remember white spaces after that separator
+                cmd3[aspaces]="$next_spaces"
+            fi
+
             if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
                 cmdlist[coidx+1]="${(j: :)${(qkv)cmd3[@]}}"
             elif [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" != "ice" ]]; then
@@ -652,6 +658,11 @@ function -zcrasis_set_zui_palette() {
         # Advance deeper into "zplugin ..." if it wasn't comment
         #[[ "$token" != [[:blank:]]#\#* ]] && in_zplugin+=1
         in_zplugin+=1
+
+        # History of state
+        prev_depth="$depth"
+        prev_token="$token"
+        prev_spaces="$spaces"
     done
 
     # Spaces before first comment or command - not moved with command
@@ -999,6 +1010,7 @@ function -zcrasis_set_zui_palette() {
                     [[ "${main_cmd[-q]}" = "1" ]] && buf+=" -q"
                     [[ -n "${main_cmd[url]}" ]] && buf+=" ${main_cmd[url]}"
                     [[ "$with_comments" = "1" && -n "${main_cmd[comment]}" ]] && buf+="${main_cmd[comment]}"
+                    buf+=$'\n'
                 else
                     # Unknown subcommand
                     local -a keys
@@ -1010,7 +1022,7 @@ function -zcrasis_set_zui_palette() {
                         text+=" ${main_cmd[$key]}"
                     done
 
-                    buf+="$text"
+                    buf+="$text"$'\n'
                 fi
             else
                 local -a keys
@@ -1020,9 +1032,8 @@ function -zcrasis_set_zui_palette() {
                     [[ "$key" != arg_* ]] && continue
                     text+=" ${main_cmd[$key]}"
                 done
-                buf+="$text"
+                (( ${+main_cmd[aspaces]} )) && buf+="$text${main_cmd[aspaces]}" || buf+="$text"$'\n'
             fi
-            buf+=$'\n'
         fi
     done
 
