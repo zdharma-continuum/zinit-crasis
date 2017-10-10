@@ -25,9 +25,11 @@ FUNCTIONS
  -zcrasis_action_edit_mode
  -zcrasis_action_move_down
  -zcrasis_action_move_up
+ -zcrasis_action_options_view
  -zcrasis_action_preview
  -zcrasis_action_reload
  -zcrasis_action_save
+ -zcrasis_action_save_options
  -zcrasis_clear_visual_state
  -zcrasis_compose
  -zcrasis_dbg_msg
@@ -36,9 +38,11 @@ FUNCTIONS
  -zcrasis_generator_A
  -zcrasis_generator_B
  -zcrasis_generator_DBG
+ -zcrasis_generator_OPT
  -zcrasis_process_theme
  -zcrasis_refresh2_all_string
  -zcrasis_set_zui_palette
+ -zcrasis_switch_theme
  -zcrasis_update_ice_cmd
  -zcrasis_update_main_cmd
  -zcrasis_util_swap
@@ -51,7 +55,7 @@ DETAILS
 Script Body
 ~~~~~~~~~~~
 
-Has 145 line(s). Calls functions:
+Has 148 line(s). Calls functions:
 
  Script-Body
  |-- -zcrasis_action_reload
@@ -198,7 +202,7 @@ ____
  # On disable, normal factors are restored.
 ____
 
-Has 26 line(s). Doesn't call other functions.
+Has 34 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
@@ -299,6 +303,19 @@ Has 14 line(s). Calls functions:
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
+-zcrasis_action_options_view
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Enters or leaves options alternate-view. It basically
+ # sets option module's instance to be created, once (when
+ # entering) - by changing the module factor.
+____
+
+Has 20 line(s). Doesn't call other functions.
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
 -zcrasis_action_preview
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -309,7 +326,7 @@ ____
  # instances. Number of instances is the "module factor".
 ____
 
-Has 12 line(s). Doesn't call other functions.
+Has 20 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
@@ -352,6 +369,18 @@ Has 5 line(s). Calls functions:
 
  -zcrasis_action_save
  `-- -zcrasis_compose
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_action_save_options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Stores current settings to $ZCRASIS_REPO_DIR/crasis.conf.
+ # Outputs status message.
+____
+
+Has 5 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
@@ -435,7 +464,7 @@ ____
  # (normal, preview, debug).
 ____
 
-Has 47 line(s). Doesn't call other functions.
+Has 49 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
@@ -449,7 +478,7 @@ ____
  # lines horizontally, by ZUI normal operation).
 ____
 
-Has 186 line(s). Calls functions:
+Has 192 line(s). Calls functions:
 
  -zcrasis_generator_A
  |-- -zcrasis_update_ice_cmd
@@ -486,6 +515,15 @@ Has 15 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
+-zcrasis_generator_OPT
+~~~~~~~~~~~~~~~~~~~~~~
+
+Has 33 line(s). Doesn't call other functions.
+
+Uses feature(s): _eval_
+
+Not called by script or any function, may be a hook or Zle widget, etc.
+
 -zcrasis_process_theme
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -494,7 +532,7 @@ ____
  # this functions converts it to be ready to use
 ____
 
-Has 99 line(s). Calls functions:
+Has 127 line(s). Calls functions:
 
  -zcrasis_process_theme
  |-- -zcrasis_dbg_msg
@@ -504,6 +542,7 @@ Uses feature(s): _source_
 
 Called by:
 
+ -zcrasis_switch_theme
  Script-Body
 
 -zcrasis_refresh2_all_string
@@ -538,11 +577,33 @@ Has 7 line(s). Calls functions:
  -zcrasis_set_zui_palette
  `-- is-at-least
 
-Uses feature(s): _autoload_, _zstyle_
+Uses feature(s): _autoload_
 
 Called by:
 
+ -zcrasis_switch_theme
  Script-Body
+
+-zcrasis_switch_theme
+~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Switches theme during operation of Crasis (not
+ # at startup).
+ #
+ # $1 - theme name (not a path, no .cr-theme extension)
+____
+
+Has 4 line(s). Calls functions:
+
+ -zcrasis_switch_theme
+ |-- -zcrasis_process_theme
+ |   |-- -zcrasis_dbg_msg
+ |   `-- -zcrasis_dbg_msg_arr
+ `-- -zcrasis_set_zui_palette
+     `-- is-at-least
+
+Not called by script or any function, may be a hook or Zle widget, etc.
 
 -zcrasis_update_ice_cmd
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -606,10 +667,6 @@ Called by:
 
 -zcrasis-process-buffer
 ~~~~~~~~~~~~~~~~~~~~~~~
-
-____
- # vim:ft=zsh
-____
 
 Has 134 line(s). Calls functions:
 
