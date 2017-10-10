@@ -587,7 +587,7 @@ function -zcrasis_set_zui_palette() {
             if [[ "${TOKEN_TYPES[$prev_token]}" = "3" ]]; then
                 # When command ends with explicit command separator,
                 # then remember white spaces after that separator
-                cmd3[aspaces]="$next_spaces"
+                cmd3[aspaces]="$spaces"
             fi
 
             if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
