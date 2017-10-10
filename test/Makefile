@@ -11,7 +11,7 @@ prepare: ../crasis ../-zcrasis-process-buffer
 	./bin/get-body-part.pl > data/test_body
 
 test%: _test%/zshrc _test%/script data
-	./bin/runtest.zsh _$@
+	./bin/runtest.zsh _$@ $(VERBOSE)
 	diff _$@/zshrc.result _$@/zshrc.test
 
 data: ../crasis ../-zcrasis-process-buffer

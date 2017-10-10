@@ -1,11 +1,11 @@
 current_dir = $(notdir $(shell pwd))
 
 test: script zshrc zshrc.result ../data
-	cd .. && ./bin/runtest.zsh $(current_dir)
+	cd .. && ./bin/runtest.zsh $(current_dir) $(VERBOSE)
 	cd .. && diff $(current_dir)/zshrc.result $(current_dir)/zshrc.test
 
 test%: ../_test%/zshrc ../_test%/script ../data
-	cd .. && ./bin/runtest.zsh _$@
+	cd .. && ./bin/runtest.zsh _$@ $(VERBOSE)
 	cd .. && diff _$@/zshrc.result _$@/zshrc.test
 
 ../data: ../../crasis ../../-zcrasis-process-buffer
