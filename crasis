@@ -645,7 +645,7 @@ function -zcrasis_set_zui_palette() {
             elif [[ "${cmd3[sub]}" = "cdclear" ]]; then
                 [[ "$token" = "-q" ]] && cmd3[-q]="1"
             elif [[ "${cmd3[sub]}" = "cdreplay" ]]; then
-                :
+                [[ "$token" = "-q" ]] && cmd3[-q]="1"
             elif [[ "${cmd3[sub]}" = "unkn" ]]; then
                 # Argument following "zplugin <unknown> ..."
                 cmd3[arg_$(( in_zplugin - 2 ))]="$token"
