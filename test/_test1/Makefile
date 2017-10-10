@@ -2,11 +2,13 @@ current_dir = $(notdir $(shell pwd))
 
 test: script zshrc zshrc.result ../data
 	cd .. && ./bin/runtest.zsh $(current_dir) $(VERBOSE)
-	cd .. && diff $(current_dir)/zshrc.result $(current_dir)/zshrc.test
+	[[ "$(NODIFF)" = "" ]] && cd .. && diff $(current_dir)/zshrc.result $(current_dir)/zshrc.test || true
+	@echo
 
 test%: ../_test%/zshrc ../_test%/script ../data
 	cd .. && ./bin/runtest.zsh _$@ $(VERBOSE)
-	cd .. && diff _$@/zshrc.result _$@/zshrc.test
+	[[ "$(NODIFF)" = "" ]] && cd .. && diff _$@/zshrc.result _$@/zshrc.test || true
+	@echo
 
 ../data: ../../crasis ../../-zcrasis-process-buffer
 	make -C .. prepare
