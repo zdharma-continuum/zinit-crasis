@@ -550,7 +550,10 @@ function -zcrasis_set_zui_palette() {
         prev_spaces="$spaces"
     done
 
+    echo "-- pre_block_end: $pre_block_end"
     (( pre_block_end == 0 )) && pre_block_end=2*(i-1)
+    echo "-- pre_block_end FIXED: $pre_block_end, #ZCR_PB_ALL: $#ZCR_PB_ALL, #ZCR_PB_WORDS: $#ZCR_PB_WORDS"
+    echo "-- post_block_begin: $post_block_begin"
     (( post_block_begin == 0 )) && post_block_begin=2*i-1 || {
         # Detect not related trailing comments
         for (( j=(post_block_begin+1)/2-1; j >= 1; j -- )); do
@@ -559,6 +562,7 @@ function -zcrasis_set_zui_palette() {
             } || break
         done
     }
+    echo "-- post_block_begin FIXED: $post_block_begin, #ZCR_PB_ALL: $#ZCR_PB_ALL, #ZCR_PB_WORDS: $#ZCR_PB_WORDS"
 }
 # }}}
 # FUNCTION: -zcrasis-process-zplugin-commands {{{
@@ -573,6 +577,9 @@ function -zcrasis_set_zui_palette() {
 -zcrasis-process-zplugin-commands() {
     integer i
     cmd3=()
+    echo "-- My post_block_begin: $post_block_begin, my #ZCR_PB_ALL: $#ZCR_PB_ALL"
+    print -rl "Last tokens are:" "${(@)ZCR_PB_WORDS[(post_block_begin+1)/2-6,(post_block_begin+1)/2-1]}"
+    print "Loop goes from $(( (pre_block_end/2)+1 )) to $(( (post_block_begin+1)/2-1 ))"
     # From start to end of zplugin block
     for (( i=(pre_block_end/2)+1; i<=(post_block_begin+1)/2-1; ++ i )); do
         token="${ZCR_PB_WORDS[i]}"
@@ -1036,6 +1043,9 @@ function -zcrasis_set_zui_palette() {
             fi
         fi
     done
+
+    print "Outputting [$post_block_begin,-1] from #ZCR_PB_ALL $#ZCR_PB_ALL into postblock.txt"
+    print -r -- "${(j::)ZCR_PB_ALL[post_block_begin,-1]}" > postblock.txt
 
     buf="${buf%$'\n'}"
     [[ "$whole" = "1" ]] && buf+="${(j::)ZCR_PB_ALL[post_block_begin,-1]}"
