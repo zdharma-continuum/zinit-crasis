@@ -14,6 +14,6 @@ test%: ../_test%/zshrc ../_test%/script ../data
 	make -C .. prepare
 
 clean:
-	rm -f zshrc.test
+	rm -f zshrc.test *.txt
 
 .PHONY: test clean
