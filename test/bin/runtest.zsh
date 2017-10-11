@@ -26,7 +26,7 @@ coidx=1
 stats=()
 
 cd "$1"
-command cp -vf "zshrc" "zshrc.test"
+command cp -f "zshrc" "zshrc.test"
 zshrc_path=`pwd`/"zshrc.test"
 
 command rm -f skip

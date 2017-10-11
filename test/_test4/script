@@ -1,3 +1,3 @@
--zcrasis_action_reload
+-zcrasis_action_reload >/dev/null || { echo "Failed to parse zshrc" | tee zshrc.test; return 0; }
 -zcrasis_action_move_down 2 1
 -zcrasis_action_save
