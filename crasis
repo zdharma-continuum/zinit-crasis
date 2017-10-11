@@ -625,6 +625,7 @@ function -zcrasis_set_zui_palette() {
                 [[ "$token" = (ice|load|light|snippet|cdclear|cdreplay) ]] && cmd3[sub]="$token" || { cmd3[sub]="unkn"; cmd3[unkn]="$token"; }
             else
                 cmd3[arg_1]="$token"
+                cmd3[spaces_1]="$spaces"
             fi
         else
             if [[ "${cmd3[sub]}" = "ice" ]]; then
@@ -652,6 +653,7 @@ function -zcrasis_set_zui_palette() {
             else
                 # Argument following "<unknown> <arg_1> ..."
                 cmd3[arg_$(( in_zplugin - 1 ))]="$token"
+                cmd3[spaces_$(( in_zplugin - 1 ))]="$spaces"
             fi
         fi
 
@@ -1030,7 +1032,7 @@ function -zcrasis_set_zui_palette() {
                 keys=( "${(kon)main_cmd[@]}" )
                 for key in "${keys[@]}"; do
                     [[ "$key" != arg_* ]] && continue
-                    text+=" ${main_cmd[$key]}"
+                    text+="${main_cmd[spaces_${key#arg_}]}${main_cmd[$key]}"
                 done
                 (( ${+main_cmd[aspaces]} )) && buf+="$text${main_cmd[aspaces]}" || buf+="$text"$'\n'
             fi

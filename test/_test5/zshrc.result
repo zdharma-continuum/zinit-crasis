@@ -32,7 +32,7 @@ zplugin snippet 'https://github.com/robbyrussell/oh-my-zsh/raw/master/plugins/co
 zplugin light 'zsh-users/zsh-autosuggestions'
 # zsh-autosuggestions -- clear the suggestion when entering completion select
 # menu
-ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=( "expand-or-complete" )
+ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=("expand-or-complete")
 zplugin light 'zdharma/fast-syntax-highlighting'
 
 # ----------------------------------------------------------------------------
