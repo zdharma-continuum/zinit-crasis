@@ -4,7 +4,8 @@ Origin is:
 
 version dd5b483.
 
-The file doesn't parse on Zsh <= 5.4.2. The reason is closing parenthesis
-not at the same line as $(. Expected test result is failure, and make
-doesn't get error. The test7 uses the same file but with the problematic
-syntax fixed.
+The file doesn't parse on Zsh <= 5.4.2. The reason is closing parenthesis not
+at the same line as $(. Expected test result is failure, and make doesn't get
+error. The test7 uses the same zshrc but skip-condition is reversed and
+expected result is correct parsing. The test8 uses the same file but with the
+problematic syntax fixed and no skip condition (test always enabled).
