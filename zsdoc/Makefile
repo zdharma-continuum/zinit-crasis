@@ -23,7 +23,7 @@ pdf: pdf/crasis.pdf
 
 pdf/crasis.pdf:
 	@mkdir -p pdf
-	asciidoctor -b pdf -r asciidoctor-pdf -D pdf crasis.adoc
+	asciidoctor -a reproducible -b pdf -r asciidoctor-pdf -D pdf crasis.adoc
 
 clean:
 	rm -rf man pdf data
