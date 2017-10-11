@@ -5,6 +5,7 @@ emulate -LR zsh -o warncreateglobal -o typesetsilent -o extendedglob
 source data/test_body
 fpath+=( $PWD $PWD/data/functions/crasis )
 
+autoload is-at-least
 autoload -- -zcrasis-process-buffer
 autoload -- -zcrasis_dbg_msg -zcrasis_dbg_msg_arr
 autoload -- -zcrasis-process-zplugin-commands -zcrasis-process-zsh-rc -zcrasis-tokenize-zsh-rc
@@ -28,6 +29,7 @@ cd "$1"
 command cp -vf "zshrc" "zshrc.test"
 zshrc_path=`pwd`/"zshrc.test"
 
+command rm -f skip
 source ./script
 
 if [[ -n "$2" ]]; then

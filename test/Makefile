@@ -12,7 +12,7 @@ prepare: ../crasis ../-zcrasis-process-buffer
 
 test%: _test%/zshrc _test%/script data
 	./bin/runtest.zsh _$@ $(VERBOSE)
-	[ "$(NODIFF)" = "" ] && diff _$@/zshrc.result _$@/zshrc.test || true
+	if [ "$(NODIFF)" = "" -a ! -f _$@/skip ]; then diff _$@/zshrc.result _$@/zshrc.test; exit $$?; fi
 	@echo
 
 data: ../crasis ../-zcrasis-process-buffer
