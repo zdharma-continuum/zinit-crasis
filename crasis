@@ -407,6 +407,51 @@ function -zcrasis_set_zui_palette() {
     -zcrasis-process-buffer "$zshrc" 1
 }
 # }}}
+# FUNCTION: -zcrasis_verify_tokenization {{{
+# To large extent verifies if tokenization was correct.
+# Also removes the test-tokens added to input zshrc.
+-zcrasis_verify_tokenization() {
+    local lasta="${ZCR_PB_WORDS[-1]}" lastb="${ZCR_PB_ALL[-2]}"
+
+    if [[ "$lasta" != "test" || "$lastb" != "test" ]]; then
+        return 1
+    fi
+
+    ZCR_PB_WORDS[-1]=()
+    ZCR_PB_SPACES[-1]=()
+    ZCR_PB_SPACES[-1]="${ZCR_PB_SPACES[-1]%$'\n'}"
+    ZCR_PB_ALL[-2,-1]=()
+    ZCR_PB_ALL[-1]="${ZCR_PB_ALL[-1]%$'\n'}"
+
+    return 0
+}
+# }}}
+# FUNCTION: -zcrasis_tokenization_failed {{{
+# Outputs a message that zshrc didn't parse, and
+# includes information what can be a possible cause.
+-zcrasis_tokenization_failed() {
+    print -r -- "Failed to parse zshrc. Possible causes:"
+    print -r -- ""
+    print -r -- "1. Zsh <= 5.4.2 doesn't parse closing parenthesis ')' for '\$('"
+    print -r -- "   if it is at other line, not at the same line as '\$('. So:"
+    print -r -- ""
+    print -r -- "     \$(ls -1 | perl -alne 'echo foo')"
+    print -r -- ""
+    print -r -- "   will parse correctly, while:"
+    print -r -- ""
+    print -r -- "     \$(ls -1 | perl -alne 'echo foo'"
+    print -r -- "     )"
+    print -r -- ""
+    print -r -- "   will not. A more sophisticated not-parsing example:"
+    print -r -- ""
+    print -r -- "     asmcmds+=(\${(o)\$(ls -1 | perl -alne 'echo foo'"
+    print -r -- "     )})"
+    print -r -- ""
+    print -r -- "2. A regular syntax error may exist, try: zcompile .zshrc, or"
+    print -r -- "   start a zsh session and see if there are error messages."
+    print -r -- ""
+}
+# }}}
 # FUNCTION: -zcrasis-process-zsh-rc {{{
 # Parses tokens of the loaded zshrc and detects:
 # - functions
@@ -834,7 +879,7 @@ function -zcrasis_set_zui_palette() {
         -zui_std_set_mod_factor 4 1
         ZUI[in_debug]=1
 
-        ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCSIZE>/${#zshrc}}" )
+        ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCSIZE>/$(( ${#zshrc} - 5 ))}" )
         local -a lines
         lines=( "${(f@)zshrc}" )
         ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCLINES>/${#lines}}" )
@@ -1637,8 +1682,10 @@ function -zcrasis_set_zui_palette() {
     float -F 2 sum=0.0
     local -a stats
 
+    reply=()
+
     -zcrasis_dbg_msg "Loading \`$zshrc_path'..."
-    zshrc="$(<$zshrc_path)"
+    zshrc="$(<$zshrc_path)"$'\ntest'
     -zcrasis_dbg_msg "Read <ZSHRCSIZE> bytes (<ZSHRCLINES> lines)"
     -zcrasis_dbg_msg ""
 
@@ -1656,6 +1703,7 @@ function -zcrasis_set_zui_palette() {
 
     typeset -F 2 SECONDS=0
     -zcrasis-tokenize-zsh-rc
+    -zcrasis_verify_tokenization || { -zcrasis_tokenization_failed; return 1; }
     stats+=( "Tokenization time: $SECONDS seconds" )
     sum+=SECONDS
 
@@ -1689,10 +1737,13 @@ function -zcrasis_set_zui_palette() {
         -zcrasis_refresh2_all_string
 
         reply=( "$REPLY" "" )
-    } || reply=()
+        return 0
+    }
+
+    return 0
 }
 # }}}
--zcrasis_action_reload
+-zcrasis_action_reload || return 1
 
 # Create needed local parameters
 integer i
