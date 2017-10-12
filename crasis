@@ -478,36 +478,36 @@ function -zcrasis_set_zui_palette() {
         (( next_nested_fun )) && { next_nested_fun=0 nested_fun=1 prev_nested_fun=0; }
 
         # Explicit future-function
-        if [[ "$token" = "function" && ( "$fun_depth" -lt 0 ) && ( $anon_depth -lt 0 ) ]]; then
+        if [[ "$token" = "function"(|$'\r') && ( "$fun_depth" -lt 0 ) && ( $anon_depth -lt 0 ) ]]; then
             next_fun=1 cur_fun=0 prev_fun=0 anon_depth=-1
         # Detect top-level prev-function differentiating from anonymous function
-        elif [[ "$token" = "()" && ( "$fun_depth" -lt 0 ) && ( $anon_depth -lt 0 ) ]]; then
+        elif [[ "$token" = "()"(|$'\r') && ( "$fun_depth" -lt 0 ) && ( $anon_depth -lt 0 ) ]]; then
             if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [123] ]]; then
                 next_fun=0 cur_fun=0 prev_fun=0 anon_depth=$depth
             else
                 next_fun=0 cur_fun=0 prev_fun=1 anon_depth=-1
             fi
         # Must be a nested future-function
-        elif [[ "$token" = "function" ]]; then
+        elif [[ "$token" = "function"(|$'\r') ]]; then
             next_nested_fun=1 nested_fun=0 prev_nested_fun=0
         # Is it a nested prev-function?
-        elif [[ "$token" = "()" && "$nested_fun" -eq 0 && "$depth" -gt "$fun_stack_depths[-1]" ]]; then
+        elif [[ "$token" = "()"(|$'\r') && "$nested_fun" -eq 0 && "$depth" -gt "$fun_stack_depths[-1]" ]]; then
             if [[ "$spaces" != *$'\n'* && -n "$prev_token" && "${TOKEN_TYPES[$prev_token]}" != [123] ]]; then
                 next_nested_fun=0 nested_fun=0 prev_nested_fun=1
             fi
-        elif [[ "$token" = "{" ]]; then
+        elif [[ "$token" = "{"(|$'\r') ]]; then
             (( ++ depth ))
-        elif [[ "$token" = "}" ]]; then
+        elif [[ "$token" = "}"(|$'\r') ]]; then
             (( -- depth ))
         fi
 
         # Check if any final function-flag is raised
         if (( cur_fun )); then
-            fun_name="$token"
+            fun_name="${token%$'\r'}"
             fun_depth="$depth"
             fun_stack_depths+=( "$depth" )
         elif (( prev_fun )); then
-            fun_name="$prev_token"
+            fun_name="${prev_token%$'\r'}"
             fun_depth="$depth"
             fun_stack_depths+=( "$depth" )
         fi
@@ -518,7 +518,7 @@ function -zcrasis_set_zui_palette() {
         fi
 
         # Ascent to function - skip '{'
-        if (( fun_depth >= 0 && depth == (fun_depth + 1) )) && [[ "$token" = "{" ]]; then
+        if (( fun_depth >= 0 && depth == (fun_depth + 1) )) && [[ "$token" = "{"(|$'\r') ]]; then
             :
         # In function
         elif (( fun_depth >= 0 && depth > fun_depth )); then
@@ -558,7 +558,7 @@ function -zcrasis_set_zui_palette() {
         if (( at_command )); then
             at_command=0
             # Zplugin call not in function
-            if [[ "$cur_fun" -eq 0 && "$next_token" != "()" && "$fun_stack_depths[-1]" -le "0" ]]; then
+            if [[ "$cur_fun" -eq 0 && "$next_token" != "()"(|$'\r') && "$fun_stack_depths[-1]" -le "0" ]]; then
                 if [[ "$token" = (zplugin|zplg) || ( "$token" = ":" && "$next_token" = (zplugin|zplg) ) ]]; then
                     in_zplugin=1
                     (( was_zplugin == 0 )) && {
@@ -584,7 +584,7 @@ function -zcrasis_set_zui_palette() {
             fun_stack_depths[-1]=()
         # No-function text gathering
         elif (( next_fun == 0 && cur_fun == 0 && prev_fun == 0 && anon_depth < 0 && fun_depth < 0 )); then
-            if [[ "$next_token" != "()" || "$next_spaces" = *$'\n'* || "${TOKEN_TYPES[$token]}" = 3 ]]; then
+            if [[ "$next_token" != "()"(|$'\r') || "$next_spaces" = *$'\n'* || "${TOKEN_TYPES[$token]}" = 3 ]]; then
                 [[ "$token" != [[:blank:]]#\#* ]] && : # do something with script-body token
             fi
         fi
