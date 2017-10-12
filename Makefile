@@ -4,7 +4,7 @@ all: zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc themes
 	share/zcompile -- $<
 
 test:
-	make VERBOSE=$(VERBOSE) NODIFF=$(NODIFF) -C test test
+	make VERBOSE=$(VERBOSE) NODIFF=$(NODIFF) DEBUG=$(DEBUG) -C test test
 
 doc: crasis
 	rm -rf zsdoc/data zsdoc/*.adoc

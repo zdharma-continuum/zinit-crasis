@@ -29,6 +29,7 @@ cd "$1"
 command cp -f "zshrc" "zshrc.test"
 zshrc_path=`pwd`/"zshrc.test"
 
+[[ -n "$3" ]] && DBG=1
 command rm -f skip
 source ./script
 
