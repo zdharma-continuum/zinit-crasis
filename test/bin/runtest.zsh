@@ -3,7 +3,7 @@
 emulate -LR zsh -o warncreateglobal -o typesetsilent -o extendedglob
 
 source data/test_body
-fpath+=( $PWD $PWD/data/functions/crasis )
+fpath+=( $PWD/data/functions/crasis )
 
 autoload is-at-least
 autoload -- -zcrasis-process-buffer
