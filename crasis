@@ -618,6 +618,10 @@ function -zcrasis_set_zui_palette() {
 -zcrasis-process-zplugin-commands() {
     integer i
     cmd3=()
+
+    # Reset parameters used in -zcrasis-process-zsh-rc
+    prev_depth=0 prev_token="" prev_spaces=""
+
     # From start to end of zplugin block
     for (( i=(pre_block_end/2)+1; i<=(post_block_begin+1)/2-1; ++ i )); do
         token="${ZCR_PB_WORDS[i]}"
