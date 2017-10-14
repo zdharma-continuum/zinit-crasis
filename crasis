@@ -77,12 +77,13 @@ TOKEN_TYPES=(
 
   '|'   3
   '||'  3
-  ';'   3
-  '&'   3
   '&&'  3
-  '|&'  3
-  '&!'  3
-  '&|'  3
+
+  '|&'  4
+  '&!'  4
+  '&|'  4
+  '&'   4
+  ';'   4
 )
 
 local -a chosen_plugins
@@ -482,7 +483,7 @@ function -zcrasis_set_zui_palette() {
             next_fun=1 cur_fun=0 prev_fun=0 anon_depth=-1
         # Detect top-level prev-function differentiating from anonymous function
         elif [[ "$token" = "()"(|$'\r') && ( "$fun_depth" -lt 0 ) && ( $anon_depth -lt 0 ) ]]; then
-            if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [123] ]]; then
+            if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [1234] ]]; then
                 next_fun=0 cur_fun=0 prev_fun=0 anon_depth=$depth
             else
                 next_fun=0 cur_fun=0 prev_fun=1 anon_depth=-1
@@ -492,7 +493,7 @@ function -zcrasis_set_zui_palette() {
             next_nested_fun=1 nested_fun=0 prev_nested_fun=0
         # Is it a nested prev-function?
         elif [[ "$token" = "()"(|$'\r') && "$nested_fun" -eq 0 && "$depth" -gt "$fun_stack_depths[-1]" ]]; then
-            if [[ "$spaces" != *$'\n'* && -n "$prev_token" && "${TOKEN_TYPES[$prev_token]}" != [123] ]]; then
+            if [[ "$spaces" != *$'\n'* && -n "$prev_token" && "${TOKEN_TYPES[$prev_token]}" != [1234] ]]; then
                 next_nested_fun=0 nested_fun=0 prev_nested_fun=1
             fi
         elif [[ "$token" = "{"(|$'\r') ]]; then
@@ -548,7 +549,7 @@ function -zcrasis_set_zui_palette() {
         fi
 
         # Check for introduction of Zplugin call
-        if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [123] ]]; then
+        if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [1234] ]]; then
             at_command=1
             (( in_zplugin )) && post_block_begin=2*i-1
             [[ "$token" != [[:blank:]]#\#* ]] && in_zplugin=0 || { (( in_zplugin )) && in_zplugin=1; }
@@ -584,7 +585,7 @@ function -zcrasis_set_zui_palette() {
             fun_stack_depths[-1]=()
         # No-function text gathering
         elif (( next_fun == 0 && cur_fun == 0 && prev_fun == 0 && anon_depth < 0 && fun_depth < 0 )); then
-            if [[ "$next_token" != "()"(|$'\r') || "$next_spaces" = *$'\n'* || "${TOKEN_TYPES[$token]}" = 3 ]]; then
+            if [[ "$next_token" != "()"(|$'\r') || "$next_spaces" = *$'\n'* || "${TOKEN_TYPES[$token]}" = [34] ]]; then
                 [[ "$token" != [[:blank:]]#\#* ]] && : # do something with script-body token
             fi
         fi
@@ -598,15 +599,48 @@ function -zcrasis_set_zui_palette() {
     # If zplugin command ended the zshrc, detect it here
     (( in_zplugin )) && post_block_begin=2*i-1
 
-    (( pre_block_end == 0 )) && pre_block_end=2*(i-1)
-    (( post_block_begin == 0 )) && post_block_begin=2*i-1 || {
+    if (( pre_block_end == 0 )); then
+        pre_block_end=2*(i-1)
+    else
+        j=0+(pre_block_end/2)
+
+        # Soft command-separator?
+        if [[ "${TOKEN_TYPES[${ZCR_PB_WORDS[j]}]}" = "3" ]]; then
+            integer found=0
+            for (( j=(pre_block_end/2)-1; j>=1; -- j )); do
+                token="${ZCR_PB_WORDS[j]}"
+                spaces="${ZCR_PB_SPACES[j]}"
+                next_token="${ZCR_PB_WORDS[j+1]}"
+                next_spaces="${ZCR_PB_SPACES[j+1]}"
+                (( j >= 2 )) && prev_token="${ZCR_PB_WORDS[j-1]}" || prev_token=""
+
+                if [[ "${TOKEN_TYPES[$token]}" = "4" ]]; then
+                    found=1
+                    pre_block_end=2*j
+                    break
+                # Soft command separator can have spaces after it
+                elif [[ "$spaces" = *$'\n'* && "${TOKEN_TYPES[$prev_token]}" != "3" ]]; then
+                    pre_block_end=2*(j-1)
+                    found=1
+                    break
+                fi
+            done
+
+            # Didn't found, and therefore reached beginning of file
+            (( found == 0 )) && pre_block_end=0
+        fi
+    fi
+
+    if (( post_block_begin == 0 )); then
+        post_block_begin=2*i-1
+    else
         # Detect not related trailing comments
         for (( j=(post_block_begin+1)/2-1; j >= 1; j -- )); do
             [[ "${ZCR_PB_WORDS[j]}" = [[:blank:]]#\#* && "${ZCR_PB_WORDS[j]}" != [[:blank:]]#\#[[:blank:]]#zplugin* ]] && {
                 post_block_begin=2*j-1
             } || break
         done
-    }
+    fi
 }
 # }}}
 # FUNCTION: -zcrasis-process-zplugin-commands {{{
@@ -633,10 +667,10 @@ function -zcrasis_set_zui_palette() {
         next_spaces="${ZCR_PB_SPACES[i+1]}"
 
         # New command?
-        if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [123] ]]; then
+        if [[ "$spaces" = *$'\n'* || -z "$prev_token" || "${TOKEN_TYPES[$prev_token]}" = [1234] ]]; then
             in_zplugin=1
 
-            if [[ "${TOKEN_TYPES[$prev_token]}" = "3" ]]; then
+            if [[ "${TOKEN_TYPES[$prev_token]}" = [34] ]]; then
                 # When command ends with explicit command separator,
                 # then remember white spaces after that separator
                 cmd3[aspaces]="$spaces"
@@ -1016,7 +1050,13 @@ function -zcrasis_set_zui_palette() {
     local -a cmd
     local -A ice_cmd main_cmd
 
-    [[ "$whole" = "1" ]] && buf="${(j::)ZCR_PB_ALL[1,pre_block_end]}$leading_spaces"
+    [[ "$whole" = "1" ]] && {
+        if (( pre_block_end > 0 )); then
+            buf="${(j::)ZCR_PB_ALL[1,pre_block_end]}$leading_spaces"
+        else
+            buf="$leading_spaces"
+        fi
+    }
 
     for (( i=1; i<=size; ++ i )); do
         cmd=( "${(@)cmdlist[(i-1)*3+1,i*3]}" )
