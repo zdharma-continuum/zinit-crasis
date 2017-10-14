@@ -399,8 +399,8 @@ dko::source "${LDOTDIR}/zshrc"
 # ============================================================================
 
 autoload -Uz compinit
-compinit
-dko::has 'zplugin' && zplugin cdreplay -q
+dko::has 'zplugin' && compinit
+zplugin cdreplay -q
 
 # ============================================================================
 # End profiling
