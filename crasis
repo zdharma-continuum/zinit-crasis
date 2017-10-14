@@ -161,9 +161,10 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
 local CRASIS_THEME="$CRASIS_THEME"
 
-local -a thcol_entries thcol_entries2 thtxt_entries thtxt_entries2
+local -a thcol_entries thcol_entries2 thbcol_entries thtxt_entries thtxt_entries2
 thcol_entries=(
     # Top bar
+    menu-active-button-fg menu2-active-button-fg
     reload save preview options debug delete-mode edit-mode compact-mode
     # Add bar
     add-snippet add-plugin gold-choose
@@ -180,6 +181,8 @@ thcol_entries=(
 )
 
 thcol_entries2=( p-mode i-id d-email )
+
+thbcol_entries=( menu-bg menu-active-button-bg menu2-bg menu2-active-button-bg )
 
 thtxt_entries=(
     # Top bar
@@ -259,16 +262,17 @@ function -zcrasis_process_theme() {
 
     # Convert colors' symbolic names like "green"
     local ckey cval nval
-    for ckey in "${thcol_entries[@]}" i-blockf; do
+    for ckey in "${thcol_entries[@]}" "${thbcol_entries[@]}" i-blockf; do
         cval=${(U)theme[$ckey]}
         [[ -z "$cval" ]] && continue
-        nval=${ZUI[$cval]}
+
+        [[ -n "${thbcol_entries[(r)$ckey]}" ]] && nval=${ZUI[BG_$cval]} || nval=${ZUI[$cval]}
 
         if [[ -n "$nval" ]]; then
             theme[$ckey]="$nval"
         else
             cval="${cval#B}"
-            nval=${ZUI[$cval]}
+            [[ -n "${thbcol_entries[(r)$ckey]}" ]] && nval=${ZUI[BG_$cval]} || nval=${ZUI[$cval]}
             [[ -n "$nval" ]] && theme[$ckey]="${ZUI[BOLD]}$nval" || theme[$ckey]=""
         fi
     done
@@ -1311,19 +1315,39 @@ function -zcrasis_set_zui_palette() {
 
     reply=()
 
-    -zui_util_map_bools '[[ ${ZUI[in_preview]} = 1 ]]' pv_col "${ZUI[BG_BLUE]}" "$theme[preview]"
-    -zui_util_map_bools '[[ ${ZUI[in_options]} = 1 ]]' op_col "${ZUI[BG_BLUE]}" "$theme[options]"
-    -zui_util_map_bools '[[ ${ZUI[in_debug]} = 1 ]]' dg_col "${ZUI[BG_BLUE]}" "$theme[debug]"
-    -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col "${ZUI[BG_BLUE]}" "$theme[delete-mode]"
-    -zui_util_map_bools '[[ "${ZUI[zc_edit_mode]}" = "1" ]]' ed_col "${ZUI[BG_BLUE]}" "$theme[edit-mode]"
-    -zui_util_map_bools '[[ "${ZUI[zc_compact_mode]}" = "1" ]]' co_col "${ZUI[BG_BLUE]}" "$theme[compact-mode]"
+    local act_fg_bg="$theme[menu-active-button-fg]$theme[menu-active-button-bg]"
+    local act_fg_bg2="$theme[menu2-active-button-fg]$theme[menu2-active-button-bg]"
+
+    -zui_util_map_bools '[[ ${ZUI[in_preview]} = 1 ]]' pv_col \
+                                                "$act_fg_bg" \
+                                                "$theme[preview]$theme[menu-bg]"
+    -zui_util_map_bools '[[ ${ZUI[in_options]} = 1 ]]' op_col \
+                                                "$act_fg_bg" \
+                                                "$theme[options]$theme[menu-bg]"
+    -zui_util_map_bools '[[ ${ZUI[in_debug]} = 1 ]]' dg_col \
+                                                "$act_fg_bg" \
+                                                "$theme[debug]$theme[menu-bg]"
+    -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col \
+                                                "$act_fg_bg2" \
+                                                "$theme[delete-mode]$theme[menu2-bg]"
+    -zui_util_map_bools '[[ "${ZUI[zc_edit_mode]}" = "1" ]]' ed_col \
+                                                "$act_fg_bg2" \
+                                                "$theme[edit-mode]$theme[menu2-bg]"
+    -zui_util_map_bools '[[ "${ZUI[zc_compact_mode]}" = "1" ]]' co_col \
+                                                "$act_fg_bg2" \
+                                                "$theme[compact-mode]$theme[menu2-bg]"
 
     # 1. - 5.
-    -zui_std_button "reload" "$theme[reload-text-c]" -zcrasis_action_reload
-    -zui_std_button "save" "$theme[save-text-c]" '-zcrasis_action_save; internal=1'
-    -zui_std_button "preview" "${pv_col}$theme[preview-text]${ZUI[FMT_END]}" -zcrasis_action_preview
-    -zui_std_button "options" "${op_col}$theme[options-text]${ZUI[FMT_END]}" -zcrasis_action_options_view
-    -zui_std_button "debug" "${dg_col}$theme[debug-text]${ZUI[FMT_END]}" -zcrasis_action_debug_view
+    local close
+    [[ -n "$theme[menu-bg]" || -n "$theme[reload]" ]] && close="${ZUI[FMT_END]}" || close=""
+    -zui_std_button "reload" "$theme[reload]$theme[menu-bg]$theme[reload-text]$close" -zcrasis_action_reload
+
+    [[ -n "$theme[menu-bg]" || -n "$theme[save]" ]] && close="${ZUI[FMT_END]}" || close=""
+    -zui_std_button "save" "$theme[save]$theme[menu-bg]$theme[save-text]$close" '-zcrasis_action_save; internal=1'
+
+    -zui_std_button "preview" "${pv_col}$theme[preview-text]${pv_col:+${ZUI[FMT_END]}}" -zcrasis_action_preview
+    -zui_std_button "options" "${op_col}$theme[options-text]${op_col:+${ZUI[FMT_END]}}" -zcrasis_action_options_view
+    -zui_std_button "debug" "${dg_col}$theme[debug-text]${dg_col:+${ZUI[FMT_END]}}" -zcrasis_action_debug_view
 
     (( ${ZUI[in_preview]} + ZUI[in_debug] + ZUI[in_options] == 0 )) && {
         # Variables of the text field
@@ -1347,21 +1371,24 @@ function -zcrasis_set_zui_palette() {
         -zui_std_button "plugin" "$theme[add-plugin-text-c]" -zcrasis_action_add_plugin optional
 
         # 5. - 7.
-        -zui_std_button "delete_mode" "${dl_col}$theme[delete-mode-text]${ZUI[FMT_END]}" -zcrasis_action_delete_mode optional
-        -zui_std_button "edit_mode" "${ed_col}$theme[edit-mode-text]${ZUI[FMT_END]}" -zcrasis_action_edit_mode optional
-        -zui_std_button "compact_mode" "${co_col}$theme[compact-mode-text]${ZUI[FMT_END]}" -zcrasis_action_compact_mode optional
+        -zui_std_button "delete_mode" "${dl_col}$theme[delete-mode-text]${dl_col:+${ZUI[FMT_END]}}" -zcrasis_action_delete_mode optional
+        -zui_std_button "edit_mode" "${ed_col}$theme[edit-mode-text]${ed_col:+${ZUI[FMT_END]}}" -zcrasis_action_edit_mode optional
+        -zui_std_button "compact_mode" "${co_col}$theme[compact-mode-text]${co_col:+${ZUI[FMT_END]}}" -zcrasis_action_compact_mode optional
 
         # 8.
         -zui_std_special_text "$theme[gold-choose-text-c]" optional
 
-        local line1="${optional[5]} ${optional[6]} ${optional[7]}"
+        [[ -n "$theme[menu2-bg]" ]] && local spc2="$theme[menu2-bg] ${ZUI[FMT_END]}" || local spc2=" "
+
+        local line1="${optional[5]}$spc2${optional[6]}$spc2${optional[7]}"
         local line2="${optional[1]} ${optional[3]} ${optional[4]}  ${optional[8]} ${optional[2]}"
     } || {
         local line1="" line2=""
     }
 
+    [[ -n "$theme[menu-bg]" ]] && local spc="$theme[menu-bg] ${ZUI[FMT_END]}" || local spc=" "
     reply=(
-        "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]} ${reply[5]}"
+        "${reply[1]}$spc${reply[2]}$spc${reply[3]}$spc${reply[4]}$spc${reply[5]}"
         "$line1"
         ""
         "$line2"

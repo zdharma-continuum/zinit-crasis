@@ -4,15 +4,21 @@
 local -A my_crasis_theme_data
 my_crasis_theme_data=(
     # Top menu bar
-    reload              cyan
+    menu-bg                 blue
+    menu-active-button-fg   black
+    menu-active-button-bg   green
+    menu2-bg                ""
+    menu2-active-button-fg  black
+    menu2-active-button-bg  green
+    reload              bcyan
     reload-text         " Load zshrc "
     save                red
     save-text           " Save zshrc "
-    preview             cyan
+    preview             bcyan
     preview-text        " Preview "
-    options             cyan
+    options             bcyan
     options-text        " Options "
-    debug               cyan
+    debug               bcyan
     debug-text          " Debug "
     delete-mode         red
     delete-mode-text    " Delete Mode "

@@ -4,15 +4,21 @@
 local -A my_crasis_theme_data
 my_crasis_theme_data=(
     # Top menu bar
-    reload              green
+    menu-bg                 blue
+    menu-active-button-fg   black
+    menu-active-button-bg   green
+    menu2-bg                ""
+    menu2-active-button-fg  black
+    menu2-active-button-bg  green
+    reload              bgreen
     reload-text         "Reload"
-    save                red
+    save                bred
     save-text           "Save"
-    preview             green
+    preview             bgreen
     preview-text        "Preview"
-    options             green
+    options             bgreen
     options-text        " Options "
-    debug               green
+    debug               bgreen
     debug-text          "Debug"
     delete-mode         red
     delete-mode-text    "Delete Mode"
