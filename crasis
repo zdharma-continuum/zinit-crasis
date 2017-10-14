@@ -674,6 +674,14 @@ function -zcrasis_set_zui_palette() {
                 # When command ends with explicit command separator,
                 # then remember white spaces after that separator
                 cmd3[aspaces]="$spaces"
+            elif [[ "$spaces" != (|$'\r')$'\n' ]]; then
+                # Remember spaces if they're not single newline, and
+                # if what follows isn't a comment. So basically spaces
+                # between commands are remembered. Spaces before comments
+                # are not (but comment-remembering handles this)
+                if [[ "$token" != [[:blank:]]#\#* ]]; then
+                    cmd3[aspaces]="$spaces"
+                fi
             fi
 
             if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
@@ -1104,7 +1112,8 @@ function -zcrasis_set_zui_palette() {
                     [[ "${main_cmd[-q]}" = "1" ]] && buf+=" -q"
                     [[ -n "${main_cmd[url]}" ]] && buf+=" ${main_cmd[url]}"
                     [[ "$with_comments" = "1" && -n "${main_cmd[comment]}" ]] && buf+="${main_cmd[comment]}"
-                    buf+=$'\n'
+
+                    (( ${+main_cmd[aspaces]} )) && buf+="${main_cmd[aspaces]}" || buf+=$'\n'
                 else
                     # Unknown subcommand
                     local -a keys
@@ -1116,7 +1125,7 @@ function -zcrasis_set_zui_palette() {
                         text+=" ${main_cmd[$key]}"
                     done
 
-                    buf+="$text"$'\n'
+                    (( ${+main_cmd[aspaces]} )) && buf+="$text${main_cmd[aspaces]}" || buf+="$text"$'\n'
                 fi
             else
                 local -a keys

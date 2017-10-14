@@ -33,6 +33,7 @@ zplugin light 'zsh-users/zsh-autosuggestions'
 # zsh-autosuggestions -- clear the suggestion when entering completion select
 # menu
 ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=("expand-or-complete")
+
 zplugin light 'zdharma/fast-syntax-highlighting'
 
 # ----------------------------------------------------------------------------
@@ -40,9 +41,13 @@ zplugin light 'zdharma/fast-syntax-highlighting'
 # ----------------------------------------------------------------------------
 
 zplugin light 'zsh-users/zsh-completions'
+
 zplugin light 'gradle/gradle-completion'
+
 zplugin light 'lukechilds/zsh-better-npm-completion'
+
 zplugin light 'vasyharan/zsh-brew-services'
+
 zplugin light 'voronkovich/phpcs.plugin.zsh'
 
 export DKO_SOURCE="${DKO_SOURCE} }"
