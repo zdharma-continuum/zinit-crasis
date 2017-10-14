@@ -595,6 +595,9 @@ function -zcrasis_set_zui_palette() {
         prev_spaces="$spaces"
     done
 
+    # If zplugin command ended the zshrc, detect it here
+    (( in_zplugin )) && post_block_begin=2*i-1
+
     (( pre_block_end == 0 )) && pre_block_end=2*(i-1)
     (( post_block_begin == 0 )) && post_block_begin=2*i-1 || {
         # Detect not related trailing comments
