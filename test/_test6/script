@@ -1,4 +1,4 @@
-if ! is-at-least 5.0.7; then
+if ! is-at-least 5.0.7 || [[ "$ZSH_VERSION" = "5.4.2-dev-0" ]]; then
     echo "Skipping test (Zsh $ZSH_VERSION correctly parses the zshrc)."
     command touch skip
     return 0
