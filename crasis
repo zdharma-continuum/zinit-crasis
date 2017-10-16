@@ -1023,7 +1023,7 @@ function -zcrasis_set_zui_palette() {
 # only a single line per plugin/snippet/etc. is displayed.
 -zcrasis_action_compact_mode() {
     if [[ -n "${ZUI[my_compact_mode]}" ]]; then
-        (( ZUI[my_compact_mode] = 1 - ZUI[my_compact_mode] ))
+        (( ZUI[my_compact_mode] = (ZUI[my_compact_mode]+1) % 3 ))
     else
         ZUI[my_compact_mode]=1
     fi
@@ -1333,7 +1333,7 @@ function -zcrasis_set_zui_palette() {
     -zui_util_map_bools '[[ "${ZUI[my_edit_mode]}" = "1" ]]' ed_col \
                                                 "$act_fg_bg2" \
                                                 "$theme[edit-mode]$theme[menu2-bg]"
-    -zui_util_map_bools '[[ "${ZUI[my_compact_mode]}" = "1" ]]' co_col \
+    -zui_util_map_bools '[[ "${ZUI[my_compact_mode]}" = [12] ]]' co_col \
                                                 "$act_fg_bg2" \
                                                 "$theme[compact-mode]$theme[menu2-bg]"
 
@@ -1396,8 +1396,8 @@ function -zcrasis_set_zui_palette() {
 
     [[ -z "$line1" && -z "$line2" ]] && reply[2,4]=()
 
-    # Non-selectable lines   Hops to jump with [ and ]   Local anchors
-    reply2=( )               reply3=( 1 )                reply4=( )
+    # Non-selectable lines   Hops to jump with [ and ]   Local anchors  Spacing
+    reply2=( )               reply3=( 1 )                reply4=( )     reply5="0"
 }
 # }}}
 # FUNCTION: -zcrasis_generator_A {{{
@@ -1468,8 +1468,8 @@ function -zcrasis_set_zui_palette() {
 
     [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || -zcrasis_update_main_cmd disabled "${ZUI[toggle_dis_${mod}_${ice}]}" "$ice"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "$disabled" "$enabled"
-    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[my_compact_mode]}\" = 1 ]]" "smarker_text" "$theme[s-marker-disabled-text-c]" "$theme[s-marker-text-c]"
-    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[my_compact_mode]}\" = 1 ]]" "pmarker_text" "$theme[p-marker-disabled-text-c]" "$theme[p-marker-text-c]"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[my_compact_mode]}\" = [12] ]]" "smarker_text" "$theme[s-marker-disabled-text-c]" "$theme[s-marker-text-c]"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[my_compact_mode]}\" = [12] ]]" "pmarker_text" "$theme[p-marker-disabled-text-c]" "$theme[p-marker-text-c]"
 
     # 3.
     -zui_std_button "toggle_dis_${mod}_${ice}" "$disabled_text" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
@@ -1595,7 +1595,7 @@ function -zcrasis_set_zui_palette() {
         reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
         [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
 
-        [[ "${ZUI[my_compact_mode]}" = 1 ]] && reply[short_idx+1,-1]=()
+        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[short_idx+1,-1]=()
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
         #
         # 7. Url, edited in edit-mode
@@ -1635,17 +1635,17 @@ function -zcrasis_set_zui_palette() {
         reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
         [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
 
-        [[ "${ZUI[my_compact_mode]}" = 1 ]] && reply[short_idx+1,-1]=()
+        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[short_idx+1,-1]=()
     elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdreplay" )
         reply+=( "${output[4]:-    }${output[3]}" )
 
-        [[ "${ZUI[my_compact_mode]}" = 1 ]] && reply[-1]=()
+        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[-1]=()
     elif [[ "${main_cmd[sub]}" = "cdclear" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdclear" )
         reply+=( "${output[4]:-    }${output[3]}" )
 
-        [[ "${ZUI[my_compact_mode]}" = 1 ]] && reply[-1]=()
+        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[-1]=()
     else
         # Custom command
         local -a keys
@@ -1660,7 +1660,7 @@ function -zcrasis_set_zui_palette() {
         reply+=( "$num ${output[1]} ${output[2]} $text" )
         reply+=( "${output[4]:-    }${output[3]}" )
 
-        [[ "${ZUI[my_compact_mode]}" = 1 ]] && reply[-1]=()
+        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[-1]=()
     fi
 
     # Instead of debugging ZUI, I've added '-1' here
@@ -1669,6 +1669,9 @@ function -zcrasis_set_zui_palette() {
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( move_up_${mod}_${ice} move_down_${mod}_${ice} )
+
+    # Module's spacing, the blank lines at top
+    [[ "${ZUI[my_compact_mode]}" != "2" || "$ice" -eq 1 ]] && reply5="1" || reply5="0"
 }
 # }}}
 # FUNCTION: -zcrasis_generator_B {{{
