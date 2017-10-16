@@ -1559,9 +1559,9 @@ function -zcrasis_set_zui_palette() {
 
         if [[ "${ZUI[my_edit_mode]}" = 1 ]]; then
             # Variables of the text field
-            (( ${+ZUI[my_tfield2_${ice}_width]} == 0 )) && ZUI[my_tfield2_${ice}_width]=$(( ${#main_cmd[url]} + 10 < 30 ? 30 : ${#main_cmd[url]} + 10 ))
+            (( ${+ZUI[my_tfield2_${ice}_width]} == 0 )) && ZUI[my_tfield2_${ice}_width]=80
             (( ${+ZUI[my_tfield2_${ice}_start]} == 0 )) && ZUI[my_tfield2_${ice}_start]=1
-            (( ${+ZUI[my_tfield2_${ice}_data]} == 0 )) && ZUI[my_tfield2_${ice}_data]="${main_cmd[url]}"
+            ZUI[my_tfield2_${ice}_data]="${main_cmd[url]}"
 
             noglob -zui_std_text_field "tfield2_${mod}_${ice}" ZUI[my_tfield2_${ice}_width] ZUI[my_tfield2_${ice}_start] ZUI[my_tfield2_${ice}_data] "" "" "" '-zcrasis_update_main_cmd url "${ZUI[my_tfield2_'${ice}'_data]}" '$ice output
         else
@@ -1603,9 +1603,9 @@ function -zcrasis_set_zui_palette() {
 
         if [[ "${ZUI[my_edit_mode]}" = 1 ]]; then
             # Variables of the text field
-            (( ${+ZUI[my_tfield2_${ice}_width]} == 0 )) && ZUI[my_tfield2_${ice}_width]=30
+            (( ${+ZUI[my_tfield2_${ice}_width]} == 0 )) && ZUI[my_tfield2_${ice}_width]=35
             (( ${+ZUI[my_tfield2_${ice}_start]} == 0 )) && ZUI[my_tfield2_${ice}_start]=1
-            (( ${+ZUI[my_tfield2_${ice}_data]} == 0 )) && ZUI[my_tfield2_${ice}_data]="${main_cmd[url]}"
+            ZUI[my_tfield2_${ice}_data]="${main_cmd[url]}"
 
             noglob -zui_std_text_field "tfield2_${mod}_${ice}" ZUI[my_tfield2_${ice}_width] ZUI[my_tfield2_${ice}_start] ZUI[my_tfield2_${ice}_data] "" "" "" '-zcrasis_update_main_cmd url "${ZUI[my_tfield2_'${ice}'_data]}" '$ice output
         else
