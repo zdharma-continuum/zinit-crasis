@@ -864,19 +864,19 @@ function -zcrasis_set_zui_palette() {
 -zcrasis_action_preview() {
     -zui_std_set_mod_factor 4 0
     -zui_std_set_mod_factor 5 0
-    ZUI[in_debug]=0
-    ZUI[in_options]=0
-    if [[ "${ZUI[in_preview]}" != 1 ]]; then
+    ZUI[my_in_debug]=0
+    ZUI[my_in_options]=0
+    if [[ "${ZUI[my_in_preview]}" != 1 ]]; then
         -zui_std_set_mod_factor 2 0
         -zui_std_set_mod_factor 3 1
-        ZUI[in_preview]=1
+        ZUI[my_in_preview]=1
     else
         -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
         -zui_std_set_mod_factor 3 0
-        ZUI[in_preview]=0
+        ZUI[my_in_preview]=0
     fi
 
-    if [[ "${ZUI[in_preview]}" = "0" && "${ZUI[my_rerender]}" = "1" ]]; then
+    if [[ "${ZUI[my_in_preview]}" = "0" && "${ZUI[my_rerender]}" = "1" ]]; then
         ZUI[my_rerender]=0
         # Regenerate all modules with active instances - it will be mod1 and mod2
         reply=( ",all," "" )
@@ -893,19 +893,19 @@ function -zcrasis_set_zui_palette() {
 -zcrasis_action_options_view() {
     -zui_std_set_mod_factor 3 0
     -zui_std_set_mod_factor 4 0
-    ZUI[in_debug]=0
-    ZUI[in_preview]=0
-    if [[ "${ZUI[in_options]}" != 1 ]]; then
+    ZUI[my_in_debug]=0
+    ZUI[my_in_preview]=0
+    if [[ "${ZUI[my_in_options]}" != 1 ]]; then
         -zui_std_set_mod_factor 2 0 # plugin list
         -zui_std_set_mod_factor 5 1 # options
-        ZUI[in_options]=1
+        ZUI[my_in_options]=1
     else
         -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
         -zui_std_set_mod_factor 5 0
-        ZUI[in_options]=0
+        ZUI[my_in_options]=0
     fi
 
-    if [[ "${ZUI[in_preview]}" = "0" && "${ZUI[my_rerender]}" = "1" ]]; then
+    if [[ "${ZUI[my_in_preview]}" = "0" && "${ZUI[my_rerender]}" = "1" ]]; then
         ZUI[my_rerender]=0
         # Regenerate all modules with active instances - it will be mod1 and mod2
         reply=( ",all," "" )
@@ -924,13 +924,13 @@ function -zcrasis_set_zui_palette() {
 -zcrasis_action_debug_view() {
     -zui_std_set_mod_factor 3 0
     -zui_std_set_mod_factor 5 0
-    ZUI[in_preview]=0
-    ZUI[in_options]=0
+    ZUI[my_in_preview]=0
+    ZUI[my_in_options]=0
 
-    if [[ "${ZUI[in_debug]}" != 1 ]]; then
+    if [[ "${ZUI[my_in_debug]}" != 1 ]]; then
         -zui_std_set_mod_factor 2 0
         -zui_std_set_mod_factor 4 1
-        ZUI[in_debug]=1
+        ZUI[my_in_debug]=1
 
         ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCSIZE>/$(( ${#zshrc} - 5 ))}" )
         local -a lines
@@ -947,10 +947,10 @@ function -zcrasis_set_zui_palette() {
     else
         -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
         -zui_std_set_mod_factor 4 0
-        ZUI[in_debug]=0
+        ZUI[my_in_debug]=0
     fi
 
-    if [[ "${ZUI[in_preview]}" = "0" && "${ZUI[my_rerender]}" = "1" ]]; then
+    if [[ "${ZUI[my_in_preview]}" = "0" && "${ZUI[my_rerender]}" = "1" ]]; then
         ZUI[my_rerender]=0
         # Regenerate all modules with active instances - it will be mod1 and mod2
         reply=( ",all," "" )
@@ -1318,13 +1318,13 @@ function -zcrasis_set_zui_palette() {
     local act_fg_bg="$theme[menu-active-button-fg]$theme[menu-active-button-bg]"
     local act_fg_bg2="$theme[menu2-active-button-fg]$theme[menu2-active-button-bg]"
 
-    -zui_util_map_bools '[[ ${ZUI[in_preview]} = 1 ]]' pv_col \
+    -zui_util_map_bools '[[ ${ZUI[my_in_preview]} = 1 ]]' pv_col \
                                                 "$act_fg_bg" \
                                                 "$theme[preview]$theme[menu-bg]"
-    -zui_util_map_bools '[[ ${ZUI[in_options]} = 1 ]]' op_col \
+    -zui_util_map_bools '[[ ${ZUI[my_in_options]} = 1 ]]' op_col \
                                                 "$act_fg_bg" \
                                                 "$theme[options]$theme[menu-bg]"
-    -zui_util_map_bools '[[ ${ZUI[in_debug]} = 1 ]]' dg_col \
+    -zui_util_map_bools '[[ ${ZUI[my_in_debug]} = 1 ]]' dg_col \
                                                 "$act_fg_bg" \
                                                 "$theme[debug]$theme[menu-bg]"
     -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col \
@@ -1349,7 +1349,7 @@ function -zcrasis_set_zui_palette() {
     -zui_std_button "options" "${op_col}$theme[options-text]${op_col:+${ZUI[FMT_END]}}" -zcrasis_action_options_view
     -zui_std_button "debug" "${dg_col}$theme[debug-text]${dg_col:+${ZUI[FMT_END]}}" -zcrasis_action_debug_view
 
-    (( ${ZUI[in_preview]} + ZUI[in_debug] + ZUI[in_options] == 0 )) && {
+    (( ${ZUI[my_in_preview]} + ZUI[my_in_debug] + ZUI[my_in_options] == 0 )) && {
         # Variables of the text field
         (( ${+ZUI[my_tfield3_width]} == 0 )) && ZUI[my_tfield3_width]=${theme[new-id-url-width]}
         (( ${+ZUI[my_tfield3_start]} == 0 )) && ZUI[my_tfield3_start]=1
@@ -1781,8 +1781,9 @@ function -zcrasis_set_zui_palette() {
 
     [[ -n "$id" ]] && { -zcrasis_dbg_msg "[Reload] pressed"; -zcrasis_dbg_msg ""; }
 
-    [[ "${ZUI[in_preview]}" = 1 ]] && ZUI[in_preview]=0
-    [[ "${ZUI[in_debug]}" = 1 ]] && ZUI[in_debug]=0
+    [[ "${ZUI[my_in_preview]}" = 1 ]] && ZUI[my_in_preview]=0
+    [[ "${ZUI[my_in_debug]}" = 1 ]] && ZUI[my_in_debug]=0
+    [[ "${ZUI[my_in_options]}" = 1 ]] && ZUI[my_in_options]=0
 
     typeset -F 2 SECONDS=0
     -zcrasis-tokenize-zsh-rc
