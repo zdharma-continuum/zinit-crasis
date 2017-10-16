@@ -993,10 +993,10 @@ function -zcrasis_set_zui_palette() {
 # to each plugin, snippet, external command, etc. (main
 # view).
 -zcrasis_action_delete_mode() {
-    if [[ -n "${ZUI[zc_delete_mode]}" ]]; then
-        (( ZUI[zc_delete_mode] = 1 - ZUI[zc_delete_mode] ))
+    if [[ -n "${ZUI[my_delete_mode]}" ]]; then
+        (( ZUI[my_delete_mode] = 1 - ZUI[my_delete_mode] ))
     else
-        ZUI[zc_delete_mode]=1
+        ZUI[my_delete_mode]=1
     fi
 
     -zcrasis_refresh2_all_string
@@ -1008,10 +1008,10 @@ function -zcrasis_set_zui_palette() {
 # Enables ability to edit entries - strings with plugin name,
 # snippet url, etc. turn into text fields for manual editing.
 -zcrasis_action_edit_mode() {
-    if [[ -n "${ZUI[zc_edit_mode]}" ]]; then
-        (( ZUI[zc_edit_mode] = 1 - ZUI[zc_edit_mode] ))
+    if [[ -n "${ZUI[my_edit_mode]}" ]]; then
+        (( ZUI[my_edit_mode] = 1 - ZUI[my_edit_mode] ))
     else
-        ZUI[zc_edit_mode]=1
+        ZUI[my_edit_mode]=1
     fi
 
     -zcrasis_refresh2_all_string
@@ -1022,10 +1022,10 @@ function -zcrasis_set_zui_palette() {
 # Switches the entry list to compact-mode. In this mode,
 # only a single line per plugin/snippet/etc. is displayed.
 -zcrasis_action_compact_mode() {
-    if [[ -n "${ZUI[zc_compact_mode]}" ]]; then
-        (( ZUI[zc_compact_mode] = 1 - ZUI[zc_compact_mode] ))
+    if [[ -n "${ZUI[my_compact_mode]}" ]]; then
+        (( ZUI[my_compact_mode] = 1 - ZUI[my_compact_mode] ))
     else
-        ZUI[zc_compact_mode]=1
+        ZUI[my_compact_mode]=1
     fi
 
     -zcrasis_refresh2_all_string
@@ -1327,13 +1327,13 @@ function -zcrasis_set_zui_palette() {
     -zui_util_map_bools '[[ ${ZUI[my_in_debug]} = 1 ]]' dg_col \
                                                 "$act_fg_bg" \
                                                 "$theme[debug]$theme[menu-bg]"
-    -zui_util_map_bools '[[ "${ZUI[zc_delete_mode]}" = "1" ]]' dl_col \
+    -zui_util_map_bools '[[ "${ZUI[my_delete_mode]}" = "1" ]]' dl_col \
                                                 "$act_fg_bg2" \
                                                 "$theme[delete-mode]$theme[menu2-bg]"
-    -zui_util_map_bools '[[ "${ZUI[zc_edit_mode]}" = "1" ]]' ed_col \
+    -zui_util_map_bools '[[ "${ZUI[my_edit_mode]}" = "1" ]]' ed_col \
                                                 "$act_fg_bg2" \
                                                 "$theme[edit-mode]$theme[menu2-bg]"
-    -zui_util_map_bools '[[ "${ZUI[zc_compact_mode]}" = "1" ]]' co_col \
+    -zui_util_map_bools '[[ "${ZUI[my_compact_mode]}" = "1" ]]' co_col \
                                                 "$act_fg_bg2" \
                                                 "$theme[compact-mode]$theme[menu2-bg]"
 
@@ -1468,15 +1468,15 @@ function -zcrasis_set_zui_palette() {
 
     [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || -zcrasis_update_main_cmd disabled "${ZUI[toggle_dis_${mod}_${ice}]}" "$ice"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "$disabled" "$enabled"
-    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "smarker_text" "$theme[s-marker-disabled-text-c]" "$theme[s-marker-text-c]"
-    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[zc_compact_mode]}\" = 1 ]]" "pmarker_text" "$theme[p-marker-disabled-text-c]" "$theme[p-marker-text-c]"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[my_compact_mode]}\" = 1 ]]" "smarker_text" "$theme[s-marker-disabled-text-c]" "$theme[s-marker-text-c]"
+    -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[my_compact_mode]}\" = 1 ]]" "pmarker_text" "$theme[p-marker-disabled-text-c]" "$theme[p-marker-text-c]"
 
     # 3.
     -zui_std_button "toggle_dis_${mod}_${ice}" "$disabled_text" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
     # 4. Delete
     -zui_std_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "$theme[delete-text-c]" -zcrasis_action_delete output
-    if (( ZUI[zc_delete_mode] )); then
+    if (( ZUI[my_delete_mode] )); then
         output[4]+=" "
     else
         output[4]=""
@@ -1557,7 +1557,7 @@ function -zcrasis_set_zui_palette() {
         # 7. Url, edited in edit-mode
         #
 
-        if [[ "${ZUI[zc_edit_mode]}" = 1 ]]; then
+        if [[ "${ZUI[my_edit_mode]}" = 1 ]]; then
             # Variables of the text field
             (( ${+ZUI[my_tfield2_${ice}_width]} == 0 )) && ZUI[my_tfield2_${ice}_width]=$(( ${#main_cmd[url]} + 10 < 30 ? 30 : ${#main_cmd[url]} + 10 ))
             (( ${+ZUI[my_tfield2_${ice}_start]} == 0 )) && ZUI[my_tfield2_${ice}_start]=1
@@ -1595,13 +1595,13 @@ function -zcrasis_set_zui_palette() {
         reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
         [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
 
-        [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[short_idx+1,-1]=()
+        [[ "${ZUI[my_compact_mode]}" = 1 ]] && reply[short_idx+1,-1]=()
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
         #
         # 7. Url, edited in edit-mode
         #
 
-        if [[ "${ZUI[zc_edit_mode]}" = 1 ]]; then
+        if [[ "${ZUI[my_edit_mode]}" = 1 ]]; then
             # Variables of the text field
             (( ${+ZUI[my_tfield2_${ice}_width]} == 0 )) && ZUI[my_tfield2_${ice}_width]=30
             (( ${+ZUI[my_tfield2_${ice}_start]} == 0 )) && ZUI[my_tfield2_${ice}_start]=1
@@ -1635,17 +1635,17 @@ function -zcrasis_set_zui_palette() {
         reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
         [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
 
-        [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[short_idx+1,-1]=()
+        [[ "${ZUI[my_compact_mode]}" = 1 ]] && reply[short_idx+1,-1]=()
     elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdreplay" )
         reply+=( "${output[4]:-    }${output[3]}" )
 
-        [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[-1]=()
+        [[ "${ZUI[my_compact_mode]}" = 1 ]] && reply[-1]=()
     elif [[ "${main_cmd[sub]}" = "cdclear" ]]; then
         reply+=( "$num ${output[1]} ${output[2]} cdclear" )
         reply+=( "${output[4]:-    }${output[3]}" )
 
-        [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[-1]=()
+        [[ "${ZUI[my_compact_mode]}" = 1 ]] && reply[-1]=()
     else
         # Custom command
         local -a keys
@@ -1660,7 +1660,7 @@ function -zcrasis_set_zui_palette() {
         reply+=( "$num ${output[1]} ${output[2]} $text" )
         reply+=( "${output[4]:-    }${output[3]}" )
 
-        [[ "${ZUI[zc_compact_mode]}" = 1 ]] && reply[-1]=()
+        [[ "${ZUI[my_compact_mode]}" = 1 ]] && reply[-1]=()
     fi
 
     # Instead of debugging ZUI, I've added '-1' here
