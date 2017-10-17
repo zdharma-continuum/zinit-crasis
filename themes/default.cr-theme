@@ -79,6 +79,8 @@ my_crasis_theme_data=(
     p-compile-text      "Compile"
 
     # Ice enumeration in snippet and plugin items
+    i-indent            ""
+    i-indent-text       "    "
     #                   proto  from   depth  if     blockf atclo. atload atpull
     i-id                yellow:yellow:yellow:yellow:yellow:yellow:yellow:yellow
     i-blockf-text       "[%s]",blockf

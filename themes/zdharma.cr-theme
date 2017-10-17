@@ -79,7 +79,9 @@ my_crasis_theme_data=(
     p-compile-text      "compile"
 
     # Ice enumeration in snippet and plugin items
-    #                   proto  from   depth  if     blockf atclo. atload atpull
+    i-indent            ""
+    i-indent-text       "        "
+    #                   proto   from    depth   if      blockf  atclone atload  atpull
     i-id                magenta:magenta:magenta:magenta:magenta:magenta:magenta:magenta
     i-blockf-text       "[%s]",blockf
 
