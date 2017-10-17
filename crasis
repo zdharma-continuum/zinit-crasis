@@ -1385,7 +1385,10 @@ function -zcrasis_set_zui_palette() {
         -zui_std_button "plugin" "$theme[add-plugin-text-c]" -zcrasis_action_add_plugin optional
 
         # 5. - 7.
-        (( ZUI[my_compact_mode] > 0 )) && local cm_index="${ZUI[my_compact_mode]} "
+        (( ZUI[my_compact_mode] > 0 )) && {
+            local cm_index="${ZUI[my_compact_mode]}"
+            [[ "${${theme[compact-mode-text]}[-1]}" = " " ]] && cm_index+=" " || cm_index=" $cm_index"
+        }
         -zui_std_button "delete_mode" "${dl_col}$theme[delete-mode-text]${dl_col:+${ZUI[FMT_END]}}" -zcrasis_action_delete_mode optional
         -zui_std_button "edit_mode" "${ed_col}$theme[edit-mode-text]${ed_col:+${ZUI[FMT_END]}}" -zcrasis_action_edit_mode optional
         -zui_std_button "compact_mode" "${co_col}$theme[compact-mode-text]$cm_index${co_col:+${ZUI[FMT_END]}}" -zcrasis_action_compact_mode optional
