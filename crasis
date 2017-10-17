@@ -371,13 +371,22 @@ function -zcrasis_process_theme() {
 # If theme provides palette-string, it is
 # applied to ZUI settings of this application
 function -zcrasis_set_zui_palette() {
-    [[ -z "$theme[palette-string]" ]] && return
-    autoload is-at-least
-    if [[ "$theme[palette-string]" = *[[:digit:]]* ]] && ! is-at-least 5.3; then
-        -zui_std_stalog "256-color palette needs " "Zsh >= 5.3, " "" "it hasn't been applied"
-        return
-    fi
-    ZUI[palette]="$theme[palette-string]"
+    [[ -n "$theme[palette-string]" ]] && {
+        autoload is-at-least
+        if [[ "$theme[palette-string]" = *[[:digit:]]* ]] && ! is-at-least 5.3; then
+            -zui_std_stalog "256-color palette needs " "Zsh >= 5.3, " "" "it hasn't been applied"
+        else
+            ZUI[palette]="$theme[palette-string]"
+        fi
+    }
+    [[ -n "$theme[logs-palette-string]" ]] && {
+        autoload is-at-least
+        if [[ "$theme[logs-palette-string]" = *[[:digit:]]* ]] && ! is-at-least 5.3; then
+            -zui_std_stalog "256-color logs palette needs " "Zsh >= 5.3, " "" "it hasn't been applied"
+        else
+            ZUI[log_colors]="${theme[logs-palette-string]//:/ }"
+        fi
+    }
 }
 # }}}
 # FUNCTION: -zcrasis_switch_theme {{{
@@ -1860,7 +1869,7 @@ ZUI[reset_current_segment]="no"
 ## Start application ##
 zui-event-loop 1:-zcrasis_generator_0 $(( ${#cmdlist} / 3 )):-zcrasis_generator_A \
                0:-zcrasis_generator_B 0:-zcrasis_generator_DBG 0:-zcrasis_generator_OPT \
-               cfg-refresh:palette
+               cfg-refresh:palette,log_colors
 
 -zui_std_cleanup serialize
 
