@@ -1479,7 +1479,8 @@ function -zcrasis_set_zui_palette() {
     -zui_std_button "toggle_dis_${mod}_${ice}" "$disabled_text" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
     # 4. Delete
-    -zui_std_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "$theme[delete-text-c]" -zcrasis_action_delete output
+    (( theme[delete-unicode-bool] )) && local delete="$theme[delete-unicode-c]" || local delete="$theme[delete-text-c]"
+    -zui_std_button_ext "delete_${mod}_${ice}" "$mod" "$ice" "" "" "$delete" -zcrasis_action_delete output
     if (( ZUI[my_delete_mode] )); then
         output[4]+=" "
     else
