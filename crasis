@@ -174,6 +174,8 @@ thcol_entries=(
     s-url s-marker s-marker-disabled s-as-command s-force
     # Plugin item
     p-id p-marker p-marker-disabled p-compile
+    # Ice listing
+    i-indent
     # Options view
     o-theme-box o-switch o-save
     # Debug view
@@ -197,7 +199,7 @@ thtxt_entries=(
     # Plugin item
     p-marker-text p-marker-disabled-text p-compile-text
     # Ice listing
-    i-blockf-text
+    i-indent-text i-blockf-text
     # Options view
     o-switch-text o-save-text
     # Debug view
@@ -1534,7 +1536,7 @@ function -zcrasis_set_zui_palette() {
     integer index=0
     # Something more than [c]=zplugin [sub]=ice [comment]=comment
     (( ${#ice_cmd} > 2 && ${+ice_cmd[comment]} == 0 || ${#ice_cmd} > 3 && ${+ice_cmd[comment]} == 1 )) && {
-        ioutput=( "  " )
+        ioutput=( "${theme[i-indent-text-c]-    }" )
         for t in "${ice_order[@]}"; do
             index+=1
             case "$t" in
@@ -1545,12 +1547,12 @@ function -zcrasis_set_zui_palette() {
                     (( ${+ZUI[my_tfield4_${ice}_${t}_start]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_start]=1
                     (( ${+ZUI[my_tfield4_${ice}_${t}_data]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_data]="${ice_cmd[$t]}"
 
-                    [[ -n "$theme[i-id-${index}]" ]] && ioutput+=( " $theme[i-id-${index}]$t${ZUI[FMT_END]}:" ) || ioutput+=( " $t" )
+                    [[ -n "$theme[i-id-${index}]" ]] && ioutput+=( "$theme[i-id-${index}]$t${ZUI[FMT_END]}:" ) || ioutput+=( "$t" )
                     noglob -zui_std_text_field "tfield4_${mod}_${ice}_${t}" ZUI[my_tfield4_${ice}_${t}_width] ZUI[my_tfield4_${ice}_${t}_start] ZUI[my_tfield4_${ice}_${t}_data] "" "" "" '-zcrasis_update_ice_cmd '$t' "${ZUI[my_tfield4_'${ice}'_'$t'_data]}" '$ice ioutput
                     ;;
                 (blockf)
                     (( ${+ice_cmd[$t]} == 0 )) && continue
-                    ioutput+=( " $theme[i-blockf-text-c]" )
+                    ioutput+=( "$theme[i-blockf-text-c]" )
                     ;;
             esac
         done
@@ -1598,7 +1600,7 @@ function -zcrasis_set_zui_palette() {
         reply+=( "$num ${output[1]} ${output[2]} $smarker_text ${output[7]}" )
         short_idx=${#reply}
         reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
-        [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
+        [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[1]}${(j: :)ioutput[2,-1]}" )
 
         [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[short_idx+1,-1]=()
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
@@ -1638,7 +1640,7 @@ function -zcrasis_set_zui_palette() {
         reply+=( "$num ${output[1]} ${output[2]} $pmarker_text ${output[7]}" )
         short_idx=${#reply}
         reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
-        [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[*]}" )
+        [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[1]}${(j: :)ioutput[2,-1]}" )
 
         [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[short_idx+1,-1]=()
     elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
