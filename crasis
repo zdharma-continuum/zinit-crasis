@@ -387,6 +387,14 @@ function -zcrasis_set_zui_palette() {
             ZUI[log_colors]="${theme[logs-palette-string]//:/ }"
         fi
     }
+    [[ -n "$theme[colorpair-string]" ]] && {
+        autoload is-at-least
+        if [[ "$theme[colorpair-string]" = *[[:digit:]]* ]] && ! is-at-least 5.3; then
+            -zui_std_stalog "256-colors need " "Zsh >= 5.3, " "" "color was skipped"
+        else
+            ZUI[colorpair]="${theme[colorpair-string]//:/ }"
+        fi
+    }
 }
 # }}}
 # FUNCTION: -zcrasis_switch_theme {{{
@@ -1872,7 +1880,7 @@ ZUI[reset_current_segment]="no"
 ## Start application ##
 zui-event-loop 1:-zcrasis_generator_0 $(( ${#cmdlist} / 3 )):-zcrasis_generator_A \
                0:-zcrasis_generator_B 0:-zcrasis_generator_DBG 0:-zcrasis_generator_OPT \
-               cfg-refresh:palette,log_colors
+               cfg-refresh:palette,log_colors,colorpair
 
 -zui_std_cleanup serialize
 
