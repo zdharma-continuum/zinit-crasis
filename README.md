@@ -12,7 +12,7 @@ This way `Crasis` lets you edit your `Zplugin` commands located in `.zshrc`. All
 No more commenting-out a line with a text editor to disable plugin, cluttering `.zshrc`,
 now you can just **press a button**. `Crasis` is not fully, but nearly complete:
 
-[![asciicast](https://asciinema.org/a/142687.png)](https://asciinema.org/a/142687)
+[![asciicast](https://asciinema.org/a/142702.png)](https://asciinema.org/a/142702)
 
 `Crasis` uses [ZUI](http://github.com/zdharma/zui/) library to create `ncurses` interface.
 
