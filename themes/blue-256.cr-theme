@@ -99,7 +99,7 @@ my_crasis_theme_data=(
 
     # ZUI settings
     # original palette:     black:red:gr:yel:blu:mag:cyan:white
-    palette-string          "black:124:185:72:24:38:187:208"
+    palette-string          "black:124:185:72:24:74:187:208"
     # original palette:     white cyan yellow green cyan red magenta yellow blue
     logs-palette-string     "white:208:151:152:180:red:magenta:142:180"
     colorpair-string        "white/16"
