@@ -98,5 +98,6 @@ my_crasis_theme_data=(
     d-save-text             " Save "
 
     # Change default palette used by ZUI
+    # original palette:    black:red:gree:yel:bl:magenta:cyan:white
     palette-string          "black:red:51:146:61:164:cyan:white"
 )
