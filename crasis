@@ -26,6 +26,8 @@ local -a ZCR_DEBUG_MSGS
 # Append multiple messages to the debug view
 -zcrasis_dbg_msg_arr() { ZCR_DEBUG_MSGS+=( "$@" ); }
 
+ZUI[log_time_format]="[%H:%M] "
+
 # Initial debug message
 -zcrasis_dbg_msg "ZSH version: $ZSH_VERSION ($ZSH_PATCHLEVEL), machine: $CPUTYPE $VENDOR $OSTYPE, LANG: $LANG"
 if [[ ${+ZPLGM} = 1 ]]; then
@@ -363,6 +365,7 @@ function -zcrasis_process_theme() {
     chosen_plugins[1]="$theme[gold-list-info-text]"
 
     -zcrasis_dbg_msg_arr "Theme processing time: $SECONDS seconds" ""
+    -zui_std_stalog "Loaded theme \`$CRASIS_THEME'"
 
     return 0
 }
@@ -1880,7 +1883,7 @@ ZUI[reset_current_segment]="no"
 ## Start application ##
 zui-event-loop 1:-zcrasis_generator_0 $(( ${#cmdlist} / 3 )):-zcrasis_generator_A \
                0:-zcrasis_generator_B 0:-zcrasis_generator_DBG 0:-zcrasis_generator_OPT \
-               cfg-refresh:palette,log_colors,colorpair
+               cfg-refresh:palette,log_colors,colorpair,log_time_format
 
 -zui_std_cleanup serialize
 
