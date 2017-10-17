@@ -1498,8 +1498,8 @@ function -zcrasis_set_zui_palette() {
     toadd=( ${(@)ice_order:|existing} )
 
     # Variables of the list box
-    (( ${+ZUI[my_lbox2_${mod}_${ice}_width]} == 0 )) && ZUI[my_lbox2_${mod}_${ice}_width]=${#t}
-    (( ${+ZUI[my_lbox2_${mod}_${ice}_idx]} == 0 )) && ZUI[my_lbox2_${mod}_${ice}_idx]=1
+    ZUI[my_lbox2_${mod}_${ice}_width]=${#t}
+    ZUI[my_lbox2_${mod}_${ice}_idx]=1
     ZUI[my_lbox2_${mod}_${ice}_opts]="$t;${(j:;:)toadd}"
 
     (( ${#toadd} )) && noglob -zui_std_list_box "lbox2_${mod}_${ice}" ZUI[my_lbox2_${mod}_${ice}_width] ZUI[my_lbox2_${mod}_${ice}_idx] ZUI[my_lbox2_${mod}_${ice}_opts] "" "" "" '-zui_std_fly_mod_regen '$mod' '$ice' newice-"${${(s:;:)ZUI[my_lbox2_'${mod}'_'${ice}'_opts]}[${ZUI[my_lbox2_'${mod}'_'${ice}'_idx]}]}"; ZUI[my_lbox2_'${mod}'_'${ice}'_idx]=1;' output || output+=( "" )
@@ -1514,8 +1514,8 @@ function -zcrasis_set_zui_palette() {
     toremove=( ${(@)ice_order:*existing} )
 
     # Variables of the list box
-    (( ${+ZUI[my_lbox3_${mod}_${ice}_width]} == 0 )) && ZUI[my_lbox3_${mod}_${ice}_width]=${#t}
-    (( ${+ZUI[my_lbox3_${mod}_${ice}_idx]} == 0 )) && ZUI[my_lbox3_${mod}_${ice}_idx]=1
+    ZUI[my_lbox3_${mod}_${ice}_width]=${#t}
+    ZUI[my_lbox3_${mod}_${ice}_idx]=1
     ZUI[my_lbox3_${mod}_${ice}_opts]="$t;${(j:;:)toremove}"
 
     (( ${#toremove} )) && noglob -zui_std_list_box "lbox3_${mod}_${ice}" ZUI[my_lbox3_${mod}_${ice}_width] ZUI[my_lbox3_${mod}_${ice}_idx] ZUI[my_lbox3_${mod}_${ice}_opts] "" "" "" '-zui_std_fly_mod_regen '$mod' '$ice' delice-"${${(s:;:)ZUI[my_lbox3_'${mod}'_'${ice}'_opts]}[${ZUI[my_lbox3_'${mod}'_'${ice}'_idx]}]}"; ZUI[my_lbox3_'${mod}'_'${ice}'_idx]=1;' output || output+=( "" )
