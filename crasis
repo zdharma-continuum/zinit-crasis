@@ -370,10 +370,10 @@ function -zcrasis_process_theme() {
     return 0
 }
 # }}}
-# FUNCTION: -zcrasis_set_zui_palette {{{
+# FUNCTION: -zcrasis_set_zui_settings {{{
 # If theme provides palette-string, it is
 # applied to ZUI settings of this application
-function -zcrasis_set_zui_palette() {
+function -zcrasis_set_zui_settings() {
     [[ -n "$theme[palette-string]" ]] && {
         autoload is-at-least
         if [[ "$theme[palette-string]" = *[[:digit:]]* ]] && ! is-at-least 5.3; then
@@ -395,7 +395,15 @@ function -zcrasis_set_zui_palette() {
         if [[ "$theme[colorpair-string]" = *[[:digit:]]* ]] && ! is-at-least 5.3; then
             -zui_std_stalog "256-colors need " "Zsh >= 5.3, " "" "color was skipped"
         else
-            ZUI[colorpair]="${theme[colorpair-string]//:/ }"
+            ZUI[colorpair]="${theme[colorpair-string]}"
+        fi
+    }
+    [[ -n "$theme[status-cp-string]" ]] && {
+        autoload is-at-least
+        if [[ "$theme[status-cp-string]" = *[[:digit:]]* ]] && ! is-at-least 5.3; then
+            -zui_std_stalog "256-colors need " "Zsh >= 5.3, " "" "color was skipped"
+        else
+            ZUI[status_colorpair]="${theme[status-cp-string]}"
         fi
     }
 }
@@ -409,7 +417,7 @@ function -zcrasis_set_zui_palette() {
     -zui_std_strip_color_codes "$1"
     CRASIS_THEME="$REPLY"
     -zcrasis_process_theme
-    -zcrasis_set_zui_palette
+    -zcrasis_set_zui_settings
 }
 # }}}
 # FUNCTION: -zcrasis_action_save_options {{{
@@ -426,7 +434,7 @@ function -zcrasis_set_zui_palette() {
 # }}}
 
 -zcrasis_process_theme || return 1
--zcrasis_set_zui_palette
+-zcrasis_set_zui_settings
 
 # FUNCTION: -zcrasis-tokenize-zsh-rc {{{
 # Runs -zcrasis-process-buffer() on $zshrc (containing the loaded
@@ -1883,7 +1891,7 @@ ZUI[reset_current_segment]="no"
 ## Start application ##
 zui-event-loop 1:-zcrasis_generator_0 $(( ${#cmdlist} / 3 )):-zcrasis_generator_A \
                0:-zcrasis_generator_B 0:-zcrasis_generator_DBG 0:-zcrasis_generator_OPT \
-               cfg-refresh:palette,log_colors,colorpair,log_time_format
+               cfg-refresh:palette,log_colors,colorpair,status_colorpair,log_time_format
 
 -zui_std_cleanup serialize
 
