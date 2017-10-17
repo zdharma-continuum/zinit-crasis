@@ -320,9 +320,9 @@ function -zcrasis_process_theme() {
         else
             cval="${theme[${tkey%(-text|-unicode)}]}"
             if [[ -n "$cval" ]]; then
-                theme[${tkey}-c]="${cval}$tval${ZUI[FMT_END]}"
+                [[ -n "$tval" ]] && theme[${tkey}-c]="${cval}$tval${ZUI[FMT_END]}"
             else
-                theme[${tkey}-c]="$tval"
+                [[ -n "$tval" ]] && theme[${tkey}-c]="$tval"
             fi
         fi
     done
