@@ -105,4 +105,5 @@ my_crasis_theme_data=(
     # original palette:     white cyan yellow green cyan red magenta yellow blue
     logs-palette-string     "146:164:146:147:135:red:magenta:153:blue"
     colorpair-string        "white/black"
+    status-cp-string        "white/black"
 )
