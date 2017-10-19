@@ -75,7 +75,7 @@ my_crasis_theme_data=(
     p-marker-text           "PL"
     p-marker-disabled       red
     p-marker-disabled-text  "PL"
-    p-mode                  bblue:yellow
+    p-mode                  yellow:bblue
     p-mode-text             "[%s]",light\;"[%s]",normal
     p-compile               yellow
     p-compile-text          "compile"
