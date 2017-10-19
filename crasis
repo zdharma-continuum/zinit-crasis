@@ -775,11 +775,13 @@ function -zcrasis_set_zui_settings() {
                     cmd3[url]="$token"
                 fi
             elif [[ "${cmd3[sub]}" = "snippet" ]]; then
-                [[ "$token" = "-f" ]] && cmd3[-f]="1" || {
-                    [[ "$token" = "--command" ]] && cmd3[--command]="1" || {
-                        cmd3[url]="$token"
-                    }
-                }
+                if [[ "$token" = "-f" ]]; then
+                    cmd3[-f]="1"
+                elif [[ "$token" = "--command" ]]; then
+                    cmd3[--command]="1"
+                elif [[ "${TOKEN_TYPES[$token]}" != [34] ]]; then
+                    cmd3[url]="$token"
+                fi
             elif [[ "${cmd3[sub]}" = "cdclear" ]]; then
                 [[ "$token" = "-q" ]] && cmd3[-q]="1"
             elif [[ "${cmd3[sub]}" = "cdreplay" ]]; then
@@ -1135,6 +1137,10 @@ function -zcrasis_set_zui_settings() {
                         buf+=" $tmp${(qqq)ice_cmd[$tmp]}"
                         ;;
                     (blockf)
+                        (( ${+ice_cmd[$tmp]} == 0 )) && continue
+                        buf+=" $tmp"
+                        ;;
+                    (svn)
                         (( ${+ice_cmd[$tmp]} == 0 )) && continue
                         buf+=" $tmp"
                         ;;
