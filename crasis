@@ -642,7 +642,9 @@ function -zcrasis_set_zui_settings() {
     # If zplugin command ended the zshrc, detect it here
     (( in_zplugin )) && post_block_begin=2*i-1
 
-    if (( pre_block_end != 0 )); then
+    if (( pre_block_end == 0 )); then
+        (( post_block_begin == 0 )) && pre_block_end=2*(i-1)
+    else
         j=0+(pre_block_end/2)
 
         # Soft command-separator?
