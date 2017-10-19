@@ -1,4 +1,7 @@
-all: zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc themes/default.cr-theme.zwc themes/zdharma.cr-theme.zwc themes/zdharma-256.cr-theme.zwc themes/safari-256.cr-theme.zwc test
+all: zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc \
+     themes/default.cr-theme.zwc themes/zdharma.cr-theme.zwc themes/zdharma-256.cr-theme.zwc \
+     themes/safari-256.cr-theme.zwc themes/forest-256.cr-theme.zwc themes/blue-256.cr-theme.zwc \
+     themes/clean-256.cr-theme.zwc test
 
 %.zwc : %
 	share/zcompile -- $<
