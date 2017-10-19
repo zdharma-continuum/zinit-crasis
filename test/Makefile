@@ -21,6 +21,6 @@ data: ../crasis ../-zcrasis-process-buffer
 
 clean:
 	rm -rf -- data zsdoc crasis
-	rm -f _test*/zshrc.test _test*/*.txt _test*/*token*
+	rm -f _test*/zshrc.test _test*/*.txt _test*/*token* _test*/skip
 
 .PHONY: all test prepare clean
