@@ -102,8 +102,13 @@ chosen_plugins=(
 )
 
 local -a ice_order
-ice_order=( proto from depth if blockf atclone atload atpull )
-#
+ice_order=( proto from depth if blockf svn atclone atload atpull )
+
+# Layout parameters
+local -a w_snippet_item_long w_snippet_item_short w_plugin_item_long w_plugin_item_short
+local -a w_cdreplay_item_long w_cdreplay_item_short w_cdclear_item_long w_cdclear_item_short
+local -a w_other_item_long w_other_item_short
+
 #
 # PARAMETERS
 #
@@ -161,7 +166,7 @@ local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 # Load and process theme
 #
 
-local CRASIS_THEME="$CRASIS_THEME"
+local CRASIS_THEME="$CRASIS_THEME" CRASIS_LAYOUT="${CRASIS_LAYOUT:-default}"
 
 local -a thcol_entries thcol_entries2 thbcol_entries thtxt_entries thtxt_entries2
 thcol_entries=(
@@ -254,6 +259,7 @@ function -zcrasis_process_theme() {
     source "$ZCRASIS_REPO_DIR/themes/${CRASIS_THEME}.cr-theme"
     theme+=( "${(kv)my_crasis_theme_data[@]}" )
     theme[i-blockf]="${${(s;:;)theme[i-id]}[5]}"
+    theme[layout]="$(<$ZCRASIS_REPO_DIR/layouts/${CRASIS_LAYOUT}.cr-layout)"
 
     # Stats on color settings
     local -a provided missing
@@ -365,7 +371,7 @@ function -zcrasis_process_theme() {
     chosen_plugins[1]="$theme[gold-list-info-text]"
 
     -zcrasis_dbg_msg_arr "Theme processing time: $SECONDS seconds" ""
-    -zui_std_stalog "Loaded theme \`$CRASIS_THEME'"
+    -zui_std_stalog "Loaded theme \`$CRASIS_THEME' and layout \`$CRASIS_LAYOUT'"
 
     return 0
 }
@@ -761,7 +767,7 @@ function -zcrasis_set_zui_settings() {
         else
             if [[ "${cmd3[sub]}" = "ice" ]]; then
                 # Also dequote the ice modifier
-                [[ "$token" = (#b)(from|proto|if|depth|blockf|atclone|atload|atpull)(*) ]] && cmd3[${match[1]}]="${(Q)match[2]}"
+                [[ "$token" = (#b)(from|proto|if|depth|blockf|svn|atclone|atload|atpull)(*) ]] && cmd3[${match[1]}]="${(Q)match[2]}"
             elif [[ "${cmd3[sub]}" = (load|light) ]]; then
                 if (( in_zplugin == 4 )); then
                     cmd3[url]+="/$token"
@@ -1245,7 +1251,7 @@ function -zcrasis_set_zui_settings() {
     fi
 
     local -a other
-    other=( "${(@)ice_cmd[(I)(proto|from|depth|if|blockf|atclone|atload|atpull)]}" )
+    other=( "${(@)ice_cmd[(I)(proto|from|depth|if|blockf|svn|atclone|atload|atpull)]}" )
     if (( ${#other} == 0 )); then
         ice_cmd=( comment "${ice_cmd[comment]}" )
     else
@@ -1448,7 +1454,6 @@ function -zcrasis_set_zui_settings() {
     local -A ice_cmd main_cmd
     local var_name1 var_name2
     local num smarker_text pmarker_text mode_text command_col force_col disabled_text
-    integer short_idx
 
     # Ice addition request?
     if [[ "$arg" = newice-* ]]; then
@@ -1481,7 +1486,7 @@ function -zcrasis_set_zui_settings() {
     var_name1="my_mod${mod}_ice$(( ice-1 ))_size"
     var_name2="my_mod${mod}_ice$(( ice+1 ))_size"
 
-    # 1.
+    # 1. Up
     if [[ "$ice" -gt 1 ]]; then
         (( theme[ud-unicode-bool] )) && local up="$theme[up-unicode-c]" || local up="$theme[up-text-c]"
         -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "$up" "-zcrasis_action_move_up $mod $ice" output
@@ -1490,7 +1495,7 @@ function -zcrasis_set_zui_settings() {
         output+=( "$up" )
     fi
 
-    # 2.
+    # 2. Down
     if [[ "$ice" -lt $(( ${#cmdlist} / 3 )) ]]; then
         (( theme[ud-unicode-bool] )) && local down="$theme[down-unicode-c]" || local down="$theme[down-text-c]"
         -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "$down" "-zcrasis_action_move_down $mod $ice" output
@@ -1499,7 +1504,7 @@ function -zcrasis_set_zui_settings() {
         output+=( "$down" )
     fi
 
-    # "Disabled" or "Enabled"
+    # 3. "Disabled" or "Enabled"
     (( theme[ed-unicode-bool] )) && local enabled="$theme[enabled-unicode-c]" || local enabled="$theme[enabled-text-c]"
     (( theme[ed-unicode-bool] )) && local disabled="$theme[disabled-unicode-c]" || local disabled="$theme[disabled-text-c]"
 
@@ -1508,7 +1513,6 @@ function -zcrasis_set_zui_settings() {
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[my_compact_mode]}\" = [12] ]]" "smarker_text" "$theme[s-marker-disabled-text-c]" "$theme[s-marker-text-c]"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[my_compact_mode]}\" = [12] ]]" "pmarker_text" "$theme[p-marker-disabled-text-c]" "$theme[p-marker-text-c]"
 
-    # 3.
     -zui_std_button "toggle_dis_${mod}_${ice}" "$disabled_text" '(( ZUI[toggle_dis_'"${mod}_${ice}"']=1-${ZUI[toggle_dis_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
     # 4. Delete
@@ -1520,6 +1524,9 @@ function -zcrasis_set_zui_settings() {
         output[4]=""
     fi
 
+    # Save for layout
+    local w_up="$output[1]" w_down="$output[2]" w_disable="$output[3]" w_delete="${output[4]:-    }"
+
     #
     # 5. Add ice
     #
@@ -1527,7 +1534,7 @@ function -zcrasis_set_zui_settings() {
     t="<+ICE>"
     [[ -n "$theme[plus-ice]" ]] && t="$theme[plus-ice]$t${ZUI[FMT_END]}"
     local -a existing toadd
-    existing=( "${(@)ice_cmd[(I)(proto|from|depth|if|blockf|atclone|atload|atpull)]}" )
+    existing=( "${(@)ice_cmd[(I)(proto|from|depth|if|blockf|svn|atclone|atload|atpull)]}" )
     toadd=( ${(@)ice_order:|existing} )
 
     # Variables of the list box
@@ -1571,7 +1578,7 @@ function -zcrasis_set_zui_settings() {
         for t in "${ice_order[@]}"; do
             index+=1
             case "$t" in
-                (proto|from|depth|if|atload|atpull|atclone)
+                (proto|from|depth|svn|if|atload|atpull|atclone)
                     [[ -z "${ice_cmd[$t]}" ]] && continue
                     # Variables of the text field
                     (( ${+ZUI[my_tfield4_${ice}_${t}_width]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_width]=$(( ${#ice_cmd[$t]} + 1 ))
@@ -1628,12 +1635,10 @@ function -zcrasis_set_zui_settings() {
         # The Resulting Document
         #
 
-        reply+=( "$num ${output[1]} ${output[2]} $smarker_text ${output[7]}" )
-        short_idx=${#reply}
-        reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
-        [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[1]}${(j: :)ioutput[2,-1]}" )
+        local w_url="$output[7]" w_ascommand="$output[8]" w_force="$output[9]"
 
-        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[short_idx+1,-1]=()
+        eval "$theme[layout]"
+        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply=( "${w_snippet_item_short[@]}" ) || reply=( "${w_snippet_item_long[@]}" )
     elif [[ "${main_cmd[sub]}" = (light|load) ]]; then
         #
         # 7. Url, edited in edit-mode
@@ -1668,22 +1673,16 @@ function -zcrasis_set_zui_settings() {
         # The Resulting Document
         #
 
-        reply+=( "$num ${output[1]} ${output[2]} $pmarker_text ${output[7]}" )
-        short_idx=${#reply}
-        reply+=( "${output[4]:-    }${output[3]} ${output[8]} ${output[9]} $ice_add_remove" )
-        [[ "${#ioutput}" -gt 0 ]] && reply+=( "${ioutput[1]}${(j: :)ioutput[2,-1]}" )
+        local w_plugin="$output[7]" w_mode="$output[8]" w_compile="$output[9]"
 
-        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[short_idx+1,-1]=()
+        eval "$theme[layout]"
+        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply=( "${w_plugin_item_short[@]}" ) || reply=( "${w_plugin_item_long[@]}" )
     elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
-        reply+=( "$num ${output[1]} ${output[2]} cdreplay" )
-        reply+=( "${output[4]:-    }${output[3]}" )
-
-        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[-1]=()
+        eval "$theme[layout]"
+        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply=( "${w_cdreplay_item_short[@]}" ) || reply=( "${w_cdreplay_item_long[@]}" )
     elif [[ "${main_cmd[sub]}" = "cdclear" ]]; then
-        reply+=( "$num ${output[1]} ${output[2]} cdclear" )
-        reply+=( "${output[4]:-    }${output[3]}" )
-
-        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[-1]=()
+        eval "$theme[layout]"
+        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply=( "${w_cdclear_item_short[@]}" ) || reply=( "${w_cdclear_item_long[@]}" )
     else
         # Custom command
         local -a keys
@@ -1695,10 +1694,9 @@ function -zcrasis_set_zui_settings() {
             text+=" ${main_cmd[$key]}"
         done
         [[ -n "${main_cmd[unkn]}" ]] && text+=" (${ZUI[RED]}unknown Zplugin subcommand${ZUI[FMT_END]})"
-        reply+=( "$num ${output[1]} ${output[2]} $text" )
-        reply+=( "${output[4]:-    }${output[3]}" )
 
-        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply[-1]=()
+        eval "$theme[layout]"
+        [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply=( "${w_other_item_short[@]}" ) || reply=( "${w_other_item_long[@]}" )
     fi
 
     # Instead of debugging ZUI, I've added '-1' here
