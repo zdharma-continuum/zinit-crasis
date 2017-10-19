@@ -41,11 +41,13 @@ FUNCTIONS
  -zcrasis_generator_OPT
  -zcrasis_process_theme
  -zcrasis_refresh2_all_string
- -zcrasis_set_zui_palette
+ -zcrasis_set_zui_settings
  -zcrasis_switch_theme
+ -zcrasis_tokenization_failed
  -zcrasis_update_ice_cmd
  -zcrasis_update_main_cmd
  -zcrasis_util_swap
+ -zcrasis_verify_tokenization
 AUTOLOAD -zcrasis-process-buffer
 AUTOLOAD is-at-least
 
@@ -55,7 +57,7 @@ DETAILS
 Script Body
 ~~~~~~~~~~~
 
-Has 148 line(s). Calls functions:
+Has 158 line(s). Calls functions:
 
  Script-Body
  |-- -zcrasis_action_reload
@@ -67,13 +69,16 @@ Has 148 line(s). Calls functions:
  |   |       `-- -zcrasis_dbg_msg
  |   |-- -zcrasis_clear_visual_state
  |   |-- -zcrasis_dbg_msg
- |   `-- -zcrasis_refresh2_all_string
+ |   |-- -zcrasis_dbg_msg_arr
+ |   |-- -zcrasis_refresh2_all_string
+ |   |-- -zcrasis_tokenization_failed
+ |   `-- -zcrasis_verify_tokenization
  |-- -zcrasis_dbg_msg
  |-- -zcrasis_dbg_msg_arr
  |-- -zcrasis_process_theme
  |   |-- -zcrasis_dbg_msg
  |   `-- -zcrasis_dbg_msg_arr
- `-- -zcrasis_set_zui_palette
+ `-- -zcrasis_set_zui_settings
      `-- is-at-least
 
 -zcrasis-process-zplugin-commands
@@ -90,7 +95,7 @@ ____
  # - $ZCR_PB_SPACES - spaces in front of each token, +1 at the end
 ____
 
-Has 86 line(s). Calls functions:
+Has 104 line(s). Calls functions:
 
  -zcrasis-process-zplugin-commands
  `-- -zcrasis_dbg_msg
@@ -114,7 +119,7 @@ ____
  # - $ZCR_PB_SPACES - spaces in front of each token, +1 at the end
 ____
 
-Has 109 line(s). Doesn't call other functions.
+Has 155 line(s). Doesn't call other functions.
 
 Called by:
 
@@ -340,7 +345,7 @@ ____
  # the backend model-structure, the $cmdlist array of hashes.
 ____
 
-Has 55 line(s). Calls functions:
+Has 57 line(s). Calls functions:
 
  -zcrasis_action_reload
  |-- -zcrasis-process-zplugin-commands
@@ -351,7 +356,10 @@ Has 55 line(s). Calls functions:
  |       `-- -zcrasis_dbg_msg
  |-- -zcrasis_clear_visual_state
  |-- -zcrasis_dbg_msg
- `-- -zcrasis_refresh2_all_string
+ |-- -zcrasis_dbg_msg_arr
+ |-- -zcrasis_refresh2_all_string
+ |-- -zcrasis_tokenization_failed
+ `-- -zcrasis_verify_tokenization
 
 Called by:
 
@@ -380,7 +388,7 @@ ____
  # Outputs status message.
 ____
 
-Has 5 line(s). Doesn't call other functions.
+Has 6 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
@@ -415,7 +423,7 @@ ____
  # $reply - lines of created code
 ____
 
-Has 76 line(s). Doesn't call other functions.
+Has 87 line(s). Doesn't call other functions.
 
 Called by:
 
@@ -452,6 +460,7 @@ Has 1 line(s). Doesn't call other functions.
 
 Called by:
 
+ -zcrasis_action_reload
  -zcrasis_process_theme
  Script-Body
 
@@ -464,7 +473,7 @@ ____
  # (normal, preview, debug).
 ____
 
-Has 49 line(s). Doesn't call other functions.
+Has 76 line(s). Doesn't call other functions.
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
@@ -478,11 +487,13 @@ ____
  # lines horizontally, by ZUI normal operation).
 ____
 
-Has 192 line(s). Calls functions:
+Has 186 line(s). Calls functions:
 
  -zcrasis_generator_A
  |-- -zcrasis_update_ice_cmd
  `-- -zcrasis_update_main_cmd
+
+Uses feature(s): _eval_
 
 Not called by script or any function, may be a hook or Zle widget, etc.
 
@@ -518,7 +529,7 @@ Not called by script or any function, may be a hook or Zle widget, etc.
 -zcrasis_generator_OPT
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Has 33 line(s). Doesn't call other functions.
+Has 40 line(s). Doesn't call other functions.
 
 Uses feature(s): _eval_
 
@@ -532,7 +543,7 @@ ____
  # this functions converts it to be ready to use
 ____
 
-Has 127 line(s). Calls functions:
+Has 132 line(s). Calls functions:
 
  -zcrasis_process_theme
  |-- -zcrasis_dbg_msg
@@ -564,17 +575,17 @@ Called by:
  -zcrasis_action_edit_mode
  -zcrasis_action_reload
 
--zcrasis_set_zui_palette
-~~~~~~~~~~~~~~~~~~~~~~~~
+-zcrasis_set_zui_settings
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ____
  # If theme provides palette-string, it is
  # applied to ZUI settings of this application
 ____
 
-Has 7 line(s). Calls functions:
+Has 32 line(s). Calls functions:
 
- -zcrasis_set_zui_palette
+ -zcrasis_set_zui_settings
  `-- is-at-least
 
 Uses feature(s): _autoload_
@@ -600,10 +611,24 @@ Has 4 line(s). Calls functions:
  |-- -zcrasis_process_theme
  |   |-- -zcrasis_dbg_msg
  |   `-- -zcrasis_dbg_msg_arr
- `-- -zcrasis_set_zui_palette
+ `-- -zcrasis_set_zui_settings
      `-- is-at-least
 
 Not called by script or any function, may be a hook or Zle widget, etc.
+
+-zcrasis_tokenization_failed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # Outputs a message that zshrc didn't parse, and
+ # includes information what can be a possible cause.
+____
+
+Has 20 line(s). Doesn't call other functions.
+
+Called by:
+
+ -zcrasis_action_reload
 
 -zcrasis_update_ice_cmd
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -665,6 +690,20 @@ Called by:
  -zcrasis_action_move_down
  -zcrasis_action_move_up
 
+-zcrasis_verify_tokenization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+____
+ # To large extent verifies if tokenization was correct.
+ # Also removes the test-tokens added to input zshrc.
+____
+
+Has 13 line(s). Doesn't call other functions.
+
+Called by:
+
+ -zcrasis_action_reload
+
 -zcrasis-process-buffer
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -684,5 +723,5 @@ Has 56 line(s). Doesn't call other functions.
 
 Called by:
 
- -zcrasis_set_zui_palette
+ -zcrasis_set_zui_settings
 
