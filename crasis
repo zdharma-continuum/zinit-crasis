@@ -685,7 +685,7 @@ function -zcrasis_set_zui_settings() {
         done
 
         # Detect if compinit follows
-        integer count=0+size-(post_block_begin+1)/2
+        integer count=$(( size-(post_block_begin+1)/2 ))
         local next_token_2
         (( count = (count > 15) ? 15 : count ))
         for (( j=(post_block_begin+1)/2; count > 0; ++ j, -- count )); do
