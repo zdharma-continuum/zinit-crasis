@@ -678,10 +678,30 @@ function -zcrasis_set_zui_settings() {
         post_block_begin=2*i-1
     else
         # Detect not related trailing comments
-        for (( j=(post_block_begin+1)/2-1; j >= 1; j -- )); do
+        for (( j=(post_block_begin+1)/2-1; j >= 1; -- j )); do
             [[ "${ZCR_PB_WORDS[j]}" = [[:blank:]]#\#* && "${ZCR_PB_WORDS[j]}" != [[:blank:]]#\#[[:blank:]]#zplugin* ]] && {
                 post_block_begin=2*j-1
             } || break
+        done
+
+        # Detect if compinit follows
+        integer count=0+size-(post_block_begin+1)/2
+        local next_token_2
+        (( count = (count > 15) ? 15 : count ))
+        for (( j=(post_block_begin+1)/2; count > 0; ++ j, -- count )); do
+            token="${ZCR_PB_WORDS[j]}"
+            next_token="${ZCR_PB_WORDS[j+1]}"
+            next_token_2="${ZCR_PB_WORDS[j+2]}"
+            next_spaces="${ZCR_PB_SPACES[j+1]}"
+
+            if [[ "$token" = "autoload" && ( "$next_token" = "compinit" || "$next_token_2" = "compinit" ) ]]; then
+                [[ "$next_token" = "compinit" ]] && { post_block_begin=2*(j+2)-1; j+=1; count=count-1; }
+                [[ "$next_token_2" = "compinit" ]] && { post_block_begin=2*(j+3)-1; j+=2; count=count-2; }
+            elif [[ "$token" = "compinit" && ( "$next_spaces" = *$'\n'* || "${TOKEN_TYPES[$next_token]}" = 4 ) ]]; then
+                # TODO: soft-connected following tokens can be also included
+                post_block_begin=2*(j+1)-1
+                break
+            fi
         done
     fi
 }
@@ -818,6 +838,8 @@ function -zcrasis_set_zui_settings() {
         if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
             cmdlist[coidx+1]="${(j: :)${(qkv)cmd3[@]}}"
         elif [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" != "ice" ]]; then
+            cmdlist[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
+        elif [[ "${cmd3[c]}" != "zplugin" ]]; then
             cmdlist[coidx+2]="${(j: :)${(qkv)cmd3[@]}}"
         fi
         -zcrasis_dbg_msg "Zplugin block in zshrc has $(( (coidx + 2) / 3 )) commands (not counting \`zplugin ice ...')"
