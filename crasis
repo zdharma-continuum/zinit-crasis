@@ -1815,7 +1815,7 @@ function -zcrasis_set_zui_settings() {
 # zshrc parts, forgets user changes because it regenerates
 # the backend model-structure, the $cmdlist array of hashes.
 -zcrasis_action_reload() {
-    local id="$1" msg
+    local id="$1"
     float -F 2 sum=0.0
     local -a stats
 
@@ -1855,12 +1855,7 @@ function -zcrasis_set_zui_settings() {
     stats+=( "Zplugin-commands processing time: $SECONDS seconds" )
     sum+=SECONDS
 
-    for msg in "${stats[@]}"; do
-        -zcrasis_dbg_msg "$msg"
-    done
-
-    -zcrasis_dbg_msg "Total time: $sum seconds"
-    -zcrasis_dbg_msg ""
+    -zcrasis_dbg_msg_arr "${stats[@]}" "Total time: $sum seconds" ""
 
     -zui_std_stalog "Read " "\`$zshrc_path' " "(time: $sum sec)"
 
