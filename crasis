@@ -1330,7 +1330,7 @@ function -zcrasis_set_zui_settings() {
     local -A main_cmd
 
     [[ -z "$url" || "$url" = \<*\> ]] && { -zui_std_stalog "" "" "" "WARNING: " "" "Aborted, please enter a proper snippet URL"; return; }
-    [[ "$url" != /* && "$url" != (http|ftp|https):* ]] && -zui_std_stalog "" "" "" "WARNING: " "" "Snippet isn't absolute path or URL"
+    [[ "$url" != /* && "$url" != (http|ftp|https|OMZ|PZT):* ]] && -zui_std_stalog "" "" "" "WARNING: " "" "Snippet isn't absolute path or URL"
 
     main_cmd[c]="zplugin"
     main_cmd[sub]="snippet"
