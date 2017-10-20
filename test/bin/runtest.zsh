@@ -13,13 +13,14 @@ autoload -- -zcrasis_verify_tokenization -zcrasis_tokenization_failed
 autoload -- -zcrasis_action_add_plugin -zcrasis_action_add_snippet
 autoload -- -zcrasis_util_swap -zcrasis_action_move_down -zcrasis_action_move_up
 autoload -- -zcrasis_action_reload -zcrasis_action_save
-autoload -- -zcrasis_compose
+autoload -- -zcrasis_compose -zcrasis_refresh2_all_string
 autoload -- -zcrasis_update_ice_cmd -zcrasis_update_main_cmd
 
 local -A ZUI
 local -a ZCR_DEBUG_MSGS
 -zui_std_stalog() { print -r -- "${(j: :)@}"; }
 -zcrasis_clear_visual_state() {}
+-zui_std_set_mod_factor() {}
 
 cmdlist=()
 coidx=1
