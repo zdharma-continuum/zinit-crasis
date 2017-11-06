@@ -287,8 +287,7 @@ function mvcd() {
 
 zplugin light zdharma/history-search-multi-word
 (( $+functions[mvcd] )) && zplugin load zdharma/zredis
-(( $+functions[mkcd] )) && (( $+functions[ls] )) && { zplugin ice svn
-zplugin snippet -f 'https://github.com/davidosomething/git-my/blob/master/git-my' }
+(( $+functions[mkcd] )) && (( $+functions[ls] )) && { zplugin ice svn; zplugin snippet -f 'https://github.com/davidosomething/git-my/blob/master/git-my' }
 
 function copy() {
     fc -ln -1 | sed -e 's|\\n|;|g' |
