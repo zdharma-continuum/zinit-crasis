@@ -83,8 +83,10 @@ my_crasis_theme_data=(
     # Ice enumeration in snippet and plugin items
     i-indent            ""
     i-indent-text       "        "
-    #                   proto   from    depth   if      blockf  atclone atload  atpull
+    #                   proto   from    depth   if      blockf  pick    as      ver     silent svn mv cp atclone atload atpull
     i-id                magenta:magenta:magenta:magenta:magenta:magenta:magenta:magenta
+    i-unknown           magenta
+    i-unknown-text      "[%s]"
     i-blockf-text       "[%s]",blockf
 
     # Options view

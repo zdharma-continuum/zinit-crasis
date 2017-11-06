@@ -101,8 +101,9 @@ chosen_plugins=(
     "zsh-users/zsh-syntax-highlighting"
 )
 
-local -a ice_order
-ice_order=( proto from depth if blockf svn atclone atload atpull )
+local -a ice_order nval_ices
+ice_order=( proto from depth if blockf pick as ver silent svn mv cp atclone atload atpull )
+nval_ices=( blockf silent svn )
 
 # Layout parameters
 local -a w_snippet_item_long w_snippet_item_short w_plugin_item_long w_plugin_item_short
@@ -182,7 +183,7 @@ thcol_entries=(
     # Plugin item
     p-id p-marker p-marker-disabled p-compile
     # Ice listing
-    i-indent
+    i-indent i-unknown
     # Options view
     o-theme-box o-switch o-save
     # Debug view
@@ -206,7 +207,7 @@ thtxt_entries=(
     # Plugin item
     p-marker-text p-marker-disabled-text p-compile-text
     # Ice listing
-    i-indent-text i-blockf-text
+    i-indent-text i-blockf-text i-unknown-text
     # Options view
     o-switch-text o-save-text
     # Debug view
@@ -316,7 +317,7 @@ function -zcrasis_process_theme() {
         tval="${theme[$tkey]}"
 
         # %s conversion
-        if [[ "${tval/\%s/}" != "$tval" ]]; then
+        if [[ "${tval/\%s*,/}" != "$tval" ]]; then
             thsplit=( "${(@s:,:)tval}" )
 
             cval="${theme[${tkey%(-text|-unicode)}]}"
@@ -346,7 +347,7 @@ function -zcrasis_process_theme() {
         for tval in "${thsplit[@]}"; do
             index+=1
             # %s conversion
-            if [[ "${tval/\%s/}" != "$tval" ]]; then
+            if [[ "${tval/\%s*,/}" != "$tval" ]]; then
                 thsplit=( "${(@s:,:)tval}" )
 
                 cval="${theme[${mkey%(-text|-unicode)}-${index}]}"
@@ -369,6 +370,9 @@ function -zcrasis_process_theme() {
     done
 
     chosen_plugins[1]="$theme[gold-list-info-text]"
+    [[ -n "$theme[i-unknown]" ]] && {
+        theme[i-unknown-text-c]="${theme[i-unknown-text]//\%s/${theme[i-unknown]}%s$ZUI[FMT_END]}"
+    } || theme[i-unknown-text-c]="$theme[i-unknown-text]"
 
     -zcrasis_dbg_msg_arr "Theme processing time: $SECONDS seconds" ""
     -zui_std_stalog "Loaded theme \`$CRASIS_THEME' and layout \`$CRASIS_LAYOUT'"
@@ -787,7 +791,7 @@ function -zcrasis_set_zui_settings() {
         else
             if [[ "${cmd3[sub]}" = "ice" ]]; then
                 # Also dequote the ice modifier
-                [[ "$token" = (#b)(from|proto|if|depth|blockf|svn|atclone|atload|atpull)(*) ]] && cmd3[${match[1]}]="${(Q)match[2]}"
+                [[ "$token" = (#b)(${(~j:|:)ice_order})(*) ]] && cmd3[${match[1]}]="${(Q)match[2]}"
             elif [[ "${cmd3[sub]}" = (load|light) ]]; then
                 if (( in_zplugin == 4 )); then
                     cmd3[url]+="/$token"
@@ -1153,16 +1157,12 @@ function -zcrasis_set_zui_settings() {
             buf+="zplugin ice"
             for tmp in "${ice_order[@]}"; do
                 case "$tmp" in
-                    (proto|from|depth|if|atclone|atload|atpull)
+                    (${(~j:|:)${ice_order:|nval_ices}})
                         [[ -z "${ice_cmd[$tmp]}" || "${ice_cmd[$tmp]}" = "<empty>"* ]] && continue
                         # Also quote the ice modifier
                         buf+=" $tmp${(qqq)ice_cmd[$tmp]}"
                         ;;
-                    (blockf)
-                        (( ${+ice_cmd[$tmp]} == 0 )) && continue
-                        buf+=" $tmp"
-                        ;;
-                    (svn)
+                    (${(~j:|:)nval_ices})
                         (( ${+ice_cmd[$tmp]} == 0 )) && continue
                         buf+=" $tmp"
                         ;;
@@ -1279,7 +1279,7 @@ function -zcrasis_set_zui_settings() {
     fi
 
     local -a other
-    other=( "${(@)ice_cmd[(I)(proto|from|depth|if|blockf|svn|atclone|atload|atpull)]}" )
+    other=( "${(@)ice_cmd[(I)(${(~j:|:)ice_order})]}" )
     if (( ${#other} == 0 )); then
         ice_cmd=( comment "${ice_cmd[comment]}" )
     else
@@ -1562,7 +1562,7 @@ function -zcrasis_set_zui_settings() {
     t="<+ICE>"
     [[ -n "$theme[plus-ice]" ]] && t="$theme[plus-ice]$t${ZUI[FMT_END]}"
     local -a existing toadd
-    existing=( "${(@)ice_cmd[(I)(proto|from|depth|if|blockf|svn|atclone|atload|atpull)]}" )
+    existing=( "${(@)ice_cmd[(I)(${(~j:|:)ice_order})]}" )
     toadd=( ${(@)ice_order:|existing} )
 
     # Variables of the list box
@@ -1606,19 +1606,27 @@ function -zcrasis_set_zui_settings() {
         for t in "${ice_order[@]}"; do
             index+=1
             case "$t" in
-                (proto|from|depth|svn|if|atload|atpull|atclone)
+                (${(~j:|:)${ice_order:|nval_ices}})
                     [[ -z "${ice_cmd[$t]}" ]] && continue
                     # Variables of the text field
                     (( ${+ZUI[my_tfield4_${ice}_${t}_width]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_width]=$(( ${#ice_cmd[$t]} + 1 ))
                     (( ${+ZUI[my_tfield4_${ice}_${t}_start]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_start]=1
                     (( ${+ZUI[my_tfield4_${ice}_${t}_data]} == 0 )) && ZUI[my_tfield4_${ice}_${t}_data]="${ice_cmd[$t]}"
 
-                    [[ -n "$theme[i-id-${index}]" ]] && ioutput+=( "$theme[i-id-${index}]$t${ZUI[FMT_END]}:" ) || ioutput+=( "$t" )
+                    (( ${+theme[i-id-${index}]} )) && {
+                        [[ -n "$theme[i-id-${index}]" ]] && ioutput+=( "$theme[i-id-${index}]$t${ZUI[FMT_END]}:" ) || ioutput+=( "$t" )
+                    } || {
+                        [[ -n "$theme[i-unknown]" ]] && ioutput+=( "$theme[i-unknown]$t${ZUI[FMT_END]}" ) || ioutput+=( "$t" )
+                    }
                     noglob -zui_std_text_field "tfield4_${mod}_${ice}_${t}" ZUI[my_tfield4_${ice}_${t}_width] ZUI[my_tfield4_${ice}_${t}_start] ZUI[my_tfield4_${ice}_${t}_data] "" "" "" '-zcrasis_update_ice_cmd '$t' "${ZUI[my_tfield4_'${ice}'_'$t'_data]}" '$ice ioutput
                     ;;
-                (blockf)
+                (${(~j:|:)nval_ices})
                     (( ${+ice_cmd[$t]} == 0 )) && continue
-                    ioutput+=( "$theme[i-blockf-text-c]" )
+                    if [[ -n "$theme[i-${t}-text-c]" ]]; then
+                        ioutput+=( "$theme[i-${t}-text-c]" )
+                    else
+                        ioutput+=( `printf "$theme[i-unknown-text-c]" ${t}` )
+                    fi
                     ;;
             esac
         done
