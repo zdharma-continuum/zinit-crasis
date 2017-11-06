@@ -1271,7 +1271,11 @@ function -zcrasis_set_zui_settings() {
         main_cmd=( "${(z@)cmd[3]}" )
         main_cmd=( "${(Qkv)main_cmd[@]}" )
     fi
-    main_cmd[$key]="$data"
+    if [[ "$data" = " delete " ]]; then
+        unset "main_cmd[$key]"
+    else
+        main_cmd[$key]="$data"
+    fi
 
     cmdlist[idx*3]="${(j: :)${(qkv)main_cmd[@]}}"
     return 0
