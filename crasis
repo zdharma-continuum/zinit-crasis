@@ -791,25 +791,40 @@ function -zcrasis_set_zui_settings() {
         else
             if [[ "${cmd3[sub]}" = "ice" ]]; then
                 # Also dequote the ice modifier
-                [[ "$token" = (#b)(${(~j:|:)ice_order})(*) ]] && cmd3[${match[1]}]="${(Q)match[2]}"
+                [[ "$token" = (#b)(${(~j:|:)ice_order})(*) ]] && cmd3[${match[1]}]="${(Q)match[2]}" || {
+                    cmd3[custom_$(( in_zplugin - 2 ))]="$token"
+                    cmd3[spaces_$(( in_zplugin - 2 ))]="$spaces"
+                }
             elif [[ "${cmd3[sub]}" = (load|light) ]]; then
                 if (( in_zplugin == 4 )); then
                     cmd3[url]+="/$token"
-                else
+                elif (( ${+cmd3[url]} == 0 )); then
                     cmd3[url]="$token"
+                else
+                    cmd3[custom_$(( in_zplugin - 2 ))]="$token"
+                    cmd3[spaces_$(( in_zplugin - 2 ))]="$spaces"
                 fi
             elif [[ "${cmd3[sub]}" = "snippet" ]]; then
                 if [[ "$token" = "-f" ]]; then
                     cmd3[-f]="1"
                 elif [[ "$token" = "--command" ]]; then
                     cmd3[--command]="1"
-                elif [[ "${TOKEN_TYPES[$token]}" != [34] ]]; then
+                elif [[ ${+cmd3[url]} != 1 && "${TOKEN_TYPES[$token]}" != [34] ]]; then
                     cmd3[url]="$token"
+                else
+                    cmd3[custom_$(( in_zplugin - 2 ))]="$token"
+                    cmd3[spaces_$(( in_zplugin - 2 ))]="$spaces"
                 fi
             elif [[ "${cmd3[sub]}" = "cdclear" ]]; then
-                [[ "$token" = "-q" ]] && cmd3[-q]="1"
+                [[ "$token" = "-q" ]] && cmd3[-q]="1" || {
+                    cmd3[custom_$(( in_zplugin - 2 ))]="$token"
+                    cmd3[spaces_$(( in_zplugin - 2 ))]="$spaces"
+                }
             elif [[ "${cmd3[sub]}" = "cdreplay" ]]; then
-                [[ "$token" = "-q" ]] && cmd3[-q]="1"
+                [[ "$token" = "-q" ]] && cmd3[-q]="1" || {
+                    cmd3[custom_$(( in_zplugin - 2 ))]="$token"
+                    cmd3[spaces_$(( in_zplugin - 2 ))]="$spaces"
+                }
             elif [[ "${cmd3[sub]}" = "unkn" ]]; then
                 # Argument following "zplugin <unknown> ..."
                 cmd3[arg_$(( in_zplugin - 2 ))]="$token"
@@ -1124,9 +1139,9 @@ function -zcrasis_set_zui_settings() {
 # $reply - lines of created code
 -zcrasis_compose() {
     local with_comments="$1" whole="$2"
-    local buf="" tmp comment
+    local buf="" tmp comment key
     integer i size=$(( ${#commands} / 3 ))
-    local -a cmd
+    local -a cmd keys
     local -A ice_cmd main_cmd
 
     [[ "$whole" = "1" ]] && {
@@ -1170,8 +1185,17 @@ function -zcrasis_set_zui_settings() {
                         ;;
                 esac
             done
+
+            # Put tokens other than ice-mod at the
+            # end, in order, with spaces
+            keys=( "${(kon)ice_cmd[@]}" )
+            for key in "${keys[@]}"; do
+                [[ "$key" != custom_* ]] && continue
+                buf+="${ice_cmd[spaces_${key#custom_}]}${ice_cmd[$key]}"
+            done
+
             [[ "$with_comments" = "1" && -n "${ice_cmd[comment]}" ]] && buf+="${ice_cmd[comment]}"
-            buf+=$'\n'
+            (( ${+ice_cmd[aspaces]} )) && buf+="${ice_cmd[aspaces]}" || buf+=$'\n'
         fi
 
         # COMMAND
@@ -1189,8 +1213,7 @@ function -zcrasis_set_zui_settings() {
                     (( ${+main_cmd[aspaces]} )) && buf+="${main_cmd[aspaces]}" || buf+=$'\n'
                 else
                     # Unknown subcommand
-                    local -a keys
-                    local key text="${main_cmd[c]}"
+                    local text="${main_cmd[c]}"
                     [[ -n "${main_cmd[unkn]}" ]] && text+=" ${main_cmd[unkn]}"
                     keys=( "${(kon)main_cmd[@]}" )
                     for key in "${keys[@]}"; do
@@ -1201,8 +1224,7 @@ function -zcrasis_set_zui_settings() {
                     (( ${+main_cmd[aspaces]} )) && buf+="$text${main_cmd[aspaces]}" || buf+="$text"$'\n'
                 fi
             else
-                local -a keys
-                local key text="${main_cmd[c]}"
+                local text="${main_cmd[c]}"
                 keys=( "${(kon)main_cmd[@]}" )
                 for key in "${keys[@]}"; do
                     [[ "$key" != arg_* ]] && continue
