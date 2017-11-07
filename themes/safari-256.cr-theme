@@ -62,7 +62,7 @@ my_crasis_theme_data=(
 
     # Snippet item in the main listing
     s-url                   magenta
-    s-marker                ""
+    s-marker                cyan
     s-marker-text           "SN"
     s-marker-disabled       red
     s-marker-disabled-text  "SN"
@@ -71,7 +71,7 @@ my_crasis_theme_data=(
 
     # Plugin item in the main listing
     p-id                    magenta
-    p-marker                ""
+    p-marker                yellow
     p-marker-text           "PL"
     p-marker-disabled       red
     p-marker-disabled-text  "PL"

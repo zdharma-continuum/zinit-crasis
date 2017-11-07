@@ -60,7 +60,7 @@ my_crasis_theme_data=(
 
     # Snippet item in the main listing
     s-url                   cyan
-    s-marker                ""
+    s-marker                green
     s-marker-text           "SN"
     s-marker-disabled       red
     s-marker-disabled-text  "SN"
@@ -69,7 +69,7 @@ my_crasis_theme_data=(
 
     # Plugin item in the main listing
     p-id                    cyan
-    p-marker                ""
+    p-marker                yellow
     p-marker-text           "PL"
     p-marker-disabled       red
     p-marker-disabled-text  "PL"
