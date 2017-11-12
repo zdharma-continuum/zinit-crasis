@@ -1685,7 +1685,7 @@ function -zcrasis_set_zui_settings() {
 
         [[ -z "${ZUI[toggle_command_${mod}_${ice}]}" ]] && ZUI[toggle_command_${mod}_${ice}]="${main_cmd[--command]:-0}" || -zcrasis_update_main_cmd --command "${ZUI[toggle_command_${mod}_${ice}]}" $ice
         -zui_util_map_bools "[[ \"${ZUI[toggle_command_${mod}_${ice}]}\" = 1 ]]" "command_col" "${ZUI[BG_BLUE]}" "$theme[s-as-command]"
-        local command_text="${command_col}as-command${ZUI[FMT_END]}"
+        local command_text="${command_col}command${ZUI[FMT_END]}"
         -zui_std_button "toggle_command_${mod}_${ice}" "$command_text" '(( ZUI[toggle_command_'"${mod}_${ice}"']=1-${ZUI[toggle_command_'"${mod}_${ice}"']} )); -zui_std_fly_mod_regen '"$mod $ice"'; internal=1' output
 
         #
