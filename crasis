@@ -1541,11 +1541,13 @@ function -zcrasis_set_zui_settings() {
     # "Up", "Down"
     var_name1="my_mod${mod}_ice$(( ice-1 ))_size"
     var_name2="my_mod${mod}_ice$(( ice+1 ))_size"
+    local gap
+    (( gap = ZUI[my_compact_mode] == 2 ? 0 : 1 ))
 
     # 1. Up
     if [[ "$ice" -gt 1 ]]; then
         (( theme[ud-unicode-bool] )) && local up="$theme[up-unicode-c]" || local up="$theme[up-text-c]"
-        -zui_std_anchor "move_up_${mod}_${ice}" "1-1-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "$up" "-zcrasis_action_move_up $mod $ice" output
+        -zui_std_anchor "move_up_${mod}_${ice}" "1-${gap}-${var_name1}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice - 1 ))," "" "$up" "-zcrasis_action_move_up $mod $ice" output
     else
         (( theme[ud-unicode-bool] )) && local up="$theme[up-unicode]" || local up="$theme[up-text]"
         output+=( "$up" )
@@ -1554,7 +1556,7 @@ function -zcrasis_set_zui_settings() {
     # 2. Down
     if [[ "$ice" -lt $(( ${#cmdlist} / 3 )) ]]; then
         (( theme[ud-unicode-bool] )) && local down="$theme[down-unicode-c]" || local down="$theme[down-text-c]"
-        -zui_std_anchor "move_down_${mod}_${ice}" "1+1+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "$down" "-zcrasis_action_move_down $mod $ice" output
+        -zui_std_anchor "move_down_${mod}_${ice}" "1+${gap}+${var_name2}" "" ",mod${mod}_ice${ice},mod${mod}_ice$(( ice + 1 ))," "" "$down" "-zcrasis_action_move_down $mod $ice" output
     else
         (( theme[ud-unicode-bool] )) && local down="$theme[down-unicode]" || local down="$theme[down-text]"
         output+=( "$down" )
@@ -1765,7 +1767,7 @@ function -zcrasis_set_zui_settings() {
 
     # Instead of debugging ZUI, I've added '-1' here
     var_name1="my_mod${mod}_ice${ice}_size"
-    : "${(P)var_name1::=${#reply}-1}"
+    : "${(P)var_name1::=${#reply}}"
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( move_up_${mod}_${ice} move_down_${mod}_${ice} )
