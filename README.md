@@ -27,20 +27,22 @@ zplugin light zdharma/zplugin-crasis
 
 # Key bindings
 
-- `<`,`>` or `{`,`}` – horizontal scroll
-- `Ctrl-L` – redraw of whole display
-- `Ctrl-U` – half page up
-- `Ctrl-D` – half page down
-- `Ctrl-P` – previous line, centered
-- `Ctrl-N` – next line, centered
-- `[`, `]` – jump to next section (e.g. next plugin or snippet)
-- `g`, `G` – jump to beginning and end of document
-- `/` – show incremental search
-- `F3` – show/hide incremental search
-- `F1` – jump to result in incremental search
-- `Esc` – exit incremental search, clearing filter
-- `Ctrl-W` (in incremental search) – delete whole word
-- `Ctrl-K` (in incremental search) – delete whole line
+| Key(s) | Description |
+|--------|-------------|
+| `<`,`>` or `{`,`}` | Horizontal scroll (i.e. left or right)   |
+| `Ctrl-L` | Redraw of whole display                            |
+| `Ctrl-U` | Half page up                                       |
+| `Ctrl-D` | Half page down                                     |
+| `Ctrl-P` | Previous line, centered                            |
+| `Ctrl-N` | Next line, centered                                |
+| `[`, `]` | Jump to next and previous section (e.g. next plugin or snippet) |
+| `g`, `G` | Jump to beginning and end of whole interface       |
+| `/`      | Show incremental search                            |
+| `F1`     | Jump to result (in incremental search)             |
+| `Esc`    | Exit incremental search, clearing filter           |
+| `Ctrl-W` | Delete whole word (in incremental search)          |
+| `Ctrl-K` | Delete whole line (in incremental search)          |
+| Up and down | Resize text field when editing it (e.g. to make the text fit in) |
 
 # Code documentation
 
