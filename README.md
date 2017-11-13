@@ -25,7 +25,7 @@ zplugin light zdharma/zui
 zplugin light zdharma/zplugin-crasis
 ```
 
-# Key bindings
+# Key Bindings
 
 | Key(s) | Description |
 |--------|-------------|
@@ -44,7 +44,13 @@ zplugin light zdharma/zplugin-crasis
 | `Ctrl-K` | Delete whole line (in incremental search)          |
 | Up and down | Resize text field when editing it (e.g. to make the text fit in) |
 
-# Code documentation
+# Screenshots
+
+![clean-256](https://raw.githubusercontent.com/zdharma/zplugin-crasis/master/themes/screenshots/clean-256.png)
+
+![zdharma-256](https://raw.githubusercontent.com/zdharma/zplugin-crasis/master/themes/screenshots/zdharma-256.png)
+
+# Code Documentation
 
 `Crasis` is a [ZUI](http://github.com/zdharma/zui/) application. `ZUI` is a pure-Zshell library
 where user generates simple text with hyperlinks, which is then turned into active document with
