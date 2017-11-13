@@ -92,6 +92,10 @@ local -a chosen_plugins
 chosen_plugins=(
     "<Gold Plugins Collection>"
     "djui/alias-tips"
+    "mollifier/anyframe"
+    "mollifier/cd-gitroot"
+    "denysdovhan/spaceship-zsh-theme"
+    "supercrabtree/k"
     "zdharma/fast-syntax-highlighting"
     "zdharma/history-search-multi-word"
     "zdharma/zredis"
