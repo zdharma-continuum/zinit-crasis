@@ -106,4 +106,11 @@ my_crasis_theme_data=(
     logs-palette-string     "white:208:151:152:180:red:magenta:142:180"
     colorpair-string        "white/16"
     status-cp-string        "white/16"
+
+    # Color of cursor, used when the active button doesn't have background
+    mark                    "red reverse lineund"
+    altmark                 "red reverse" # for terminals not supporting underline
+    # Color used when the button being active has background
+    mark2                   "magenta reverse"
+    altmark2                "magenta reverse" # for terminals not supporting underline
 )

@@ -416,6 +416,10 @@ function -zcrasis_set_zui_settings() {
             ZUI[status_colorpair]="${theme[status-cp-string]}"
         fi
     }
+    [[ -n "$theme[mark]}" ]] && ZUI[mark]="$theme[mark]"
+    [[ -n "$theme[mark2]}" ]] && ZUI[mark2]="$theme[mark2]"
+    [[ -n "$theme[altmark]}" ]] && ZUI[altmark]="$theme[altmark]"
+    [[ -n "$theme[altmark2]}" ]] && ZUI[altmark2]="$theme[altmark2]"
 }
 # }}}
 # FUNCTION: -zcrasis_switch_theme {{{
@@ -1950,7 +1954,7 @@ ZUI[reset_current_segment]="no"
 ## Start application ##
 zui-event-loop 1:-zcrasis_generator_0 $(( ${#cmdlist} / 3 )):-zcrasis_generator_A \
                0:-zcrasis_generator_B 0:-zcrasis_generator_DBG 0:-zcrasis_generator_OPT \
-               cfg-refresh:palette,log_colors,colorpair,status_colorpair,log_time_format
+               cfg-refresh:palette,log_colors,colorpair,status_colorpair,log_time_format,mark,mark2,altmark,altmark2
 
 -zui_std_cleanup serialize
 
