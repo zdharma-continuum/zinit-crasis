@@ -10,9 +10,9 @@ This way `Crasis` lets you edit your `Zplugin` commands located in `.zshrc`. All
 `Zshell` code.
 
 No more commenting-out a line with a text editor to disable plugin, cluttering `.zshrc`,
-now you can just **press a button**. `Crasis` is not fully, but nearly complete:
+now you can just **press a button**.
 
-[![asciicast](https://asciinema.org/a/142702.png)](https://asciinema.org/a/142702)
+[![asciicast](https://asciinema.org/a/147225.png)](https://asciinema.org/a/147225)
 
 `Crasis` uses [ZUI](http://github.com/zdharma/zui/) library to create `ncurses` interface.
 
@@ -24,6 +24,23 @@ Install [Zplugin](https://github.com/zdharma/zplugin) and add following commands
 zplugin light zdharma/zui
 zplugin light zdharma/zplugin-crasis
 ```
+
+# Key bindings
+
+- `<`,`>` or `{`,`}` – horizontal scroll
+- `Ctrl-L` – redraw of whole display
+- `Ctrl-U` – half page up
+- `Ctrl-D` – half page down
+- `Ctrl-P` – previous line, centered
+- `Ctrl-N` – next line, centered
+- `[`, `]` – jump to next section (e.g. next plugin or snippet)
+- `g`, `G` – jump to beginning and end of document
+- `/` – show incremental search
+- `F3` – show/hide incremental search
+- `F1` – jump to result in incremental search
+- `Esc` – exit incremental search, clearing filter
+- `Ctrl-W` (in incremental search) – delete whole word
+- `Ctrl-K` (in incremental search) – delete whole line
 
 # Code documentation
 
