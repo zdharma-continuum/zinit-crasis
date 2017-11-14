@@ -1786,11 +1786,31 @@ function -zcrasis_set_zui_settings() {
 # There is 0 or 1 instance of this module, depending on chosen
 # view.
 -zcrasis_generator_B() {
-    local mod="$1" ice="$2"
+    local mod="$1" ice="$2" arg="$3" sh_col
+
+    -zui_util_map_bools '[[ ${ZUI[incl_comm]} != 1 ]]' sh_col \
+                         "${ZUI[GREEN]}" \
+                         "${ZUI[BG_BLUE]}"
+
     local -a output
-    -zui_std_rc_button "comments_${mod}_${ice}" "${ZUI[GREEN]}Show comments${ZUI[FMT_END]}" '(( ZUI[incl_comm]=1 - ZUI[incl_comm] )); internal=1; -zui_std_fly_mod_regen '$mod' '$ice output
+    -zui_std_rc_button "comments_${mod}_${ice}" "${sh_col}Show comments${ZUI[FMT_END]}" 'internal=1; (( ZUI[incl_comm]=1 - ZUI[incl_comm] )); -zui_std_fly_mod_regen '$mod' '$ice output
+    -zui_std_rc_button "clipboard_${mod}_${ice}" "${ZUI[GREEN]}Copy to clipboard${ZUI[FMT_END]}" 'internal=1; -zui_std_fly_mod_regen '$mod' '$ice' copy' output
+
     -zcrasis_compose "${ZUI[incl_comm]}"
-    reply[1,0]=( "${output[1]}" "" )
+
+    [[ "$arg" = "copy" ]] && {
+        if (( ${+commands[xsel]} )); then
+            print -rl -- "${reply[@]}" | command xsel --clipboard --input
+            -zui_std_stalog "Copied ${#reply} lines of text"
+        elif (( ${+commands[pbcopy]} )); then
+            print -rl -- "$reply[@]" | command pbcopy
+            -zui_std_stalog "Copied ${#reply} lines of text"
+        else
+            -zui_std_stalog "No clipboard tool found (checked for pbcopy and xsel), didn't copy"
+        fi
+    }
+
+    reply[1,0]=( "${output[1]} ${output[2]}" "" )
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
