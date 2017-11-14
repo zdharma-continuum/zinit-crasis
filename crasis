@@ -949,10 +949,12 @@ function -zcrasis_set_zui_settings() {
         -zui_std_set_mod_factor 2 0
         -zui_std_set_mod_factor 3 1
         ZUI[my_in_preview]=1
+        ZUI[COLORING_PATTERN]='(#s)\#?##' ZUI[COLORING_MATCH_MULTIPLE]=0 ZUI[COLORING_COLOR]=${ZUI[MAGENTA]}
     else
         -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
         -zui_std_set_mod_factor 3 0
         ZUI[my_in_preview]=0
+        ZUI[COLORING_PATTERN]=''
     fi
 
     if [[ "${ZUI[my_in_preview]}" = "0" && "${ZUI[my_rerender]}" = "1" ]]; then
