@@ -58,7 +58,9 @@ my_crasis_theme_data=(
     delete-text         "[X]"
     delete-unicode      "X"
     plus-ice            ""
+    plus-ice-text       "<+ICE>"
     minus-ice           ""
+    minus-ice-text      "<-ICE>"
 
     # Snippet item in the main listing
     s-url               cyan

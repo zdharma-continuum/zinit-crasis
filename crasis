@@ -194,7 +194,7 @@ thtxt_entries=(
     add-snippet-text add-plugin-text new-id-url-text gold-choose-text gold-list-info-text
     # Listing
     enabled-text disabled-text enabled-unicode disabled-unicode up-text down-text up-unicode down-unicode
-    delete-text delete-unicode
+    delete-text delete-unicode minus-ice-text plus-ice-text
     # Snippet item
     s-marker-text s-marker-disabled-text
     # Plugin item
@@ -1596,8 +1596,7 @@ function -zcrasis_set_zui_settings() {
     # 5. Add ice
     #
 
-    t="<+ICE>"
-    [[ -n "$theme[plus-ice]" ]] && t="$theme[plus-ice]$t${ZUI[FMT_END]}"
+    [[ -n "$theme[plus-ice]" ]] && t="$theme[plus-ice-text-c]" || t="$theme[plus-ice-text]"
     local -a existing toadd
     existing=( "${(@)ice_cmd[(I)(${(~j:|:)ice_order})]}" )
     toadd=( ${(@)ice_order:|existing} )
@@ -1613,8 +1612,7 @@ function -zcrasis_set_zui_settings() {
     # 6. Remove ice
     #
 
-    t="<-ICE>"
-    [[ -n "$theme[minus-ice]" ]] && t="$theme[minus-ice]$t${ZUI[FMT_END]}"
+    [[ -n "$theme[minus-ice]" ]] && t="$theme[minus-ice-text-c]" || t="$theme[minus-ice-text]"
     local -a toremove
     toremove=( ${(@)ice_order:*existing} )
 

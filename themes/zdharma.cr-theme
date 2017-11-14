@@ -58,7 +58,9 @@ my_crasis_theme_data=(
     delete-text         " X "
     delete-unicode      "⌫  "
     plus-ice            ""
+    plus-ice-text       "<Ic+>"
     minus-ice           ""
+    minus-ice-text      "<Ic->"
 
     # Snippet item in the main listing
     s-url               magenta
