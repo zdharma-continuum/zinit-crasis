@@ -144,6 +144,8 @@ typeset -ga reply
 # them to prevent globals from being created
 local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
+ZUI[incl_comm]=0
+
 #
 # Examine zshrc
 #
@@ -1395,9 +1397,10 @@ function -zcrasis_set_zui_settings() {
 }
 # }}}
 # FUNCTION: -zcrasis_info {{{
+# Shows description (in status window) of the selected plugin
 -zcrasis_info() {
     [[ "$1" != <-> ]] && return
-    (( $1 <= 1 || $1 > 14 )) && return
+    (( $1 <= 1 || $1 > ${#chosen_descriptions} )) && return
     -zui_std_stalog "" "" "" "" "" "${chosen_descriptions[$1]}"
 }
 # }}}
@@ -1783,7 +1786,11 @@ function -zcrasis_set_zui_settings() {
 # There is 0 or 1 instance of this module, depending on chosen
 # view.
 -zcrasis_generator_B() {
-    -zcrasis_compose
+    local mod="$1" ice="$2"
+    local -a output
+    -zui_std_rc_button "comments_${mod}_${ice}" "${ZUI[GREEN]}Show comments${ZUI[FMT_END]}" '(( ZUI[incl_comm]=1 - ZUI[incl_comm] )); internal=1; -zui_std_fly_mod_regen '$mod' '$ice output
+    -zcrasis_compose "${ZUI[incl_comm]}"
+    reply[1,0]=( "${output[1]}" "" )
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
