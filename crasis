@@ -88,22 +88,9 @@ TOKEN_TYPES=(
   ';'   4
 )
 
-local -a chosen_plugins
-chosen_plugins=(
-    "<Gold Plugins Collection>"
-    "djui/alias-tips"
-    "mollifier/anyframe"
-    "mollifier/cd-gitroot"
-    "denysdovhan/spaceship-zsh-theme"
-    "supercrabtree/k"
-    "zdharma/fast-syntax-highlighting"
-    "zdharma/history-search-multi-word"
-    "zdharma/zredis"
-    "zsh-users/zsh-autosuggestions"
-    "zsh-users/zsh-completions"
-    "zsh-users/zsh-history-substring-search"
-    "zsh-users/zsh-syntax-highlighting"
-)
+local -a chosen_plugins chosen_descriptions
+chosen_plugins=( "${(@f)"$(<$ZCRASIS_REPO_DIR/gold.lst)"}" )
+chosen_descriptions=( "${(@f)"$(<$ZCRASIS_REPO_DIR/desc.lst)"}" )
 
 local -a ice_order nval_ices
 ice_order=( proto from depth if blockf pick as ver silent svn mv cp atclone atload atpull )
@@ -1407,6 +1394,13 @@ function -zcrasis_set_zui_settings() {
     reply=( "$REPLY" "" )
 }
 # }}}
+# FUNCTION: -zcrasis_info {{{
+-zcrasis_info() {
+    [[ "$1" != <-> ]] && return
+    (( $1 <= 1 || $1 > 14 )) && return
+    -zui_std_stalog "" "" "" "" "" "${chosen_descriptions[$1]}"
+}
+# }}}
 # FUNCTION: -zcrasis_generator_0 {{{
 # ZUI generator that creates top menu (its hypertext).
 # The menu can differ depending on current view mode
@@ -1467,7 +1461,7 @@ function -zcrasis_set_zui_settings() {
         (( ${+ZUI[my_lbox1_opts]} == 0 )) && ZUI[my_lbox1_opts]="${(j:;:)chosen_plugins}"
 
         # 2.
-        noglob -zui_std_list_box "lbox1_$mod" ZUI[my_lbox1_width] ZUI[my_lbox1_idx] ZUI[my_lbox1_opts] "" "" "" 'ZUI[my_tfield3_data]="${${(s:;:)ZUI[my_lbox1_opts]}[${ZUI[my_lbox1_idx]}]}"; [[ "${ZUI[my_lbox1_idx]}" = 1 ]] && ZUI[my_tfield3_data]="";' optional
+        noglob -zui_std_list_box "lbox1_$mod" ZUI[my_lbox1_width] ZUI[my_lbox1_idx] ZUI[my_lbox1_opts] "" "" "" 'ZUI[my_tfield3_data]="${${(s:;:)ZUI[my_lbox1_opts]}[${ZUI[my_lbox1_idx]}]}"; [[ "${ZUI[my_lbox1_idx]}" = 1 ]] && ZUI[my_tfield3_data]=""; -zcrasis_info ${ZUI[my_lbox1_idx]};' optional
 
         # 3. - 4.
         -zui_std_button "snippet" "$theme[add-snippet-text-c]" -zcrasis_action_add_snippet optional
