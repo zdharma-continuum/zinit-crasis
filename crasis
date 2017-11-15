@@ -89,8 +89,9 @@ TOKEN_TYPES=(
 )
 
 local -a chosen_plugins chosen_descriptions
-chosen_plugins=( ) #"${(@f)"$(<$ZCRASIS_REPO_DIR/gold.lst)"}" )
-chosen_descriptions=( ) #"${(@f)"$(<$ZCRASIS_REPO_DIR/desc.lst)"}" )
+# 5.0.2, 5.0.6 stop execution after unsuccessful $(<...)
+[[ -r "$ZCRASIS_REPO_DIR/gold.lst" ]] && chosen_plugins=( "${(@f)"$(<$ZCRASIS_REPO_DIR/gold.lst)"}" )
+[[ -r "$ZCRASIS_REPO_DIR/desc.lst" ]] && chosen_descriptions=( "${(@f)"$(<$ZCRASIS_REPO_DIR/desc.lst)"}" )
 
 local -a ice_order nval_ices
 ice_order=( proto from depth if blockf pick bpick as ver silent svn mv cp atclone atload atpull make )
