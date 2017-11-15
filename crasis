@@ -90,7 +90,7 @@ TOKEN_TYPES=(
 
 local -a chosen_plugins chosen_descriptions
 # 5.0.2, 5.0.6 stop execution after unsuccessful $(<...)
-[[ -r "$ZCRASIS_REPO_DIR/gold.lst" ]] && chosen_plugins=( "${(@f)"$(<$ZCRASIS_REPO_DIR/gold.lst)"}" )
+[[ -r "$ZCRASIS_REPO_DIR/gold.lst" ]] && chosen_plugins=( "${(@f)"$(<$ZCRASIS_REPO_DIR/gold.lst)"}" ) || chosen_plugins=( "" "File gold.lst not found" )
 [[ -r "$ZCRASIS_REPO_DIR/desc.lst" ]] && chosen_descriptions=( "${(@f)"$(<$ZCRASIS_REPO_DIR/desc.lst)"}" )
 
 local -a ice_order nval_ices
