@@ -124,8 +124,10 @@ fi
 
 # Plugins
 
+zplugin load psprint/zsh-select
 zplugin ice blockf
 zplugin load "zsh-users/zsh-completions"
+zplugin snippet OMZ::lib/git.zsh
 zplugin load "hlissner/zsh-autopair"
 zplugin load "zdharma/fast-syntax-highlighting"
 zplugin load "caarlos0/zsh-open-pr"
@@ -232,4 +234,3 @@ function eb-active-environment () {
 }
 
 unsetopt flow_control       # Let me use ^S and ^Q
-
