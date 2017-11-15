@@ -1161,8 +1161,12 @@ function -zcrasis_set_zui_settings() {
         ice_cmd=( "${(Qkv)ice_cmd[@]}" )
         main_cmd=( "${(Qkv)main_cmd[@]}" )
 
+        # Protection against previous command having trailing spaces before $'\n'
+        local nl=$'\n'
+        comment="${comment/[[:blank:]]##$nl/$nl}"
+
         # Comment
-        [[ "$with_comments" = "1" && -n "$comment" ]] && buf+="${comment#$'\n'}"
+        [[ "$with_comments" = "1" && -n "$comment" ]] && buf+="${comment#$nl}"
 
         # ICE
         # Something more than [c]=zplugin [sub]=ice [comment]=comment
