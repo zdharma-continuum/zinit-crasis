@@ -1754,9 +1754,11 @@ function -zcrasis_set_zui_settings() {
         eval "$theme[layout]"
         [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply=( "${w_plugin_item_short[@]}" ) || reply=( "${w_plugin_item_long[@]}" )
     elif [[ "${main_cmd[sub]}" = "cdreplay" ]]; then
+        local w_q="${main_cmd[-q]}"
         eval "$theme[layout]"
         [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply=( "${w_cdreplay_item_short[@]}" ) || reply=( "${w_cdreplay_item_long[@]}" )
     elif [[ "${main_cmd[sub]}" = "cdclear" ]]; then
+        local w_q="${main_cmd[-q]}"
         eval "$theme[layout]"
         [[ "${ZUI[my_compact_mode]}" = [12] ]] && reply=( "${w_cdclear_item_short[@]}" ) || reply=( "${w_cdclear_item_long[@]}" )
     else
