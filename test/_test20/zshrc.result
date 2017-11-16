@@ -50,6 +50,7 @@ check_com ag && export FZF_DEFAULT_COMMAND='ag -g ""'
 ##### ZPLUGIN #####
 
 zplugin load psprint/zsh-select
+
 # GitHub repositories
 zplugin load zdharma/fast-syntax-highlighting
 zplugin snippet OMZ::lib/git.zsh

@@ -131,7 +131,6 @@ integer was_zplugin=0 pre_block_end=0 post_block_begin=0
 local -A cmd3
 local -a cmdlist
 integer coidx=1
-local leading_spaces
 
 # Common
 local -a mbegin mend match
@@ -843,14 +842,6 @@ function -zcrasis_set_zui_settings() {
         prev_spaces="$spaces"
     done
 
-    # Spaces before first comment or command - not moved with command
-    if [[ -n "${cmdlist[1]}" ]]; then
-        cmdlist[1]="${cmdlist[1]##(#m)[[:space:]]##}"
-        leading_spaces="$MATCH"
-    else
-        leading_spaces="${ZCR_PB_SPACES[(pre_block_end/2)+1]}"
-    fi
-
     if [[ -n "${cmd3[c]}" ]];then
         if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
             cmdlist[coidx+1]="${(j: :)${(qkv)cmd3[@]}}"
@@ -897,6 +888,8 @@ function -zcrasis_set_zui_settings() {
 
     local -a cmd1 cmd2
 
+    (( (ice-1-1)*3+1 > ${#cmdlist} || (ice-1)*3 > ${#cmdlist} || (ice-1)*3+1 > ${#cmdlist} || ice*3 > ${#cmdlist} )) && return 1
+
     cmd1=( "${(@)cmdlist[(ice-1-1)*3+1,(ice-1)*3]}" )
     cmd2=( "${(@)cmdlist[(ice-1)*3+1,ice*3]}" )
 
@@ -907,6 +900,8 @@ function -zcrasis_set_zui_settings() {
     noglob -zcrasis_util_swap ZUI[toggle_command_${mod}_${ice}] ZUI[toggle_command_${mod}_$(( ice-1 ))]
     noglob -zcrasis_util_swap ZUI[toggle_force_${mod}_${ice}] ZUI[toggle_force_${mod}_$(( ice-1 ))]
     noglob -zcrasis_util_swap ZUI[toggle_mode_${mod}_${ice}] ZUI[toggle_mode_${mod}_$(( ice-1 ))]
+
+    return 0
 }
 # }}}
 # FUNCTION: -zcrasis_action_move_down {{{
@@ -924,6 +919,8 @@ function -zcrasis_set_zui_settings() {
 
     local -a cmd1 cmd2
 
+    (( (ice-1)*3+1 > ${#cmdlist} || ice*3 > ${#cmdlist} || (ice-1+1)*3+1 > ${#cmdlist} || (ice+1)*3 > ${#cmdlist} )) && return 1
+
     cmd1=( "${(@)cmdlist[(ice-1)*3+1,ice*3]}" )
     cmd2=( "${(@)cmdlist[(ice-1+1)*3+1,(ice+1)*3]}" )
 
@@ -934,6 +931,8 @@ function -zcrasis_set_zui_settings() {
     noglob -zcrasis_util_swap ZUI[toggle_command_${mod}_${ice}] ZUI[toggle_command_${mod}_$(( ice+1 ))]
     noglob -zcrasis_util_swap ZUI[toggle_force_${mod}_${ice}] ZUI[toggle_force_${mod}_$(( ice+1 ))]
     noglob -zcrasis_util_swap ZUI[toggle_mode_${mod}_${ice}] ZUI[toggle_mode_${mod}_$(( ice+1 ))]
+
+    return 0
 }
 # }}}
 # FUNCTION: -zcrasis_action_preview {{{
@@ -1140,15 +1139,15 @@ function -zcrasis_set_zui_settings() {
 -zcrasis_compose() {
     local with_comments="$1" whole="$2"
     local buf="" tmp comment key
-    integer i size=$(( ${#commands} / 3 ))
+    integer i size=$(( ${#cmdlist} / 3 ))
     local -a cmd keys
     local -A ice_cmd main_cmd
 
     [[ "$whole" = "1" ]] && {
         if (( pre_block_end > 0 )); then
-            buf="${(j::)ZCR_PB_ALL[1,pre_block_end]}$leading_spaces"
+            buf="${(j::)ZCR_PB_ALL[1,pre_block_end+1]}"
         else
-            buf="$leading_spaces"
+            buf=""
         fi
     }
 
@@ -1162,12 +1161,17 @@ function -zcrasis_set_zui_settings() {
         ice_cmd=( "${(Qkv)ice_cmd[@]}" )
         main_cmd=( "${(Qkv)main_cmd[@]}" )
 
+        # A horrible thing with $(<...) omitting trailing newlines
+        [[ ${#buf} -gt 0 && ${buf[-1]} != $'\n' && $i -eq 1 ]] && buf+=$'\n'
+
         # Protection against previous command having trailing spaces before $'\n'
         local nl=$'\n'
         comment="${comment/[[:blank:]]##$nl/$nl}"
 
         # Comment
-        [[ "$with_comments" = "1" && -n "$comment" ]] && buf+="${comment#$nl}"
+        [[ "$with_comments" = "1" && -n "$comment" ]] && {
+            (( i == 1 )) && buf+="${comment##[[:space:]]##}" || buf+="${comment#$nl}"
+        }
 
         # ICE
         # Something more than [c]=zplugin [sub]=ice [comment]=comment
@@ -1199,7 +1203,9 @@ function -zcrasis_set_zui_settings() {
             done
 
             [[ "$with_comments" = "1" && -n "${ice_cmd[comment]}" ]] && buf+="${ice_cmd[comment]}"
-            (( ${+ice_cmd[aspaces]} )) && buf+="${ice_cmd[aspaces]}" || buf+=$'\n'
+            if [[ ${#ice_cmd} -gt 0 || "$i" -lt "$size" ]]; then
+                (( ${+ice_cmd[aspaces]} )) && buf+="${ice_cmd[aspaces]}" || buf+=$'\n'
+            fi
         fi
 
         # COMMAND
@@ -1214,7 +1220,9 @@ function -zcrasis_set_zui_settings() {
                     [[ -n "${main_cmd[url]}" ]] && buf+=" ${main_cmd[url]}"
                     [[ "$with_comments" = "1" && -n "${main_cmd[comment]}" ]] && buf+="${main_cmd[comment]}"
 
-                    (( ${+main_cmd[aspaces]} )) && buf+="${main_cmd[aspaces]}" || buf+=$'\n'
+                    if [[ "$i" -lt "$size" ]]; then
+                        (( ${+main_cmd[aspaces]} )) && buf+="${main_cmd[aspaces]}" || buf+=$'\n'
+                    fi
                 else
                     # Unknown subcommand
                     local text="${main_cmd[c]}"
@@ -1224,8 +1232,10 @@ function -zcrasis_set_zui_settings() {
                         [[ "$key" != arg_* ]] && continue
                         text+=" ${main_cmd[$key]}"
                     done
-
-                    (( ${+main_cmd[aspaces]} )) && buf+="$text${main_cmd[aspaces]}" || buf+="$text"$'\n'
+                    buf+="$text"
+                    if [[ "$i" -lt "$size" ]]; then
+                        (( ${+main_cmd[aspaces]} )) && buf+="${main_cmd[aspaces]}" || buf+=$'\n'
+                    fi
                 fi
             else
                 local text="${main_cmd[c]}"
@@ -1234,13 +1244,17 @@ function -zcrasis_set_zui_settings() {
                     [[ "$key" != arg_* ]] && continue
                     text+="${main_cmd[spaces_${key#arg_}]}${main_cmd[$key]}"
                 done
-                (( ${+main_cmd[aspaces]} )) && buf+="$text${main_cmd[aspaces]}" || buf+="$text"$'\n'
+                buf+="$text"
+                if [[ "$i" -lt "$size" ]]; then
+                    (( ${+main_cmd[aspaces]} )) && buf+="${main_cmd[aspaces]}" || buf+=$'\n'
+                fi
             fi
         fi
     done
 
-    buf="${buf%$'\n'}"
-    [[ "$whole" = "1" ]] && buf+="${(j::)ZCR_PB_ALL[post_block_begin,-1]}"
+    if (( pre_block_end+1 != post_block_begin )); then
+        [[ "$whole" = "1" ]] && buf+="${(j::)ZCR_PB_ALL[post_block_begin,-1]}"
+    fi
 
     reply=( "${(@f)buf}" )
 }

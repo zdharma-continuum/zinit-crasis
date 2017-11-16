@@ -24,6 +24,7 @@ function zzplugin(){
 zzplugin
 
 zplugin load psprint/zsh-select
+
 #Generating zsh completion function from getopt-style help text.
 zplugin light "RobSis/zsh-completion-generator"
 zplugin snippet OMZ::lib/git.zsh

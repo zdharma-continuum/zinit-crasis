@@ -19,6 +19,7 @@ autoload -Uz compinit
 compinit
 
 zplugin load psprint/zsh-select
+
 #Run compinit from a plugin; then we have zplugin's reports
 #FIXME: compdef is unavailable for unclear reasons
 zplugin load yn/compinit
