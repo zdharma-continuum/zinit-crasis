@@ -1990,7 +1990,7 @@ function -zcrasis_set_zui_settings() {
 
 # Create needed local parameters
 integer i
-for (( i=1; i<=${#cmdlist}/3+15; i++ )); do
+for (( i=1; i<=${#cmdlist}/3+64; i++ )); do
     local my_mod2_ice${i}_size="0"
 done
 
