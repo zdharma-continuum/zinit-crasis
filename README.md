@@ -14,16 +14,26 @@ now you can just **press a button**.
 
 [![asciicast](https://asciinema.org/a/147225.png)](https://asciinema.org/a/147225)
 
-`Crasis` uses [ZUI](http://github.com/zdharma/zui/) library to create `ncurses` interface.
+`Crasis` uses pure-Zshell [ZUI](http://github.com/zdharma/zui/) library to create `ncurses` interface.
 
-# Installation
+# Installation & Basic Use
 
 Install [Zplugin](https://github.com/zdharma/zplugin) and add following commands to `.zshrc`:
 
-```
+```SystemVerilog
 zplugin light zdharma/zui
 zplugin light zdharma/zplugin-crasis
 ```
+
+To use, invoke `crasis [optional zshrc path]` or press `Ctrl-o-k`. Global variables `CRASIS_THEME`
+and `CRASIS_LAYOUT` can be used to override configuration file `crasis.conf` (located in plugin's
+tree), i.e.:
+
+```SystemVerilog
+CRASIS_THEME="zdharma-256" CRASIS_LAYOUT="contract" crasis
+```
+
+`256`-color themes require Zsh `5.3` or later.
 
 # Key Bindings
 
@@ -38,8 +48,8 @@ zplugin light zdharma/zplugin-crasis
 | `[`, `]` | Jump to next and previous section (e.g. next plugin or snippet) |
 | `g`, `G` | Jump to beginning and end of whole interface       |
 | `/`      | Show incremental search                            |
-| `F1`     | Jump to result (in incremental search)             |
-| `Esc`    | Exit incremental search, clearing filter           |
+| `F1`     | Jump to result (in incremental search) and back    |
+| `Esc`    | Exit incremental search, clearing query            |
 | `Ctrl-W` | Delete whole word (in incremental search)          |
 | `Ctrl-K` | Delete whole line (in incremental search)          |
 | Up and down | Resize text field when editing it (e.g. to make the text fit in) |
