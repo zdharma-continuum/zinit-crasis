@@ -144,7 +144,8 @@ typeset -ga reply
 # them to prevent globals from being created
 local -a ZCR_PB_WORDS ZCR_PB_SPACES ZCR_PB_WORDS_BEGINNINGS ZCR_PB_ALL
 
-ZUI[incl_comm]=0
+ZUI[my_incl_comm]=0
+ZUI[my_show_diff]=0
 
 #
 # Examine zshrc
@@ -1810,19 +1811,28 @@ function -zcrasis_set_zui_settings() {
 # There is 0 or 1 instance of this module, depending on chosen
 # view.
 -zcrasis_generator_B() {
-    local mod="$1" ice="$2" arg="$3" sh_col
+    local mod="$1" ice="$2" arg="$3" sh_col di_col
 
-    -zui_util_map_bools '[[ ${ZUI[incl_comm]} != 1 ]]' sh_col \
-                         "${ZUI[GREEN]}" \
-                         "${ZUI[BG_BLUE]}"
+    -zui_util_map_bools '[[ ${ZUI[my_incl_comm]} != 1 ]];[[ ${ZUI[my_show_diff]} != 1 ]]' \
+                        "sh_col;di_col" \
+                         "${ZUI[GREEN]}" "${ZUI[BG_BLUE]}"
 
     local -a output
-    -zui_std_rc_button "comments_${mod}_${ice}" "${sh_col}Show comments${ZUI[FMT_END]}" 'internal=1; (( ZUI[incl_comm]=1 - ZUI[incl_comm] )); -zui_std_fly_mod_regen '$mod' '$ice output
-    -zui_std_rc_button "clipboard_${mod}_${ice}" "${ZUI[GREEN]}Copy to clipboard${ZUI[FMT_END]}" 'internal=1; -zui_std_fly_mod_regen '$mod' '$ice' copy' output
+    -zui_std_rc_button "comments_${mod}_${ice}" "${sh_col}Show Comments${ZUI[FMT_END]}" 'internal=1; (( ZUI[my_incl_comm]=1 - ZUI[my_incl_comm] )); -zui_std_fly_mod_regen '$mod' '$ice' commtoggle' output
+    -zui_std_rc_button "clipboard_${mod}_${ice}" "${ZUI[GREEN]}Copy To Clipboard${ZUI[FMT_END]}" 'internal=1; -zui_std_fly_mod_regen '$mod' '$ice' copy' output
+    -zui_std_rc_button "difftoggle_${mod}_${ice}" "${di_col}Diff Mode${ZUI[FMT_END]}" 'internal=1; (( ZUI[my_show_diff]=1 - ZUI[my_show_diff] )); -zui_std_fly_mod_regen '$mod' '$ice' difftoggle' output
 
-    -zcrasis_compose "${ZUI[incl_comm]}"
+    if (( ZUI[my_show_diff] )); then
+        if [[ "$arg" = "difftoggle" || "$arg" = "commtoggle" ]]; then
+            -zcrasis_compose "${ZUI[my_incl_comm]}" 1
+            print -rl "${reply[@]}" >! "$ZCRASIS_REPO_DIR"/zshrc_test
+        fi
+        reply=( "${(f@)"$( diff -u $zshrc_path $ZCRASIS_REPO_DIR/zshrc_test )"}" )
+    else
+        -zcrasis_compose "${ZUI[my_incl_comm]}"
+    fi
 
-    [[ "$arg" = "copy" ]] && {
+    if [[ "$arg" = "copy" ]]; then
         if (( ${+commands[xsel]} )); then
             print -rl -- "${reply[@]}" | command xsel --clipboard --input
             -zui_std_stalog "Copied ${#reply} lines of text"
@@ -1832,9 +1842,9 @@ function -zcrasis_set_zui_settings() {
         else
             -zui_std_stalog "No clipboard tool found (checked for pbcopy and xsel), didn't copy"
         fi
-    }
+    fi
 
-    reply[1,0]=( "${output[1]} ${output[2]}" "" )
+    reply[1,0]=( "${output[1]} ${output[2]} ${output[3]}" "" )
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
     reply2=( )               reply3=( 1 )                reply4=( )
