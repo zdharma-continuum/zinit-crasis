@@ -92,7 +92,10 @@ my_crasis_theme_data=(
     # Options view
     o-theme-box             magenta
     o-switch                magenta
-    o-switch-text           "Switch"
+    o-switch-text           "Switch Theme"
+    o-layout-box            magenta
+    o-switch2               magenta
+    o-switch2-text          "Switch Layout"
     o-save                  magenta
     o-save-text             "Save"
 

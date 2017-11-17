@@ -94,7 +94,10 @@ my_crasis_theme_data=(
     # Options view
     o-theme-box             cyan
     o-switch                cyan
-    o-switch-text           "Switch"
+    o-switch-text           "Switch Theme"
+    o-layout-box            cyan
+    o-switch2               cyan
+    o-switch2-text          "Switch Layout"
     o-save                  cyan
     o-save-text             "Save"
 

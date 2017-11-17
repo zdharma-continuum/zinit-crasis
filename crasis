@@ -179,7 +179,7 @@ thcol_entries=(
     # Ice listing
     i-indent i-unknown
     # Options view
-    o-theme-box o-switch o-save
+    o-theme-box o-switch o-layout-box o-switch2 o-save
     # Debug view
     d-save
 )
@@ -203,7 +203,7 @@ thtxt_entries=(
     # Ice listing
     i-indent-text i-blockf-text i-unknown-text
     # Options view
-    o-switch-text o-save-text
+    o-switch-text o-switch2-text o-save-text
     # Debug view
     d-save-text
 )
@@ -420,10 +420,22 @@ function -zcrasis_set_zui_settings() {
 # Switches theme during operation of Crasis (not
 # at startup).
 #
-# $1 - theme name (not a path, no .cr-theme extension)
+# $1 - theme name (not path, no .cr-theme extension)
 -zcrasis_switch_theme() {
     -zui_std_strip_color_codes "$1"
     CRASIS_THEME="$REPLY"
+    -zcrasis_process_theme
+    -zcrasis_set_zui_settings
+}
+# }}}
+# FUNCTION: -zcrasis_switch_layout {{{
+# Switches layout during operation of Crasis (not
+# at startup).
+#
+# $1 - layout name (not path, no .cr-theme extension)
+-zcrasis_switch_layout() {
+    -zui_std_strip_color_codes "$1"
+    CRASIS_LAYOUT="$REPLY"
     -zcrasis_process_theme
     -zcrasis_set_zui_settings
 }
@@ -1852,19 +1864,27 @@ function -zcrasis_set_zui_settings() {
 # }}}
 # FUNCTION: -zcrasis_generator_OPT {{{
 -zcrasis_generator_OPT() {
-    local -a thms tnames
+    local -a thms tnames layts lnames
     thms=( "$ZCRASIS_REPO_DIR"/themes/*.cr-theme )
     tnames=( "${(o@)${thms[@]:t}%.cr-theme}" )
+    layts=( "$ZCRASIS_REPO_DIR"/layouts/*.cr-layout )
+    lnames=( "${(o@)${layts[@]:t}%.cr-layout}" )
+
+    reply=()
 
     # Switch theme list box
     (( ${+ZUI[my_lbox4_width]} == 0 )) && ZUI[my_lbox4_width]=18
     ZUI[my_lbox4_idx]=${tnames[(i)$CRASIS_THEME]}
     eval "ZUI[my_lbox4_opts]=\"$theme[o-theme-box]\${(j:${ZUI[FMT_END]};${theme[o-theme-box]}:)tnames}${ZUI[FMT_END]}\""
-
-    reply=()
-
     noglob -zui_std_list_box "lbox4_$mod" ZUI[my_lbox4_width] ZUI[my_lbox4_idx] ZUI[my_lbox4_opts] "" "" "" ''
     -zui_std_button "switch_theme" "$theme[o-switch-text-c]" 'ZUI[my_rerender]=1; -zcrasis_switch_theme "${${(s:;:)ZUI[my_lbox4_opts]}[${ZUI[my_lbox4_idx]}]}"; reply=( ",all," "" );'
+
+    # Switch layout list box
+    (( ${+ZUI[my_lbox8_width]} == 0 )) && ZUI[my_lbox8_width]=18
+    ZUI[my_lbox8_idx]=${lnames[(i)$CRASIS_LAYOUT]}
+    eval "ZUI[my_lbox8_opts]=\"$theme[o-layout-box]\${(j:${ZUI[FMT_END]};${theme[o-layout-box]}:)lnames}${ZUI[FMT_END]}\""
+    noglob -zui_std_list_box "lbox8_$mod" ZUI[my_lbox8_width] ZUI[my_lbox8_idx] ZUI[my_lbox8_opts] "" "" "" ''
+    -zui_std_button "switch_layout" "$theme[o-switch2-text-c]" 'ZUI[my_rerender]=1; -zcrasis_switch_layout "${${(s:;:)ZUI[my_lbox8_opts]}[${ZUI[my_lbox8_idx]}]}"; reply=( ",all," "" );'
 
     # Up / Down list box
     (( ${+ZUI[my_lbox5_width]} == 0 )) && ZUI[my_lbox5_width]=22
@@ -1893,13 +1913,15 @@ function -zcrasis_set_zui_settings() {
     reply=(
         "Available themes: ${reply[1]} ${reply[2]}"
         ""
-        "Buttons to move plugins in the list: ${reply[3]}"
+        "Available layouts: ${reply[3]} ${reply[4]}"
         ""
-        "Buttons to enable & disable plugins: ${reply[4]}"
+        "Buttons to move plugins in the list: ${reply[5]}"
         ""
-        "Button to delete a plugin: ${reply[5]}"
+        "Buttons to enable & disable plugins: ${reply[6]}"
         ""
-        "${reply[6]}"
+        "Button to delete a plugin: ${reply[7]}"
+        ""
+        "${reply[8]}"
     )
 
     # Non-selectable lines   Hops to jump with [ and ]   Local anchors
