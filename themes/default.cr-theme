@@ -91,6 +91,9 @@ my_crasis_theme_data=(
     i-unknown-text      "[%s]"
     i-blockf-text       "[%s]",blockf
 
+    # Preview
+    pv-main-buttons     green
+
     # Options view
     o-theme-box         yellow
     o-switch            yellow

@@ -178,6 +178,8 @@ thcol_entries=(
     p-id p-marker p-marker-disabled p-compile
     # Ice listing
     i-indent i-unknown
+    # Preview
+    pv-main-buttons
     # Options view
     o-theme-box o-switch o-layout-box o-switch2 o-save
     # Debug view
@@ -1827,12 +1829,12 @@ function -zcrasis_set_zui_settings() {
 
     -zui_util_map_bools '[[ ${ZUI[my_incl_comm]} != 1 ]];[[ ${ZUI[my_show_diff]} != 1 ]]' \
                         "sh_col;di_col" \
-                         "${ZUI[GREEN]}" "${ZUI[BG_BLUE]}"
+                         "$theme[pv-main-buttons]" "${ZUI[BG_BLUE]}"
 
     local -a output
-    -zui_std_rc_button "comments_${mod}_${ice}" "${sh_col}Show Comments${ZUI[FMT_END]}" 'internal=1; (( ZUI[my_incl_comm]=1 - ZUI[my_incl_comm] )); -zui_std_fly_mod_regen '$mod' '$ice' commtoggle' output
-    -zui_std_rc_button "clipboard_${mod}_${ice}" "${ZUI[GREEN]}Copy To Clipboard${ZUI[FMT_END]}" 'internal=1; -zui_std_fly_mod_regen '$mod' '$ice' copy' output
-    -zui_std_rc_button "difftoggle_${mod}_${ice}" "${di_col}Diff Mode${ZUI[FMT_END]}" 'internal=1; (( ZUI[my_show_diff]=1 - ZUI[my_show_diff] )); -zui_std_fly_mod_regen '$mod' '$ice' difftoggle' output
+    -zui_std_rc_button "comments_${mod}_${ice}" "${sh_col}Show Comments${sh_col:+${ZUI[FMT_END]}}" 'internal=1; (( ZUI[my_incl_comm]=1 - ZUI[my_incl_comm] )); -zui_std_fly_mod_regen '$mod' '$ice' commtoggle' output
+    -zui_std_rc_button "clipboard_${mod}_${ice}" "$theme[pv-main-buttons]Copy To Clipboard${theme[pv-main-buttons]:+${ZUI[FMT_END]}}" 'internal=1; -zui_std_fly_mod_regen '$mod' '$ice' copy' output
+    -zui_std_rc_button "difftoggle_${mod}_${ice}" "${di_col}Diff Mode${di_col:+${ZUI[FMT_END]}}" 'internal=1; (( ZUI[my_show_diff]=1 - ZUI[my_show_diff] )); -zui_std_fly_mod_regen '$mod' '$ice' difftoggle' output
 
     if (( ZUI[my_show_diff] )); then
         if [[ "$arg" = "difftoggle" || "$arg" = "commtoggle" ]]; then
