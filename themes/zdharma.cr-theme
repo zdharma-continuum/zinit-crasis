@@ -92,7 +92,8 @@ my_crasis_theme_data=(
     i-blockf-text       "[%s]",blockf
 
     # Preview
-    pv-main-buttons         green
+    pv-main-buttons     green
+    pv-comment          cyan
 
     # Options view
     o-theme-box         cyan

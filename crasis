@@ -179,7 +179,7 @@ thcol_entries=(
     # Ice listing
     i-indent i-unknown
     # Preview
-    pv-main-buttons
+    pv-main-buttons pv-comment
     # Options view
     o-theme-box o-switch o-layout-box o-switch2 o-save
     # Debug view
@@ -967,7 +967,7 @@ function -zcrasis_set_zui_settings() {
         -zui_std_set_mod_factor 2 0
         -zui_std_set_mod_factor 3 1
         ZUI[my_in_preview]=1
-        ZUI[COLORING_PATTERN]='(#s)\#?##' ZUI[COLORING_MATCH_MULTIPLE]=0 ZUI[COLORING_COLOR]=${ZUI[MAGENTA]}
+        ZUI[COLORING_PATTERN]='(#s)\#?##' ZUI[COLORING_MATCH_MULTIPLE]=0 ZUI[COLORING_COLOR]="$theme[pv-comment]"
     else
         -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
         -zui_std_set_mod_factor 3 0
@@ -998,6 +998,7 @@ function -zcrasis_set_zui_settings() {
         -zui_std_set_mod_factor 2 0 # plugin list
         -zui_std_set_mod_factor 5 1 # options
         ZUI[my_in_options]=1
+        ZUI[COLORING_PATTERN]=''
     else
         -zui_std_set_mod_factor 2 $(( ${#cmdlist} / 3 ))
         -zui_std_set_mod_factor 5 0
@@ -1030,6 +1031,7 @@ function -zcrasis_set_zui_settings() {
         -zui_std_set_mod_factor 2 0
         -zui_std_set_mod_factor 4 1
         ZUI[my_in_debug]=1
+        ZUI[COLORING_PATTERN]=''
 
         ZCR_DEBUG_MSGS=( "${ZCR_DEBUG_MSGS[@]/<ZSHRCSIZE>/$(( ${#zshrc} - 5 ))}" )
         local -a lines

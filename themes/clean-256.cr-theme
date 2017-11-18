@@ -91,6 +91,7 @@ my_crasis_theme_data=(
 
     # Preview
     pv-main-buttons         green
+    pv-comment              white
 
     # Options view
     o-theme-box             cyan
