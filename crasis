@@ -1777,7 +1777,7 @@ function -zcrasis_set_zui_settings() {
         # 9. Compile
         #
 
-        -zui_std_button "compile_${mod}_${ice}" "$theme[p-compile-text-c]" 'zplugin compile '${main_cmd[url]}'; print Done.; builtin read tmp;' output
+        -zui_std_button "compile_${mod}_${ice}" "$theme[p-compile-text-c]" 'zcurses end; zplugin compile '${main_cmd[url]}'; print Done.; builtin read tmp; zcurses refresh;' output
 
         #
         # The Resulting Document
