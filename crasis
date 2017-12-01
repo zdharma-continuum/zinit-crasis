@@ -1205,7 +1205,7 @@ function -zcrasis_set_zui_settings() {
                         # Also quote the ice modifier
                         local opt1="${(qqq)ice_cmd[$tmp]}"
                         local opt2="${(qq)ice_cmd[$tmp]}"
-                        [[ "${opt1/\\\$/}" != "$opt1" ]] && buf+=" $tmp$opt2" || buf+=" $tmp$opt1"
+                        [[ "${opt1/\\\$/}" != "$opt1" || "${opt1/\\\!/}" != "$opt1" ]] && buf+=" $tmp$opt2" || buf+=" $tmp$opt1"
                         ;;
                     (${(~j:|:)nval_ices})
                         (( ${+ice_cmd[$tmp]} == 0 )) && continue
