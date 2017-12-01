@@ -1612,7 +1612,7 @@ function -zcrasis_set_zui_settings() {
     (( theme[ed-unicode-bool] )) && local enabled="$theme[enabled-unicode-c]" || local enabled="$theme[enabled-text-c]"
     (( theme[ed-unicode-bool] )) && local disabled="$theme[disabled-unicode-c]" || local disabled="$theme[disabled-text-c]"
 
-    [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || -zcrasis_update_main_cmd disabled "${ZUI[toggle_dis_${mod}_${ice}]}" "$ice"
+    [[ -z "${ZUI[toggle_dis_${mod}_${ice}]}" ]] && ZUI[toggle_dis_${mod}_${ice}]="${main_cmd[disabled]:-0}" || { -zcrasis_update_main_cmd disabled "${ZUI[toggle_dis_${mod}_${ice}]}" "$ice"; -zcrasis_update_ice_cmd disabled "${ZUI[toggle_dis_${mod}_${ice}]}" "$ice"; }
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 ]]" "disabled_text" "$disabled" "$enabled"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[my_compact_mode]}\" = [12] ]]" "smarker_text" "$theme[s-marker-disabled-text-c]" "$theme[s-marker-text-c]"
     -zui_util_map_bools "[[ \"${ZUI[toggle_dis_${mod}_${ice}]}\" = 1 && \"${ZUI[my_compact_mode]}\" = [12] ]]" "pmarker_text" "$theme[p-marker-disabled-text-c]" "$theme[p-marker-text-c]"
