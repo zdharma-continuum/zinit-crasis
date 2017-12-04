@@ -94,7 +94,7 @@ local -a chosen_plugins chosen_descriptions
 [[ -r "$ZCRASIS_REPO_DIR/desc.lst" ]] && chosen_descriptions=( "${(@f)"$(<$ZCRASIS_REPO_DIR/desc.lst)"}" )
 
 local -a ice_order nval_ices
-ice_order=( proto from depth if wait blockf pick bpick src as ver silent svn mv cp atclone atload atpull make )
+ice_order=( proto from depth if wait load unload blockf pick bpick src as ver silent svn mv cp atclone atload atpull make )
 nval_ices=( blockf silent svn )
 
 # Layout parameters
