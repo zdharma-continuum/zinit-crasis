@@ -902,7 +902,7 @@ function -zcrasis_set_zui_settings() {
 # $1 - module index (will be 2)
 # $2 - instance index
 -zcrasis_action_move_up() {
-    local mod="$1" ice="$2" tmp
+    local mod="$1" ice="$2" t
 
     local -a cmd1 cmd2
 
@@ -919,6 +919,12 @@ function -zcrasis_set_zui_settings() {
     noglob -zcrasis_util_swap ZUI[toggle_force_${mod}_${ice}] ZUI[toggle_force_${mod}_$(( ice-1 ))]
     noglob -zcrasis_util_swap ZUI[toggle_mode_${mod}_${ice}] ZUI[toggle_mode_${mod}_$(( ice-1 ))]
 
+    for t in "${ice_order[@]}"; do
+        noglob -zcrasis_util_swap ZUI[my_tfield4_${ice}_${t}_width] ZUI[my_tfield4_$(( ice-1 ))_${t}_width]
+        noglob -zcrasis_util_swap ZUI[my_tfield4_${ice}_${t}_start] ZUI[my_tfield4_$(( ice-1 ))_${t}_start]
+        noglob -zcrasis_util_swap ZUI[my_tfield4_${ice}_${t}_data] ZUI[my_tfield4_$(( ice-1 ))_${t}_data]
+    done
+
     return 0
 }
 # }}}
@@ -933,7 +939,7 @@ function -zcrasis_set_zui_settings() {
 # $1 - module index (will be 2)
 # $2 - instance index
 -zcrasis_action_move_down() {
-    local mod="$1" ice="$2" tmp
+    local mod="$1" ice="$2" t
 
     local -a cmd1 cmd2
 
@@ -949,6 +955,12 @@ function -zcrasis_set_zui_settings() {
     noglob -zcrasis_util_swap ZUI[toggle_command_${mod}_${ice}] ZUI[toggle_command_${mod}_$(( ice+1 ))]
     noglob -zcrasis_util_swap ZUI[toggle_force_${mod}_${ice}] ZUI[toggle_force_${mod}_$(( ice+1 ))]
     noglob -zcrasis_util_swap ZUI[toggle_mode_${mod}_${ice}] ZUI[toggle_mode_${mod}_$(( ice+1 ))]
+
+    for t in "${ice_order[@]}"; do
+        noglob -zcrasis_util_swap ZUI[my_tfield4_${ice}_${t}_width] ZUI[my_tfield4_$(( ice+1 ))_${t}_width]
+        noglob -zcrasis_util_swap ZUI[my_tfield4_${ice}_${t}_start] ZUI[my_tfield4_$(( ice+1 ))_${t}_start]
+        noglob -zcrasis_util_swap ZUI[my_tfield4_${ice}_${t}_data] ZUI[my_tfield4_$(( ice+1 ))_${t}_data]
+    done
 
     return 0
 }
