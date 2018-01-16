@@ -886,9 +886,19 @@ function -zcrasis_set_zui_settings() {
 # $2 - name of second variable to swap
 -zcrasis_util_swap() {
     local __var_name1="$1" __var_name2="$2" __tmp
-    tmp="${(P)__var_name1}"
-    : ${(P)__var_name1::=${(P)__var_name2}}
-    : ${(P)__var_name2::=$tmp}
+    integer set1="${(P)+__var_name1}" set2="${(P)+__var_name2}"
+
+    if (( set1 && set2 )); then
+        tmp="${(P)__var_name1}"
+        : ${(P)__var_name1::=${(P)__var_name2}}
+        : ${(P)__var_name2::=$tmp}
+    elif (( set1 && !set2 )); then
+        : ${(P)__var_name2::=${(P)__var_name1}}
+        unset $__var_name1
+    elif (( !set1 && set2 )); then
+        : ${(P)__var_name1::=${(P)__var_name2}}
+        unset $__var_name2
+    fi
 }
 # }}}
 # FUNCTION: -zcrasis_action_move_up {{{
