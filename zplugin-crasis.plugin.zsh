@@ -1,6 +1,6 @@
 #
 # No plugin manager is needed to use this file. All that is needed is adding:
-#   source {wherezui-is}/zui.plugin.zsh
+#   source {where-crasis-is}/zplugin-crasis.plugin.zsh
 #
 # to ~/.zshrc.
 #
