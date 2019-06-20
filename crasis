@@ -94,8 +94,17 @@ local -a chosen_plugins chosen_descriptions
 [[ -r "$ZCRASIS_REPO_DIR/desc.lst" ]] && chosen_descriptions=( "${(@f)"$(<$ZCRASIS_REPO_DIR/desc.lst)"}" )
 
 local -a ice_order nval_ices
-ice_order=( proto from depth if wait load unload blockf pick bpick src as ver silent lucid svn mv cp atinit atclone atload atpull make service )
-nval_ices=( blockf silent lucid svn )
+ice_order=(
+    proto from teleid bindmap cloneopts id-as depth if wait load unload
+    blockf pick bpick src as ver silent lucid mv cp atinit atclone atload atpull
+    nocd run-atpull has cloneonly make service trackbinds multisrc compile nocompile
+    nocompletions svn
+)
+nval_ices=(
+        blockf silent lucid trackbinds cloneonly nocd run-atpull
+        nocompletions svn
+)
+
 
 # Layout parameters
 local -a w_snippet_item_long w_snippet_item_short w_plugin_item_long w_plugin_item_short
