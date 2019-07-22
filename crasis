@@ -773,7 +773,7 @@ function -zcrasis_set_zui_settings() {
                 fi
             fi
 
-            if [[ "$spaces" != *"\\"(|$'\r')$'\n'* ]]; then
+            if [[ "$spaces" != [[:blank:]]#"\\"(|$'\r')$'\n'[[:blank:]]# ]]; then
                 in_zplugin=1
 
                 if [[ "${cmd3[c]}" = "zplugin" && "${cmd3[sub]}" = "ice" ]]; then
