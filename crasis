@@ -95,14 +95,21 @@ local -a chosen_plugins chosen_descriptions
 
 local -a ice_order nval_ices
 ice_order=(
-    proto from teleid bindmap cloneopts id-as depth if wait load unload
-    blockf pick bpick src as ver silent lucid mv cp atinit atclone atload atpull
-    nocd run-atpull has cloneonly make service trackbinds multisrc compile nocompile
-    nocompletions svn
+    wait lucid silent service svn proto from teleid as id-as depth cloneopts
+    ver has if load unload blockf pick bpick src notify mv cp atinit atclone
+    atload atpull make run-atpull nocd cloneonly trackbinds bindmap multisrc
+    compile nocompile nocompletions reset-prompt
+    # Include all additional ices – after
+    # stripping them from the possible: ''
+    ${(@s.|.)${ZPLG_EXTS[ice-mods]//\'\'/}}
 )
 nval_ices=(
         blockf silent lucid trackbinds cloneonly nocd run-atpull
         nocompletions svn
+        # Include only those additional ices,
+        # don't have the '' in their name, i.e.
+        # aren't designed to hold value
+        ${(@)${(@s.|.)ZPLG_EXTS[ice-mods]}:#*\'\'*}
 )
 
 
