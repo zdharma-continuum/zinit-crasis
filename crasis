@@ -1271,7 +1271,7 @@ function -zcrasis_set_zui_settings() {
             for tmp in "${ice_order[@]}"; do
                 case "$tmp" in
                     (${(~j:|:)${ice_order:|nval_ices}})
-                        if (( !own_quoting )); then
+                        if (( !own_quoting )) && [[ -n "${ice_cmd[${tmp}_style]}" ]]; then
                             [[ -z "${ice_cmd[$tmp]}" && ${+ice_cmd[$tmp]} -eq 1 ]] && { buf+=" $tmp"; continue; }
                             [[ -z "${ice_cmd[$tmp]}" ]] && continue
                             local apos="'"
