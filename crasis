@@ -838,7 +838,23 @@ function -zcrasis_set_zui_settings() {
         else
             if [[ "${cmd3[sub]}" = "ice" ]]; then
                 # Also dequote the ice modifier
-                [[ "$token" = (#b)(${(~j:|:)ice_order})(*) ]] && cmd3[${match[1]}]="${(Q)match[2]}" || {
+                [[ "$token" = (#b)(${(~j:|:)ice_order})(?)(?)(*)(?) || \
+                    "$token" = (#b)(${(~j:|:)ice_order})(*)
+                ]] && {
+                    local key="${match[1]}" string="${match[2]#[:=]}${match[3]}${match[4]}${match[5]}"
+                    local second="${match[2]}" third="${match[3]}" last="${match[5]}"
+                    cmd3[$key]="${string//(#b)(:|=|)([\"\']|\$\'|)(*)[\"\']/${match[3]}}"
+                    # Remember also the quoting style, if the quoting
+                    # is a recognized one
+                    [[ ( -n "$second" && "$second" = "$last" ) || \
+                        "$second" = (:|=)* # Via the star this handles both matchings
+                    ]] && \
+                        cmd3[${key}_style]="${second[1]}" || {
+                            [[ "$second" = '$' && "$third" = "'" ]] && \
+                                cmd3[${key}_style]="\$'"
+                        }
+                    ((1))
+                } || {
                     cmd3[custom_$(( in_zplugin - 2 ))]="$token"
                     cmd3[spaces_$(( in_zplugin - 2 ))]="$spaces"
                 }
@@ -1211,7 +1227,7 @@ function -zcrasis_set_zui_settings() {
 #
 # $reply - lines of created code
 -zcrasis_compose() {
-    local with_comments="$1" whole="$2"
+    local with_comments="$1" whole="$2" own_quoting="$3"
     local buf="" tmp comment key
     integer i size=$(( ${#cmdlist} / 3 ))
     local -a cmd keys
@@ -1255,11 +1271,23 @@ function -zcrasis_set_zui_settings() {
             for tmp in "${ice_order[@]}"; do
                 case "$tmp" in
                     (${(~j:|:)${ice_order:|nval_ices}})
-                        [[ -z "${ice_cmd[$tmp]}" || "${ice_cmd[$tmp]}" = "<empty>"* ]] && continue
-                        # Also quote the ice modifier
-                        local opt1="${(qqq)ice_cmd[$tmp]}"
-                        local opt2="${(qq)ice_cmd[$tmp]}"
-                        [[ "${opt1/\\\$/}" != "$opt1" || "${opt1/\\\!/}" != "$opt1" ]] && buf+=" $tmp$opt2" || buf+=" $tmp$opt1"
+                        if (( !own_quoting )); then
+                            [[ -z "${ice_cmd[$tmp]}" && ${+ice_cmd[$tmp]} -eq 1 ]] && { buf+=" $tmp"; continue; }
+                            [[ -z "${ice_cmd[$tmp]}" ]] && continue
+                            local apos="'"
+                            local quoted="${ice_cmd[${tmp}_style]}${ice_cmd[$tmp]}${${${(M)ice_cmd[${tmp}_style]:#\$\'}:+$apos}:-${ice_cmd[${tmp}_style]:#[:=]}}"
+                            buf+=" $tmp$quoted"
+                        else
+                            [[ -z "${ice_cmd[$tmp]}" && ${+ice_cmd[$tmp]} -eq 1 ]] && { buf+=" $tmp"; continue; }
+                            [[ -z "${ice_cmd[$tmp]}" ]] && continue
+                            # Also quote the ice modifier
+                            local opt1="\"${ice_cmd[$tmp]}\""
+                            local opt2="'${ice_cmd[$tmp]}'"
+                            [[ "${${opt1/\$ZPFX/}/\$/}" != "${opt1/\$ZPFX/}" \
+                                # || "${opt1/\\\!/}" != "$opt1"
+                            ]] && \
+                                buf+=" $tmp$opt2" || buf+=" $tmp$opt1"
+                        fi
                         ;;
                     (${(~j:|:)nval_ices})
                         (( ${+ice_cmd[$tmp]} == 0 )) && continue
