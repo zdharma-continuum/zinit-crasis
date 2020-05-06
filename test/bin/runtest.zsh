@@ -8,7 +8,7 @@ fpath+=( $PWD/data/functions/crasis )
 autoload is-at-least
 autoload -- -zcrasis-process-buffer
 autoload -- -zcrasis_dbg_msg -zcrasis_dbg_msg_arr
-autoload -- -zcrasis-process-zplugin-commands -zcrasis-process-zsh-rc -zcrasis-tokenize-zsh-rc
+autoload -- -zcrasis-process-zinit-commands -zcrasis-process-zsh-rc -zcrasis-tokenize-zsh-rc
 autoload -- -zcrasis_verify_tokenization -zcrasis_tokenization_failed
 autoload -- -zcrasis_action_add_plugin -zcrasis_action_add_snippet
 autoload -- -zcrasis_util_swap -zcrasis_action_move_down -zcrasis_action_move_up

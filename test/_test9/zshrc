@@ -1,24 +1,24 @@
 #! zsh
-export ZPLG_HOME=$XDG_CACHE_HOME/zsh/zplugin
-if [[ ! -f $ZPLG_HOME/bin/zplugin.zsh ]]; then
-    git clone https://github.com/psprint/zplugin $ZPLG_HOME/bin
+export ZPLG_HOME=$XDG_CACHE_HOME/zsh/zinit
+if [[ ! -f $ZPLG_HOME/bin/zinit.zsh ]]; then
+    git clone https://github.com/psprint/zinit $ZPLG_HOME/bin
 fi
-source $ZPLG_HOME/bin/zplugin.zsh
+source $ZPLG_HOME/bin/zinit.zsh
 autoload -Uz compinit
 compinit -C -d $ZPLG_HOME/zcompdump
-zplugin load willghatch/zsh-saneopt
+zinit load willghatch/zsh-saneopt
  
-zplugin load mafredri/zsh-async
-zplugin load sharat87/zsh-vim-mode
-zplugin load sindresorhus/pure
-zplugin load trapd00r/LS_COLORS
-eval $(zplugin cd trapd00r/LS_COLORS; dircolors -b LS_COLORS)
+zinit load mafredri/zsh-async
+zinit load sharat87/zsh-vim-mode
+zinit load sindresorhus/pure
+zinit load trapd00r/LS_COLORS
+eval $(zinit cd trapd00r/LS_COLORS; dircolors -b LS_COLORS)
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
  
-zplugin load micha/resty
-zplugin load rupa/z
-zplugin load supercrabtree/k
+zinit load micha/resty
+zinit load rupa/z
+zinit load supercrabtree/k
  
-zplugin load zsh-users/zsh-completions
-zplugin load zsh-users/zsh-history-substring-search
-zplugin load zsh-users/zsh-syntax-highlighting
+zinit load zsh-users/zsh-completions
+zinit load zsh-users/zsh-history-substring-search
+zinit load zsh-users/zsh-syntax-highlighting

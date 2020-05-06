@@ -16,41 +16,41 @@ export GPG_TTY=$(tty)
 #zplug load
 # ZPlug (END)
 
-# Zplugin (START)
-source '/home/iboyperson/.zplugin/bin/zplugin.zsh'
-autoload -Uz _zplugin
-(( ${+_comps} )) && _comps[zplugin]=_zplugin
+# Zinit (START)
+source '/home/iboyperson/.zinit/bin/zinit.zsh'
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
 
-source ~/.zplugin-packages
+source ~/.zinit-packages
 
 #!/bin/env zsh
 
 # Libs
 # Load git lib from OMZ
-zplugin snippet OMZ::lib/git.zsh
-zplugin snippet OMZ::lib/completion.zsh
+zinit snippet OMZ::lib/git.zsh
+zinit snippet OMZ::lib/completion.zsh
 # Helpful for working with colors
 #zplug "lib/spectrum", from:oh-my-zsh
 
 # Plugins
-zplugin snippet OMZ::plugins/git/git.plugin.zsh
-zplugin snippet OMZ::plugins/gem/gem.plugin.zsh
-zplugin snippet OMZ::plugins/pip/pip.plugin.zsh
-zplugin load zsh-users/zsh-completions
-zplugin load zsh-users/zsh-syntax-highlighting
-zplugin load valentinocossar/sublime
+zinit snippet OMZ::plugins/git/git.plugin.zsh
+zinit snippet OMZ::plugins/gem/gem.plugin.zsh
+zinit snippet OMZ::plugins/pip/pip.plugin.zsh
+zinit load zsh-users/zsh-completions
+zinit load zsh-users/zsh-syntax-highlighting
+zinit load valentinocossar/sublime
 
 # Theme
-zplugin light iboyperson/pastel
+zinit light iboyperson/pastel
 # Local version for dev purposes
-#zplugin light $HOME/projects/pastel
+#zinit light $HOME/projects/pastel
 
-zplugin cdreplay -q
+zinit cdreplay -q
 
 autoload -Uz compinit
 compinit
 
-# Zplugin (END)
+# Zinit (END)
 
 [ -n "$TMUX" ] && export TERM=screen-256color
 

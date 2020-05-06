@@ -1,6 +1,6 @@
-function zzplugin(){
-    [[ -d ${ZDOTDIR:-$HOME}/.zplugin ]] || {
-       ZPLG_HOME="${ZDOTDIR:-$HOME}/.zplugin"
+function zzinit(){
+    [[ -d ${ZDOTDIR:-$HOME}/.zinit ]] || {
+       ZPLG_HOME="${ZDOTDIR:-$HOME}/.zinit"
 
     if ! test -d "$ZPLG_HOME"; then
       mkdir "$ZPLG_HOME"
@@ -12,105 +12,105 @@ function zzplugin(){
        git pull origin master
     else
        cd "$ZPLG_HOME"
-       git clone https://github.com/psprint/zplugin.git bin
+       git clone https://github.com/psprint/zinit.git bin
     fi
     }
-    source ${ZDOTDIR:-$HOME}/.zplugin/bin/zplugin.zsh
+    source ${ZDOTDIR:-$HOME}/.zinit/bin/zinit.zsh
     function zp_cmd(){
-         zplugin load "$@"
+         zinit load "$@"
     }
 }
 
-zzplugin
+zzinit
 
-zplugin load psprint/zsh-select
+zinit load psprint/zsh-select
 
 #Generating zsh completion function from getopt-style help text.
-zplugin light "RobSis/zsh-completion-generator"
-zplugin snippet OMZ::lib/git.zsh
+zinit light "RobSis/zsh-completion-generator"
+zinit snippet OMZ::lib/git.zsh
 autoload -Uz compinit && compinit -i
 
 
 # Moved into .zshrc
-#zplugin light "iladin/zstyle"
+#zinit light "iladin/zstyle"
 
 
 #Snippet expansion for zsh
-zplugin light "willghatch/zsh-snippets"
+zinit light "willghatch/zsh-snippets"
 # shamelessly taken from add-zsh-hook, and modified to be able to run on user defined hook
 
-zplugin light "willghatch/zsh-hooks"
+zinit light "willghatch/zsh-hooks"
 
-zplugin light "robertzk/send.zsh"
+zinit light "robertzk/send.zsh"
 
-zplugin snippet 'https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/git/git.plugin.zsh'
-zplugin snippet 'https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh'
+zinit snippet 'https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/git/git.plugin.zsh'
+zinit snippet 'https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh'
 
-# Zplugin commands
+# Zinit commands
 
-zplugin snippet --command 'https://github.com/takaaki-kasai/git-foresta/blob/master/git-foresta'
+zinit snippet --command 'https://github.com/takaaki-kasai/git-foresta/blob/master/git-foresta'
 
 # k is a zsh script / plugin to make directory listings more readable
 #adding a bit of color and some git status information on files and directories.
-zplugin light "supercrabtree/k"
+zinit light "supercrabtree/k"
 
 # peco/percol/fzf wrapper plugin for zsh
-zplugin light "mollifier/anyframe"
+zinit light "mollifier/anyframe"
 # An oh-my-zsh plugin to help remembering those aliases you defined once
 # Only use if you have python
-hash python && zplugin light "djui/alias-tips"
+hash python && zinit light "djui/alias-tips"
 
-zplugin light "jimhester/per-directory-history"
+zinit light "jimhester/per-directory-history"
 
 # A next-generation cd command with an interactive filter
 export ENHANCD_FILTER=fzy:peco:fzf
-zplugin light "b4b4r07/enhancd" #, of:enhancd.sh
+zinit light "b4b4r07/enhancd" #, of:enhancd.sh
 #Emoji completion on the command line
 
-zplugin light "b4b4r07/emoji-cli"
+zinit light "b4b4r07/emoji-cli"
 
-zplugin light "joshuarubin/zsh-homebrew"
+zinit light "joshuarubin/zsh-homebrew"
 
-hash docker &> /dev/null && zplugin light "felixr/docker-zsh-completion"
+hash docker &> /dev/null && zinit light "felixr/docker-zsh-completion"
 
-zplugin light "zpm-zsh/linuxbrew"
+zinit light "zpm-zsh/linuxbrew"
 
 #Incremental history word completing (started with Alt-h/H or Option-h/H on Mac)
-zplugin light "psprint/zsh-editing-workbench"
+zinit light "psprint/zsh-editing-workbench"
 
 #Because your terminal should be able to perform tasks asynchronously without external tools!
-zplugin light "mafredri/zsh-async"
+zinit light "mafredri/zsh-async"
 #Plugin that provides zsnapshot command which dumps current ZSH state into a file, for restoration by sourcing the file
-zplugin light "psprint/zsnapshot"
+zinit light "psprint/zsnapshot"
 #A shell command that will display selection list
-zplugin light "psprint/zsh-select"
+zinit light "psprint/zsh-select"
 #Curses-based tools for Zsh, e.g. multi-word history searcher
-zplugin light "psprint/zsh-navigation-tools"
+zinit light "psprint/zsh-navigation-tools"
 #Complete options from manual pages – press Ctrl-F to start the completer
-zplugin light "psprint/zzcomplete"
+zinit light "psprint/zzcomplete"
 
 
-zplugin light "Tarrasch/zsh-autoenv" # zsh-autoenv automatically sources (known/whitelisted) .autoenv.zsh files, typically used in project root directories.
+zinit light "Tarrasch/zsh-autoenv" # zsh-autoenv automatically sources (known/whitelisted) .autoenv.zsh files, typically used in project root directories.
 
 
 #THEME
-zplugin light "sindresorhus/pure"
+zinit light "sindresorhus/pure"
 
 #source $HOME/.powerlevel9k
 
 
 # zsh anything.el-like widget.
-zplugin light "zsh-users/zaw"
+zinit light "zsh-users/zaw"
 
 # Additional completion definitions for Zsh
-zplugin light "zsh-users/zsh-completions"
+zinit light "zsh-users/zsh-completions"
 # Fish-like fast/unobtrusive autosuggestions for zsh.
-zplugin light "zsh-users/zsh-autosuggestions"
+zinit light "zsh-users/zsh-autosuggestions"
 # Syntax highlighting bundle. zsh-syntax-highlighting must be loaded after
 # excuting compinit command and sourcing other plugins.
-zplugin light "zdharma/fast-syntax-highlighting" #, nice:9
+zinit light "zdharma/fast-syntax-highlighting" #, nice:9
 # ZSH port of Fish shell's history search feature
-zplugin light "zsh-users/zsh-history-substring-search" #, nice:10
+zinit light "zsh-users/zsh-history-substring-search" #, nice:10
 
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
 
@@ -144,12 +144,12 @@ fi
 export ZSH_PLUGINS_ALIAS_TIPS_TEXT='💡 '
 
 
-function zplugin_end(){
-    zplugin cdreplay -q # -q is for quiet
-    autoload -Uz _zplugin
-    #(( ${+_comps} )) && _comps[zplugin]=_zplugin
-    zcompile ${ZDOTDIR:-$HOME}/.zplugin/bin/zplugin.zsh
+function zinit_end(){
+    zinit cdreplay -q # -q is for quiet
+    autoload -Uz _zinit
+    #(( ${+_comps} )) && _comps[zinit]=_zinit
+    zcompile ${ZDOTDIR:-$HOME}/.zinit/bin/zinit.zsh
 }
 
-#if whence -f zplugin; then zplugin_end; else zplug_end; fi
-zplugin_end
+#if whence -f zinit; then zinit_end; else zplug_end; fi
+zinit_end

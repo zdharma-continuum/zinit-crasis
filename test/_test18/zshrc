@@ -5,11 +5,11 @@ source yn.zsh
 yn::zpl::setup
 popd -q
 
-## Added by Zplugin's installer
-source "${ZDOTDIR:-$HOME}/.zplugin/bin/zplugin.zsh"
-### End of Zplugin's installer chunk
+## Added by Zinit's installer
+source "${ZDOTDIR:-$HOME}/.zinit/bin/zinit.zsh"
+### End of Zinit's installer chunk
 
-## YN zplugin section
+## YN zinit section
 
 #Ideally, we could run compinit just once, in a way that captures its changes to the environment
 #Running compinit from this file after loading the compinit plugin doesn't work - get lots of zcompdump errors
@@ -18,7 +18,7 @@ source "${ZDOTDIR:-$HOME}/.zplugin/bin/zplugin.zsh"
 autoload -Uz compinit
 compinit
 
-#Run compinit from a plugin; then we have zplugin's reports  
+#Run compinit from a plugin; then we have zinit's reports  
 #FIXME: compdef is unavailable for unclear reasons
 zplg load yn/compinit 
 
@@ -30,7 +30,7 @@ functions[compinit]=""
 zplg load gcv/dotfiles
 unsetopt rc_expand_param
 
-export ZSH=/Users/yn/.zsh/.zplugin/plugins/robbyrussell---oh-my-zsh
+export ZSH=/Users/yn/.zsh/.zinit/plugins/robbyrussell---oh-my-zsh
 yn::ohmyzsh::setup
 zplg load robbyrussell/oh-my-zsh
 functions[compinit]=shadow_compinit

@@ -1,6 +1,6 @@
 # ZSH configuration
 
-source ~/territory/zplugin/zplugin.zsh
+source ~/territory/zinit/zinit.zsh
 
 ##### GRML #####
 source ~/territory/grml-etc-core/etc/zsh/zshrc
@@ -50,5 +50,5 @@ check_com ag && export FZF_DEFAULT_COMMAND='ag -g ""'
 ##### ZPLUGIN #####
 
 # GitHub repositories
-zplugin load zdharma/fast-syntax-highlighting
-zplugin load zdharma/history-search-multi-word
+zinit load zdharma/fast-syntax-highlighting
+zinit load zdharma/history-search-multi-word

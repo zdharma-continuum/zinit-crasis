@@ -1,5 +1,5 @@
 # -*- mode: sh; -*-
-source $HOME/.zplugin/bin/zplugin.zsh
+source $HOME/.zinit/bin/zinit.zsh
 
 HISTSIZE=3000
 SAVEHIST=10000
@@ -124,50 +124,50 @@ fi
 
 # Plugins
 
-zplugin ice blockf
-zplugin load "zsh-users/zsh-completions"
-zplugin load "hlissner/zsh-autopair"
-zplugin load "zdharma/fast-syntax-highlighting"
-zplugin load "caarlos0/zsh-open-pr"
-zplugin ice blockf
-zplugin load "mollifier/anyframe"
+zinit ice blockf
+zinit load "zsh-users/zsh-completions"
+zinit load "hlissner/zsh-autopair"
+zinit load "zdharma/fast-syntax-highlighting"
+zinit load "caarlos0/zsh-open-pr"
+zinit ice blockf
+zinit load "mollifier/anyframe"
 
-zplugin snippet "https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/functions.zsh"
-zplugin snippet "https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/termsupport.zsh"
+zinit snippet "https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/functions.zsh"
+zinit snippet "https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/termsupport.zsh"
 
 if [[ $os -eq darwin ]]
 then
-  zplugin load "unixorn/tumult.plugin.zsh"
+  zinit load "unixorn/tumult.plugin.zsh"
 fi
 
 if [[ -n $commands[npm] ]]
 then
-  zplugin load "lukechilds/zsh-better-npm-completion"
+  zinit load "lukechilds/zsh-better-npm-completion"
 fi
 
 if [[ -n $commands[yarn] ]]
 then
-  zplugin snippet "https://github.com/robbyrussell/oh-my-zsh/raw/master/plugins/yarn/yarn.plugin.zsh"
+  zinit snippet "https://github.com/robbyrussell/oh-my-zsh/raw/master/plugins/yarn/yarn.plugin.zsh"
 fi
 
 if [[ -n $commands[nix-env] ]]
 then
-  zplugin load "spwhitt/nix-zsh-completions"
+  zinit load "spwhitt/nix-zsh-completions"
 fi
 
 if [[ -n $commands[ghq] ]]
 then
-  zplugin load "${GOPATH:=$HOME/go}/src/github.com/motemen/ghq/zsh/"
+  zinit load "${GOPATH:=$HOME/go}/src/github.com/motemen/ghq/zsh/"
 fi
 
 autoload -Uz compinit
 compinit
 
-zplugin cdreplay -q
+zinit cdreplay -q
 
 if [[ -n $commands[ghq] && -z $functions[_ghq] ]]
 then
-  zplugin creinstall "${GOPATH:=$HOME/go}/src/github.com/motemen/ghq/zsh/"
+  zinit creinstall "${GOPATH:=$HOME/go}/src/github.com/motemen/ghq/zsh/"
 fi
 
 # General configuration
@@ -217,7 +217,7 @@ then
     ghq look $(ghq list | fzf +m)
   }
 
-  zplugin snippet "https://github.com/junegunn/fzf/raw/master/shell/key-bindings.zsh"
+  zinit snippet "https://github.com/junegunn/fzf/raw/master/shell/key-bindings.zsh"
 
   bindkey '^t' transpose-chars
 

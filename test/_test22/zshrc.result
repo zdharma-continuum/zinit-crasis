@@ -54,4 +54,4 @@ function dmenv {
 source ~/.iterm2_shell_integration.zsh
 [ -f ~/.zprofile ] && source ~/.zprofile
 [ -f ~/.zalias ] && source ~/.zalias
-zplugin snippet OMZ::lib/git.zsh
+zinit snippet OMZ::lib/git.zsh

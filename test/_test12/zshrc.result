@@ -47,9 +47,9 @@ _load_settings "$HOME/.zsh/configs"
 # aliases
 [[ -f ~/.aliases ]] && source ~/.aliases
 
-zplugin load psprint/zsh-select
+zinit load psprint/zsh-select
 
-zplugin load zdharma---zredis
+zinit load zdharma---zredis
 autoload compinit
 echo "Ending zshrc"
 

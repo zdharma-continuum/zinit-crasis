@@ -285,9 +285,9 @@ function mvcd() {
     (( $# > 1 )) && mv "$@" && cd "$@[-1]"
 }
 
-(( $+functions[mvcd] )) && zplugin light zdharma/history-search-multi-word
-(( $+functions[mkcd] )) && zplugin load zdharma zredis
-(( $+functions[ls] )) && { zplugin ice svn; zplugin snippet -f 'https://github.com/davidosomething/git-my/blob/master/git-my'; }
+(( $+functions[mvcd] )) && zinit light zdharma/history-search-multi-word
+(( $+functions[mkcd] )) && zinit load zdharma zredis
+(( $+functions[ls] )) && { zinit ice svn; zinit snippet -f 'https://github.com/davidosomething/git-my/blob/master/git-my'; }
 
 function copy() {
     fc -ln -1 | sed -e 's|\\n|;|g' |

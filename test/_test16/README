@@ -3,4 +3,4 @@ Origin:
     https://github.com/remiprev/dotfiles/blob/master/zsh/zshrc
 
 revision 10ef0fa. First test to use command altering, not only moving. Added
-zplugin commands (converted zplug commands).
+zinit commands (converted zplug commands).

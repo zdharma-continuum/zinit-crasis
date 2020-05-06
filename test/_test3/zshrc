@@ -72,15 +72,15 @@ eval "$(stack --bash-completion-script "$(which stack)")"
 # OPAM configuration
 . /home/moritz/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 
-source '/home/moritz/.zplugin/bin/zplugin.zsh'
-autoload -Uz _zplugin
-(( ${+_comps} )) && _comps[zplugin]=_zplugin
+source '/home/moritz/.zinit/bin/zinit.zsh'
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
 
-zplugin load "mafredri/zsh-async"
-zplugin load "sindresorhus/pure"
-zplugin load "zsh-users/zsh-syntax-highlighting"
-zplugin load "zsh-users/zsh-history-substring-search"
-zplugin snippet "https://raw.githubusercontent.com/rupa/z/master/z.sh"
+zinit load "mafredri/zsh-async"
+zinit load "sindresorhus/pure"
+zinit load "zsh-users/zsh-syntax-highlighting"
+zinit load "zsh-users/zsh-history-substring-search"
+zinit snippet "https://raw.githubusercontent.com/rupa/z/master/z.sh"
 
 bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down

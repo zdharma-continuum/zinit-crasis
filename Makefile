@@ -1,4 +1,4 @@
-all: zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc \
+all: zinit-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc \
      themes/default.cr-theme.zwc themes/zdharma.cr-theme.zwc themes/zdharma-256.cr-theme.zwc \
      themes/safari-256.cr-theme.zwc themes/forest-256.cr-theme.zwc themes/blue-256.cr-theme.zwc \
      themes/clean-256.cr-theme.zwc test
@@ -14,7 +14,7 @@ doc: crasis
 	zsd -v --cignore '(\#*FUNCTION:*{{{*|\#[[:space:]]#}}}*)' --fpath `pwd` crasis
 
 clean:
-	rm -f -- zplugin-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc
+	rm -f -- zinit-crasis.plugin.zsh.zwc crasis.zwc -zcrasis-process-buffer.zwc
 	rm -rf zsdoc/data
 
 .PHONY: all test clean

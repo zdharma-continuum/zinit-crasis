@@ -9,7 +9,7 @@ PSSHORT=1
 #function setopt() { print -r - "$funcfiletrace[1]: $0 ${(q-)@}" >>! /tmp/setopt_data2; builtin $0 "$@" }
 
 (( ABSD )) && {
-    export LSCOLORS=dxfxcxdxbxegedabagacad CLICOLOR="1" 
+    export LSCOLORS=dxfxcxdxbxegedabagacad CLICOLOR="1"
     export ANDROID_ROOT=/opt/android
 }
 
@@ -122,7 +122,7 @@ zle -N edit-command-line
 autoload -Uz select-word-style
 select-word-style shell
 
-autoload -Uz url-quote-magic  
+autoload -Uz url-quote-magic
 zle -N self-insert url-quote-magic
 
 url_quote_commands=(links wget youtube-dl)
@@ -564,50 +564,50 @@ zle2() {
 #    zle reset-prompt
 #}
 
-### [aa]k Zplugin
+### [aa]k Zinit
 if (( 1 )); then
 
 #zmodload zsh/zprof
 #() {
-source "$HOME/.zplugin/bin/zplugin.zsh"
+source "$HOME/.zinit/bin/zinit.zsh"
 #}
 #zprof | head
 
-autoload -Uz _zplugin
-(( ${+_comps} )) && _comps[zplugin]=_zplugin
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
 
-#module_path+=( ~/github/zplugin.git/zmodules/Src )
-#zmodload zdharma/zplugin
+#module_path+=( ~/github/zinit.git/zmodules/Src )
+#zmodload zdharma/zinit
 
 autoload -Uz compinit
 compinit
 
-zplugin snippet https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh
-zplugin ice atclone"echo Cloned"
-zplugin snippet https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/git/git.plugin.zsh
-zplugin cdclear -q
-zplugin light psprint/zsh-navigation-tools   # for n-history
-zplugin light rimraf/k
-zplugin light zdharma/zconvey
+zinit snippet https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh
+zinit ice atclone"echo Cloned"
+zinit snippet https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/git/git.plugin.zsh
+zinit cdclear -q
+zinit light psprint/zsh-navigation-tools   # for n-history
+zinit light rimraf/k
+zinit light zdharma/zconvey
 
 # History search allowing multi-term queries
 
 # Works very well
 
-zplugin ice if"(( 1 ))"  # Test commen
-zplugin light psprint/history-search-multi-word
-zplugin light psprint/zprompts
-zplugin light zdharma/zui
-zplugin light zdharma/zplugin-crasis
-: zplugin light nojhan/liquidprompt
-: zplugin light NicoSantangelo/Alpharized
-: zplugin light russjohnson/angry-fly-zsh
+zinit ice if"(( 1 ))"  # Test commen
+zinit light psprint/history-search-multi-word
+zinit light psprint/zprompts
+zinit light zdharma/zui
+zinit light zdharma/zinit-crasis
+: zinit light nojhan/liquidprompt
+: zinit light NicoSantangelo/Alpharized
+: zinit light russjohnson/angry-fly-zsh
 
 # Autosuggestions
 
-zplugin light zsh-users/zsh-autosuggestions
-zplugin light zdharma/fast-syntax-highlighting
-zplugin cdclear -q
+zinit light zsh-users/zsh-autosuggestions
+zinit light zdharma/fast-syntax-highlighting
+zinit cdclear -q
 
 fi
 
@@ -753,7 +753,7 @@ function mem() { ps -axv | grep $$ }
 #bindkey "^[[A" up-line-or-beginning-search
 #bindkey "^[[B" down-line-or-beginning-search
 
-#module_path+=( ~/github/zplugin.git/zmodules/Src/Modules )
+#module_path+=( ~/github/zinit.git/zmodules/Src/Modules )
 #zmodload autoload2
 #autoload ~/myfunctions/calendar
 
@@ -771,14 +771,14 @@ myredis() {
     zmodload zdharma/zredis
 }
 
-myzplugin() {
-    module_path+=( ~/github/zplugin.git/zmodules/Src )
-    #zmodload zdharma/zplugin
-    #zplugin cd zdharma/zconvey
+myzinit() {
+    module_path+=( ~/github/zinit.git/zmodules/Src )
+    #zmodload zdharma/zinit
+    #zinit cd zdharma/zconvey
 }
 
 #myredis
-myzplugin
+myzinit
 #ztie -d db/redis -f "127.0.0.1/4/LIST" mylist
 #echo "----------- $zredis_tied -----------"
 #zuntie mylist

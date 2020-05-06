@@ -3,12 +3,12 @@
 export ZPLUG_HOME=/usr/local/opt/zplug
 source $ZPLUG_HOME/init.zsh
 
-zplugin snippet OMZ::lib/git.zsh
-zplugin ice from"gl" depth"2"
-zplugin load "zsh-users/zsh-syntax-highlighting"
-zplugin load psprint/zsh-select
-zplugin load "zsh-users/zsh-autosuggestions"
-zplugin cdreplay
+zinit snippet OMZ::lib/git.zsh
+zinit ice from"gl" depth"2"
+zinit load "zsh-users/zsh-syntax-highlighting"
+zinit load psprint/zsh-select
+zinit load "zsh-users/zsh-autosuggestions"
+zinit cdreplay
 
 # Configuration
 # --------------------------------------

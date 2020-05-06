@@ -79,5 +79,5 @@ fi
 
 # aliases
 [[ -f ~/.aliases ]] && source ~/.aliases
-zplugin snippet OMZ::lib/git.zsh
-zplugin load psprint/zsh-select
+zinit snippet OMZ::lib/git.zsh
+zinit load psprint/zsh-select

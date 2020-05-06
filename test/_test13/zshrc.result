@@ -1,6 +1,6 @@
-zplugin light zdharma/fast-syntax-highlighting
-zplugin ice from"gitlab" depth"1" blockf svn
-zplugin load rimraf/k
+zinit light zdharma/fast-syntax-highlighting
+zinit ice from"gitlab" depth"1" blockf svn
+zinit load rimraf/k
 # uncomment to profile prompt startup with zprof
 # zmodload zsh/zprof
 

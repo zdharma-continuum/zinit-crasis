@@ -3,10 +3,10 @@
 export ZPLUG_HOME=/usr/local/opt/zplug
 source $ZPLUG_HOME/init.zsh
 
-zplugin load "zsh-users/zsh-autosuggestions"
-zplugin ice depth"1"
-zplugin load "zsh-users/zsh-syntax-highlighting"
-zplugin cdclear
+zinit load "zsh-users/zsh-autosuggestions"
+zinit ice depth"1"
+zinit load "zsh-users/zsh-syntax-highlighting"
+zinit cdclear
 
 # Configuration
 # --------------------------------------

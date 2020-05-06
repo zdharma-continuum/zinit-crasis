@@ -7,14 +7,14 @@ function precmd {
   echo -ne "\e]1;$PWD:h:t/$PWD:t\a"
 }
 
-zplugin cdclear
+zinit cdclear
 
 function set_running_app {
   printf "\e]1; $PWD:t:$(history $HISTCMD | cut -b7- ) \a"
 }
 
-zplugin ice blockf atclone"Echo cloned"
-zplugin cdreplay
+zinit ice blockf atclone"Echo cloned"
+zinit cdreplay
 autoload compinit
 compinit
 

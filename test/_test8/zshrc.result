@@ -679,8 +679,8 @@ zstyle ':filter-select'					extended-search yes
 # cleanup
 kill -USR1 $$
 
-zplugin light zdharma/fast-syntax-highlighting
-zplugin light zdharma/history-search-multi-word
+zinit light zdharma/fast-syntax-highlighting
+zinit light zdharma/history-search-multi-word
 
 # end of .zshrc config
 #

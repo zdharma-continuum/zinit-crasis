@@ -8,13 +8,13 @@ function precmd {
 }
 
 function set_running_app {
-  zplugin cdclear
+  zinit cdclear
 
 printf "\e]1; $PWD:t:$(history $HISTCMD | cut -b7- ) \a"
 }
 
-zplugin ice blockf atclone"Echo cloned"
-zplugin cdreplay
+zinit ice blockf atclone"Echo cloned"
+zinit cdreplay
 autoload compinit
 compinit
 
