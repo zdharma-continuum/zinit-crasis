@@ -18,7 +18,7 @@ now you can just **press a button**.
 
 # Installation & Basic Use
 
-Install [Zinit](https://github.com/zdharma/zinit) and add following commands to `.zshrc`:
+Install [Zinit](https://github.com/zdharma-continuum/zinit) and add following commands to `.zshrc`:
 
 ```SystemVerilog
 zinit light zdharma/zui
@@ -65,5 +65,5 @@ CRASIS_THEME="zdharma-256" CRASIS_LAYOUT="contract" crasis
 `Crasis` is a [ZUI](http://github.com/zdharma/zui/) application. `ZUI` is a pure-Zshell library
 where user generates simple text with hyperlinks, which is then turned into active document with
 buttons. Check out `Crasis` code documentation:
-[Asciidoc](https://github.com/zdharma/zinit-crasis/blob/master/zsdoc/crasis.adoc),
+[Asciidoc](https://github.com/zdharma-continuum/zinit-crasis/blob/master/zsdoc/crasis.adoc),
 [PDF](http://zdharma.org/zinit-crasis/crasis.pdf).
