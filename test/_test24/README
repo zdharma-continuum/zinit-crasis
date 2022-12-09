@@ -1,7 +1,7 @@
 Origin:
 
     https://github.com/iboyperson/dotfiles/blob/master/.zshrc
-    https://github.com/iboyperson/dotfiles/blob/master/.zinit-packages
+    https://github.com/iboyperson/dotfiles/blob/master/zi::packages
 
 revision 630e7c4. Real-world test with existing zinit commands. Merged two
 files. Script does two moves targetting autoload compinit and compinit, whose
