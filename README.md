@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/zdharma/zinit-crasis.svg?branch=master)](https://travis-ci.org/zdharma/zinit-crasis)
+[![Build Status](https://travis-ci.org/zdharma-continuum/zinit-crasis.svg?branch=master)](https://travis-ci.org/zdharma-continuum/zinit-crasis)
 [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](./LICENSE)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](./LICENSE)
 ![ZSH 5.0.0](https://img.shields.io/badge/zsh-v5.0.0-orange.svg?style=flat-square)
@@ -14,15 +14,15 @@ now you can just **press a button**.
 
 [![asciicast](https://asciinema.org/a/147225.png)](https://asciinema.org/a/147225)
 
-`Crasis` uses pure-Zshell [ZUI](http://github.com/zdharma/zui/) library to create `ncurses` interface.
+`Crasis` uses pure-Zshell [ZUI](http://github.com/zdharma-continuum/zui/) library to create `ncurses` interface.
 
 # Installation & Basic Use
 
 Install [Zinit](https://github.com/zdharma-continuum/zinit) and add following commands to `.zshrc`:
 
 ```SystemVerilog
-zinit light zdharma/zui
-zinit light zdharma/zinit-crasis
+zinit light zdharma-continuum/zui
+zinit light zdharma-continuum/zinit-crasis
 ```
 
 To use, invoke `crasis [optional zshrc path]` or press `Ctrl-o-k`. Global variables `CRASIS_THEME`
@@ -56,13 +56,13 @@ CRASIS_THEME="zdharma-256" CRASIS_LAYOUT="contract" crasis
 
 # Screenshots
 
-![clean-256](https://raw.githubusercontent.com/zdharma/zinit-crasis/master/themes/screenshots/clean-256.png)
+![clean-256](https://raw.githubusercontent.com/zdharma-continuum/zinit-crasis/master/themes/screenshots/clean-256.png)
 
-![zdharma-256](https://raw.githubusercontent.com/zdharma/zinit-crasis/master/themes/screenshots/zdharma-256.png)
+![zdharma-256](https://raw.githubusercontent.com/zdharma-continuum/zinit-crasis/master/themes/screenshots/zdharma-256.png)
 
 # Code Documentation
 
-`Crasis` is a [ZUI](http://github.com/zdharma/zui/) application. `ZUI` is a pure-Zshell library
+`Crasis` is a [ZUI](http://github.com/zdharma-continuum/zui/) application. `ZUI` is a pure-Zshell library
 where user generates simple text with hyperlinks, which is then turned into active document with
 buttons. Check out `Crasis` code documentation:
 [Asciidoc](https://github.com/zdharma-continuum/zinit-crasis/blob/master/zsdoc/crasis.adoc),
